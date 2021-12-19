@@ -14,14 +14,14 @@ namespace Chess {
         private:
             PlayerType type;
             Color color;
-            std::list<Piece*> available_pieces;
-            std::list<Piece*> lost_pieces;
+            std::list<std::shared_ptr<Piece>> available_pieces;
+            std::list<std::shared_ptr<Piece>> lost_pieces;
         
         public:
-            const std::list<Piece*>& get_available_pieces();
-            const std::list<Piece*>& get_lost_pieces();
-            void add_to_lost_pieces(Piece* piece);
-            Piece* remove_from_lost_pieces();
+            const std::list<std::shared_ptr<Piece>>& get_available_pieces();
+            const std::list<std::shared_ptr<Piece>>& get_lost_pieces();
+            void add_to_lost_pieces(std::shared_ptr<Piece> piece);
+            std::shared_ptr<Piece> remove_from_lost_pieces();
             PlayerType get_type() const;
             Color get_color() const;
     };

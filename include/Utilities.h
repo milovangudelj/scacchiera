@@ -4,8 +4,6 @@
 #ifndef utilities_h
 #define utilities_h
 
-#include <ostream>
-#include <string>
 #include <map>
 #include <utility>
 

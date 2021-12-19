@@ -10,8 +10,7 @@ namespace Chess {
         using Piece::Piece;
         public:
             KingPiece(Color color, Coordinate coordinate, PieceType type);
-            std::list<Movement> get_pseudo_valid_movements(Board& board);
-
+            std::list<Movement>& get_pseudo_valid_movements(Board& board);
     };
 }
 

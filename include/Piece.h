@@ -20,14 +20,15 @@ namespace Chess {
             char symbol;
             bool had_moved;
 
-
         public:
             Piece(Color color, Coordinate coordinate, PieceType type) :
                 color{color}, coordinate{coordinate}, type{type}, had_moved{false} {}
-            virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
+            virtual std::list<Movement>& get_pseudo_valid_movements(Board& board) = 0;
             Color get_color() const;
             Coordinate get_coordinate() const;
             PieceType get_type() const;
+            char get_symbol() const;
+            bool had_moved() const;
     };
 }
 
