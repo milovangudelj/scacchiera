@@ -3,7 +3,8 @@
 
 #include <array>
 
-template<typename T, unsigned int SIZE> using Matrix = std::array<std::array<T, SIZE>, SIZE>;
+template<typename T, unsigned int SIZE> 
+using Matrix = std::array<std::array<T, SIZE>, SIZE>;
 
 namespace Chess {
 

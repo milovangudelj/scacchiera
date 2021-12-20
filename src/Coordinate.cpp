@@ -3,9 +3,11 @@
 
 using Chess::Coordinate;
 
-Coordinate& operator+ (Coordinate& coordinate, std::pair<int, int> offset) {
+Coordinate& Coordinate::operator+ (std::pair<int, int> offset) {
     auto [rank_offset, file_offset] = offset;
-    return {coordinate.rank + rank_offset, coordinate.file + file_offset};
+    rank += rank_offset;
+    file += file_offset;
+    return *this;
 }
 
 bool operator== (Coordinate& coordinate1, Coordinate& coordinate2) {

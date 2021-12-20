@@ -3,13 +3,11 @@
 
 #include "Coordinate.h"
 
-using Chess::Coordinate;
-
 namespace Chess {
     
     struct Movement {
-        Coordinate start;
-        Coordinate end;
+        Chess::Coordinate start;
+        Chess::Coordinate end;
         bool is_promotion;
         bool is_en_passant;
         bool is_castling;

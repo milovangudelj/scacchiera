@@ -8,12 +8,9 @@ namespace Chess {
     struct Coordinate {
         unsigned int rank;
         unsigned int file;
-        bool is_valid() const {
-            return rank < 8 && file < 8;
-        }
+        bool is_valid() const { return rank < 8 && file < 8; }
+        Coordinate& operator+ (std::pair<int, int> offset);
     };
-
-    Coordinate& operator+ (Coordinate& coordinate, std::pair<int, int> offset);
 
     bool operator== (Coordinate& coordinate1, Coordinate& coordinate2);
 

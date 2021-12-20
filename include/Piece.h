@@ -7,26 +7,26 @@
 #include "Board.h"
 #include <list>
 
-using Chess::utilities::Color;
-using Chess::utilities::PieceType;
-
 namespace Chess {
 
     class Piece {
         protected:
-            Color color;
             Coordinate coordinate;
-            PieceType type;
+            Chess::utilities::Color color;
+            Chess::utilities::PieceType type;
             char symbol;
             bool had_moved;
 
         public:
-            Piece(Color color, Coordinate coordinate, PieceType type) :
-                color{color}, coordinate{coordinate}, type{type}, had_moved{false} {}
+            Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type) :
+                coordinate{coordinate}, 
+                color{color}, 
+                type{type}, 
+                had_moved{false} {}
             virtual std::list<Movement>& get_pseudo_valid_movements(Board& board) = 0;
-            Color get_color() const;
             Coordinate get_coordinate() const;
-            PieceType get_type() const;
+            Chess::utilities::Color get_color() const;
+            Chess::utilities::PieceType get_type() const;
             char get_symbol() const;
             bool had_moved() const;
     };

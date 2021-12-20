@@ -4,8 +4,10 @@ using Chess::KingPiece;
 using Chess::Movement;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
+using Chess::utilities::Color;
+using Chess::utilities::PieceType;
 
-KingPiece::KingPiece(Color color, Coordinate coordinate, PieceType type) : Piece{color, coordinate, type} {
+KingPiece::KingPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type} {
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
