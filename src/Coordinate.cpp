@@ -1,4 +1,4 @@
-#include "Coordinate.h"
+#include "coordinate.h"
 #include <string>
 
 using Chess::Coordinate;

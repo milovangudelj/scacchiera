@@ -1,7 +1,7 @@
 #ifndef king_piece_h
 #define king_piece_h
 
-#include "Piece.h"
+#include "piece.h"
 
 namespace Chess {
 

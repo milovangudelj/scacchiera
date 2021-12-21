@@ -1,10 +1,10 @@
 #ifndef piece_h
 #define piece_h
 
-#include "Utilities.h"
-#include "Coordinate.h"
-#include "Movement.h"
-#include "Board.h"
+#include "utilities.h"
+#include "coordinate.h"
+#include "movement.h"
+#include "board.h"
 
 #include <list>
 #include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
