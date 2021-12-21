@@ -1,6 +1,7 @@
 #include "King_Piece.h"
 
 using Chess::KingPiece;
+
 using Chess::Movement;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;

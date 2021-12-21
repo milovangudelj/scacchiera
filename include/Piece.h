@@ -5,6 +5,7 @@
 #include "Coordinate.h"
 #include "Movement.h"
 #include "Board.h"
+
 #include <list>
 
 namespace Chess {

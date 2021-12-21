@@ -2,6 +2,7 @@
 #define coordinate_h
 
 #include <ostream>
+#include <utility>
 
 namespace Chess {
 

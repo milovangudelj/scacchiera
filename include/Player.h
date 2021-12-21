@@ -3,6 +3,7 @@
 
 #include "Utilities.h"
 #include "Piece.h"
+
 #include <list>
 
 namespace Chess {
@@ -17,8 +18,8 @@ namespace Chess {
         public:
             const std::list<std::shared_ptr<Piece>>& get_available_pieces();
             const std::list<std::shared_ptr<Piece>>& get_lost_pieces();
-            void add_to_lost_pieces(std::shared_ptr<Piece> piece);
-            std::shared_ptr<Piece> remove_from_lost_pieces();
+            void add_to_lost_pieces(std::shared_ptr<Piece>& piece);
+            std::shared_ptr<Piece>& remove_from_lost_pieces();
             Chess::utilities::PlayerType get_type() const;
             Chess::utilities::Color get_color() const;
     };
