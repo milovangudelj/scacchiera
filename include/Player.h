@@ -5,6 +5,7 @@
 #include "Piece.h"
 
 #include <list>
+#include <memory>
 
 namespace Chess {
 

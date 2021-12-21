@@ -7,6 +7,7 @@
 #include "Board.h"
 
 #include <list>
+#include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
 
 namespace Chess {
 

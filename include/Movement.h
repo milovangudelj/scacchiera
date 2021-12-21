@@ -3,6 +3,8 @@
 
 #include "Coordinate.h"
 
+#include <ostream>
+
 namespace Chess {
     
     struct Movement {

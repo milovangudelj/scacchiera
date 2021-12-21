@@ -2,6 +2,7 @@
 #define board_h
 
 #include <array>
+#include <memory>
 
 template<typename T, unsigned int SIZE> 
 using Matrix = std::array<std::array<T, SIZE>, SIZE>;
