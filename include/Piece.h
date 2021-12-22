@@ -25,7 +25,7 @@ namespace Chess {
                 color{color}, 
                 type{type}, 
                 had_moved{false} {}
-            virtual std::list<Movement>& get_pseudo_valid_movements(Board& board) = 0;
+            virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
             Coordinate get_coordinate() const;
             Chess::utilities::Color get_color() const;
             Chess::utilities::PieceType get_type() const;
