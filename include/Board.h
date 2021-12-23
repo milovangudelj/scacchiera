@@ -13,7 +13,7 @@ namespace Chess {
         private:
             Matrix<std::shared_ptr<Piece>, 8> cells;
         public:
-            std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
+            const std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
     };
 }
 
