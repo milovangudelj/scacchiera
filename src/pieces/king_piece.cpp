@@ -12,7 +12,7 @@ KingPiece::KingPiece(Coordinate coordinate, Color color, PieceType type) : Piece
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
-std::list<Movement>& KingPiece::get_pseudo_valid_movements(Board& board) {
+std::list<Movement> KingPiece::get_pseudo_valid_movements(Board& board) {
     std::list<Movement> pseudo_movements;
     for (int i = 0; i < 8; i++) {
         std::shared_ptr<Piece> test_piece;
