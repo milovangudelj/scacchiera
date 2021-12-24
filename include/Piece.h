@@ -30,7 +30,7 @@ namespace Chess {
             Chess::utilities::Color get_color() const;
             Chess::utilities::PieceType get_type() const;
             char get_symbol() const;
-            bool had_moved() const;
+            bool get_had_moved() const;
     };
 }
 
