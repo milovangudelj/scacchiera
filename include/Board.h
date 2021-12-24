@@ -28,7 +28,7 @@ namespace Chess {
         public:
             Board(std::string fen);
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
-            friend std::ostream& operator<< (std::ostream& os, Board& board);
+            friend std::ostream& operator<< (std::ostream& os, const Board& board);
     };
 
     std::shared_ptr<Piece> make_piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
