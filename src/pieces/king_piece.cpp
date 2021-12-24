@@ -1,4 +1,5 @@
-#include "king_piece.h"
+#include "board.h"
+#include "pieces/king_piece.h"
 
 using Chess::KingPiece;
 

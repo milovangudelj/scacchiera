@@ -4,7 +4,6 @@
 #include <algorithm>
 
 using Chess::Board;
-
 using Chess::Piece;
 using Chess::KingPiece;
 using Chess::Coordinate;
@@ -70,7 +69,7 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
     }
 }
 
-std::ostream& operator<< (std::ostream& os, const Board& board) {
+std::ostream& Chess::operator<< (std::ostream& os, const Board& board) {
     for(const auto& rank : board.cells) {
         for(const auto& file : rank) {
             os << file->get_symbol() << " ";

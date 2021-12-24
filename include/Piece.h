@@ -4,12 +4,14 @@
 #include "utilities.h"
 #include "coordinate.h"
 #include "movement.h"
-#include "board.h"
 
 #include <list>
 #include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
 
+
 namespace Chess {
+
+    class Board; //predeclaration to avoid circular dependency
 
     class Piece {
         protected:
