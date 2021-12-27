@@ -8,7 +8,7 @@ add_library(chess STATIC
     src/board.cpp
     src/coordinate.cpp 
     src/movement.cpp 
-    src/pieces/king_piece.cpp
+    src/pieces/king.cpp
 )
 
 add_executable(test 

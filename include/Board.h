@@ -6,11 +6,11 @@
 #include <string>
 #include <ostream>
 
-#include "piece.h"
-#include "pieces/king_piece.h"
-#include "coordinate.h"
-#include "player.h"
-#include "utilities.h"
+#include "Piece.h"
+#include "pieces/King.h"
+#include "Coordinate.h"
+#include "Player.h"
+#include "Utilities.h"
 
 template<typename T, unsigned int SIZE> 
 using Matrix = std::array<std::array<T, SIZE>, SIZE>;

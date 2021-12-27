@@ -1,7 +1,7 @@
 #ifndef movement_h
 #define movement_h
 
-#include "coordinate.h"
+#include "Coordinate.h"
 
 #include <ostream>
 
