@@ -1,7 +1,8 @@
-#ifndef knight_piece_h
-#define knight_piece_h
+#ifndef knight_h
+#define knight_h
 
 #include "Piece.h"
+#include "Board.h"
 
 namespace Chess {
 

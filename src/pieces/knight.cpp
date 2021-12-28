@@ -1,4 +1,6 @@
-#include "knight_piece.h"
+#include "Knight.h"
+
+#include <array>
 
 using Chess::Knight_Piece;
 
