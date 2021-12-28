@@ -1,5 +1,5 @@
-#ifndef king_piece_h
-#define king_piece_h
+#ifndef king_h
+#define king_h
 
 #include "Piece.h"
 
