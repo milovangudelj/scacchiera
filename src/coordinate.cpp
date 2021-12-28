@@ -1,4 +1,4 @@
-#include "coordinate.h"
+#include "Coordinate.h"
 #include <string>
 
 using Chess::Coordinate;
@@ -10,7 +10,7 @@ Coordinate& Coordinate::operator+ (std::pair<int, int> offset) {
     return *this;
 }
 
-bool operator== (Coordinate& coordinate1, Coordinate& coordinate2) {
+bool operator== (const Coordinate& coordinate1, const Coordinate& coordinate2) {
     return coordinate1.rank == coordinate2.rank && coordinate1.file == coordinate2.file;
 }
 

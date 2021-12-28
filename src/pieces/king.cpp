@@ -1,19 +1,21 @@
-#include "king_piece.h"
+#include "Board.h"
+#include "pieces/King.h"
 
 using Chess::KingPiece;
 
 using Chess::Movement;
-using Chess::Coordinate;
+using Chess::utilities::Color;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
-using Chess::utilities::Color;
 using Chess::utilities::PieceType;
 
-KingPiece::KingPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type} {
+KingPiece::KingPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
+{
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
-std::list<Movement> KingPiece::get_pseudo_valid_movements(Board& board) {
+std::list<Movement> KingPiece::get_pseudo_valid_movements(Board &board)
+{
     std::list<Movement> pseudo_movements;
 
     Direction direction;
@@ -39,7 +41,7 @@ std::list<Movement> KingPiece::get_pseudo_valid_movements(Board& board) {
     }
 
     //check for castling conditions
-    if(!had_moved()) {
+    if(!this->get_had_moved()) {
         //short castling
         int i = 2;
         test_coordinate = this->coordinate;
@@ -54,7 +56,7 @@ std::list<Movement> KingPiece::get_pseudo_valid_movements(Board& board) {
         } while (i > 0);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::right);
         test_piece = board.get_piece_at(test_coordinate);
-        if(test_piece->get_type() == PieceType::rook && test_piece->had_moved() == false) {
+        if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
             //is castling is allowed then the king can move two positions to right/left
             Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::right), Direction::right);
             pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true});
@@ -73,7 +75,7 @@ std::list<Movement> KingPiece::get_pseudo_valid_movements(Board& board) {
         } while(i > 0);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
         test_piece = board.get_piece_at(test_coordinate);
-        if(test_piece->get_type() == PieceType::rook && test_piece->had_moved() == false) {
+        if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
             Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::left), Direction::left);
             pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true});
         }

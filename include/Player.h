@@ -1,8 +1,8 @@
 #ifndef player_h
 #define player_h
 
-#include "utilities.h"
-#include "piece.h"
+#include "Utilities.h"
+#include "Piece.h"
 
 #include <list>
 #include <memory>
