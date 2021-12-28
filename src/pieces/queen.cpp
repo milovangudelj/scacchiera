@@ -46,15 +46,3 @@ std::list<Movement> Queen::get_pseudo_valid_movements(Board &board)
 	}
 	return pseudo_movements;
 }
-
-/* Useless since I'm not yet multiplying pairs by anything
-std::pair<int, int> operator*(std::pair<int, int> &offset, int &distance)
-{
-	return std::pair<int, int>(offset.first * distance, offset.second * distance);
-};
-
-std::pair<int, int> operator*(int &distance, std::pair<int, int> &offset)
-{
-	return offset * distance;
-};
-*/
