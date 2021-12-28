@@ -1,4 +1,5 @@
 #include"rook_piece.h"
+#include"Board.h"
 
 using Chess::RookPiece;
 using Chess::Movement;
@@ -24,7 +25,7 @@ std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
 		Coordinate test_coordinate = this->coordinate + offset;
 		while(test_coordinate.is_valid())
 		{
-			test_piece=board.get_piece_at(test_coordinate);
+			test_piece = board.get_piece_at(test_coordinate);
 			if(test_piece == nullptr)
 			{
 				pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false});
@@ -43,7 +44,7 @@ std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
 
 	}
 
-    if(!had_moved())
+    if(!get_had_moved())
     {
         int i = 2;
         std::shared_ptr<Piece> test_piece;
@@ -68,7 +69,7 @@ std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
         if(test_coordinate.is_valid())
         {
             test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->had_moved()==false)
+            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
             {
                 offset = DirectionOffset.at(Direction::right);
                 test_coordinate = test_coordinate + offset;
@@ -95,7 +96,7 @@ std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
         if(test_coordinate.is_valid())
         {
             test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->had_moved()==false)
+            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
             {
                 offset = DirectionOffset.at(Direction::left);
                 test_coordinate = test_coordinate + offset;
