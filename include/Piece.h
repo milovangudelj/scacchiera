@@ -4,12 +4,14 @@
 #include "Utilities.h"
 #include "Coordinate.h"
 #include "Movement.h"
-#include "Board.h"
 
 #include <list>
 #include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
 
+
 namespace Chess {
+
+    class Board; //predeclaration to avoid circular dependency
 
     class Piece {
         protected:
@@ -26,11 +28,11 @@ namespace Chess {
                 type{type}, 
                 had_moved{false} {}
             virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
-            Coordinate get_coordinate() const;
-            Chess::utilities::Color get_color() const;
-            Chess::utilities::PieceType get_type() const;
-            char get_symbol() const;
-            bool had_moved() const;
+            Coordinate get_coordinate() const { return coordinate;};
+            Chess::utilities::Color get_color() const { return color;};
+            Chess::utilities::PieceType get_type() const { return type;};
+            char get_symbol() const {return symbol;};
+            bool get_had_moved() const { return had_moved;};
     };
 }
 
