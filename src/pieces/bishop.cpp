@@ -1,7 +1,7 @@
 #include "Board.h"
-#include "pieces/Queen.h"
+#include "pieces/Bishop.h"
 
-using Chess::Queen;
+using Chess::Bishop;
 
 using Chess::Movement;
 using Chess::utilities::Color;
@@ -9,15 +9,16 @@ using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 using Chess::utilities::PieceType;
 
-Queen::Queen(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
+Bishop::Bishop(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
-	symbol = (color == Color::black) ? 'Q' : 'q';
+	symbol = (color == Color::black) ? 'B' : 'b';
 }
 
-std::list<Movement> Queen::get_pseudo_valid_movements(Board &board)
+std::list<Movement> Bishop::get_pseudo_valid_movements(Board &board)
 {
 	std::list<Movement> pseudo_movements;
-	for (int i = 0; i < 8; i++)
+
+	for (int i = 4; i < 8; i++) // Loop starts from 4 since the bishop can't move perpendicular to the board
 	{
 		std::shared_ptr<Piece> test_piece;
 		Direction direction = static_cast<Direction>(i);
