@@ -13,6 +13,6 @@ namespace Chess
 		Queen(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
 		std::list<Movement> get_pseudo_valid_movements(Board &board);
 	};
-} // namespace Chess
+} // namespace  Chess
 
 #endif // QUEEN_H

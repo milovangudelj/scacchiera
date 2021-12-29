@@ -1,3 +1,5 @@
+// Queen implementation
+
 #include "Board.h"
 #include "pieces/Queen.h"
 
