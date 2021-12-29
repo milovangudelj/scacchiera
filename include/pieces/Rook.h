@@ -1,7 +1,7 @@
-#ifndef Rook_Piece_h
-#define Rook_Piece_h
+#ifndef Rook_h
+#define Rook_h
 
-#include"piece.h"
+#include"Piece.h"
 
 namespace Chess
 {
