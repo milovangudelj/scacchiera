@@ -1,5 +1,5 @@
-#ifndef player_h
-#define player_h
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include "Utilities.h"
 #include "Piece.h"
@@ -38,4 +38,4 @@ namespace Chess {
     };
 }
 
-#endif
+#endif // PLAYER_H
