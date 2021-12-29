@@ -26,7 +26,7 @@ std::list<Movement> KingPiece::get_pseudo_valid_movements(Board &board)
     for (int i = 0; i < 8; i++) {
         direction = static_cast<Direction>(i);
         test_coordinate = get_testing_coordinate(this->coordinate, direction);
-        while(test_coordinate.is_valid()) {
+        if(test_coordinate.is_valid()) {
             test_piece = board.get_piece_at(test_coordinate);
             if(test_piece == nullptr) {
                 pseudo_movements.push_back({this->coordinate, test_coordinate});
