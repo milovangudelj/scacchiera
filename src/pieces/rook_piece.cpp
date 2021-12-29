@@ -10,7 +10,7 @@ using Chess::utilities::PieceType;
 
 RookPiece::RookPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate,color,type}
 {
-	symbol= (color == Color::black) ? 't' : 'T';
+	symbol= (color == Color::black) ? 'T' : 't';
 }
 
 std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
