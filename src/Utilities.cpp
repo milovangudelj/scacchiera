@@ -2,7 +2,7 @@
 
 using Chess::utilities::Direction;
 
-std::map<Direction, std::pair<int, int>> DirectionOffset {
+std::map<Direction, std::pair<int, int>> Chess::utilities::DirectionOffset {
     {Direction::left,       {0, -1}},
     {Direction::up,         {1, 0}},
     {Direction::right,      {0, 1}},
