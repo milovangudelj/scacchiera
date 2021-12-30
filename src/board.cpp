@@ -70,6 +70,18 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
             return std::make_shared<King>(coordinate, color, type);
             break;
         case PieceType::queen :
+            return std::make_shared<Queen>(coordinate, color, type);
+            break;
+        case PieceType::bishop :
+            return std::make_shared<Bishop>(coordinate, color, type);
+            break;
+        case PieceType::knight :
+            return std::make_shared<Knight>(coordinate, color, type);
+            break;
+        case PieceType::rook :
+            return std::make_shared<Rook>(coordinate, color, type);
+            break;
+        //TODO Pawn
     }
 }
 
