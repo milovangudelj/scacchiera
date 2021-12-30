@@ -1,4 +1,4 @@
-#include "Knight.h"
+#include "pieces/Knight.h"
 #include "Board.h"
 
 #include <array>
