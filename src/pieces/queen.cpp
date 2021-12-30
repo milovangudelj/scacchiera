@@ -13,7 +13,7 @@ using Chess::utilities::PieceType;
 
 Queen::Queen(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
-	symbol = (color == Color::black) ? 'Q' : 'q';
+	symbol = (color == Color::black) ? 'D' : 'd';
 }
 
 std::list<Movement> Queen::get_pseudo_valid_movements(Board &board)

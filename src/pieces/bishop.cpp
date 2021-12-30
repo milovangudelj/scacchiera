@@ -11,7 +11,7 @@ using Chess::utilities::PieceType;
 
 Bishop::Bishop(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
-	symbol = (color == Color::black) ? 'B' : 'b';
+	symbol = (color == Color::black) ? 'A' : 'a';
 }
 
 std::list<Movement> Bishop::get_pseudo_valid_movements(Board &board)
