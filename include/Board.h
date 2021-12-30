@@ -35,8 +35,6 @@ namespace Chess {
             friend std::ostream& operator<< (std::ostream& os, const Board& board);
     };
 
-    std::shared_ptr<Piece> make_piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
-
 }
 
 #endif

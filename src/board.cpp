@@ -23,6 +23,28 @@ std::map<char, Chess::utilities::PieceType> char_to_piece {
     {'p', Chess::utilities::PieceType::pawn}
 };
 
+std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType type) {
+    switch (type) {
+        case PieceType::king :
+            return std::make_shared<King>(coordinate, color, type);
+            break;
+        case PieceType::queen :
+            return std::make_shared<Queen>(coordinate, color, type);
+            break;
+        case PieceType::bishop :
+            return std::make_shared<Bishop>(coordinate, color, type);
+            break;
+        case PieceType::knight :
+            return std::make_shared<Knight>(coordinate, color, type);
+            break;
+        case PieceType::rook :
+            return std::make_shared<Rook>(coordinate, color, type);
+            break;
+        //TODO Pawn
+    }
+    return nullptr;
+}
+
 Board::Board(std::string fen) {
     initialize_with_fen(fen);
 }
@@ -73,27 +95,6 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
     return false;
 }
 
-std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType type) {
-    switch (type) {
-        case PieceType::king :
-            return std::make_shared<King>(coordinate, color, type);
-            break;
-        case PieceType::queen :
-            return std::make_shared<Queen>(coordinate, color, type);
-            break;
-        case PieceType::bishop :
-            return std::make_shared<Bishop>(coordinate, color, type);
-            break;
-        case PieceType::knight :
-            return std::make_shared<Knight>(coordinate, color, type);
-            break;
-        case PieceType::rook :
-            return std::make_shared<Rook>(coordinate, color, type);
-            break;
-        //TODO Pawn
-    }
-    return nullptr;
-}
 
 namespace Chess {
     std::ostream& operator<< (std::ostream& os, const Board& board) {
