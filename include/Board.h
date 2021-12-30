@@ -19,11 +19,13 @@
 template<typename T, unsigned int SIZE> 
 using Matrix = std::array<std::array<T, SIZE>, SIZE>;
 
+constexpr int SIZE = 8;
+
 namespace Chess {
 
     class Board {
         private:
-            Matrix<std::shared_ptr<Piece>, 8> cells;
+            Matrix<std::shared_ptr<Piece>, SIZE> cells;
             void initialize_with_fen(std::string fen); //TODO exceptions
             Coordinate w_king_coordinate;
             Coordinate b_king_coordinate;

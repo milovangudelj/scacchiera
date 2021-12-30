@@ -14,6 +14,7 @@ using Chess::Coordinate;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
 
+//helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece {
     {'k', Chess::utilities::PieceType::king},
     {'q', Chess::utilities::PieceType::queen},
@@ -44,6 +45,7 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
     }
     return nullptr;
 }
+//end helper
 
 Board::Board(std::string fen) {
     initialize_with_fen(fen);
@@ -72,6 +74,7 @@ void Board::initialize_with_fen(std::string fen) {
                 b_king_coordinate = {rank, file};
             }
         }
+        file++;
     }
 }
 
@@ -98,11 +101,23 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
 
 namespace Chess {
     std::ostream& operator<< (std::ostream& os, const Board& board) {
-        for(const auto& rank : board.cells) {
-            for(const auto& file : rank) {
-                os << file->get_symbol() << " ";
+        std::shared_ptr<Piece> piece;
+        for(int rank = 0; rank < SIZE; rank++) {
+            //algebric notation is reversed from internal matrix representation
+            os << 8 - rank << " ";
+            for(int file = 0; file < SIZE; file++) {
+                piece = board.cells[rank][file];
+                if(piece == nullptr) {
+                    os << " ";
+                } else {
+                    os << piece->get_symbol();
+                }
             }
             os << "\n";
+        }
+        os << "\n" << "  ";
+        for(int i = 0; i < SIZE; i++) {
+            os << static_cast<char>('A' + i);
         }
         return os;
     }
