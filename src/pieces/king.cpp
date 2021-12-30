@@ -4,10 +4,15 @@
 using Chess::King;
 
 using Chess::Movement;
+using Chess::Coordinate;
 using Chess::utilities::Color;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 using Chess::utilities::PieceType;
+
+Coordinate get_testing_coordinate(Coordinate starting_coordinate, Chess::utilities::Direction direction) {
+    return starting_coordinate + Chess::utilities::DirectionOffset.at(direction);
+}
 
 King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {

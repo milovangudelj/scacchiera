@@ -13,10 +13,6 @@ namespace Chess {
             std::list<Movement> get_pseudo_valid_movements(Board& board);
     };
 
-    Coordinate get_testing_coordinate(Coordinate starting_coordinate, Chess::utilities::Direction direction) {
-        return starting_coordinate + Chess::utilities::DirectionOffset.at(direction);
-    }
-
 }
 
 #endif
