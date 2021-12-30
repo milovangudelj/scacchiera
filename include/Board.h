@@ -8,6 +8,10 @@
 
 #include "Piece.h"
 #include "pieces/King.h"
+#include "pieces/Queen.h"
+#include "pieces/Bishop.h"
+#include "pieces/Knight.h"
+#include "pieces/Rook.h"
 #include "Coordinate.h"
 #include "Player.h"
 #include "Utilities.h"
