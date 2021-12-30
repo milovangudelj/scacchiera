@@ -51,8 +51,7 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
         std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(board);
         auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(), 
             [king_coordinate](Movement movement) {
-                auto [start, end, f1, f2, f3] = movement;
-                return king_coordinate == end;
+                return king_coordinate == movement.end;
             });
         if(p != pseudo_movements.end()) {
             return true;
