@@ -55,7 +55,7 @@ std::list<Movement> Knight_Piece::get_pseudo_valid_movements(Board& board) {
     for(Coordinate possible_move : possible_movements) {
         if(possible_move.is_valid()) {
             test_piece = board.get_piece_at(possible_move);
-            if(test_piece == nullptr) {
+            if(test_piece == nullptr || test_piece->get_color() != this->color) {
                 pseudo_movements.push_back({this->coordinate, possible_move});
             }
         }
