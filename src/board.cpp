@@ -14,6 +14,15 @@ using Chess::Coordinate;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
 
+std::map<char, Chess::utilities::PieceType> char_to_piece {
+    {'k', Chess::utilities::PieceType::king},
+    {'q', Chess::utilities::PieceType::queen},
+    {'b', Chess::utilities::PieceType::bishop},
+    {'n', Chess::utilities::PieceType::knight},
+    {'r', Chess::utilities::PieceType::rook},
+    {'p', Chess::utilities::PieceType::pawn}
+};
+
 Board::Board(std::string fen) {
     initialize_with_fen(fen);
 }

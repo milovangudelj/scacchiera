@@ -37,14 +37,6 @@ namespace Chess {
 
     std::shared_ptr<Piece> make_piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
 
-    std::map<char, Chess::utilities::PieceType> char_to_piece {
-        {'k', Chess::utilities::PieceType::king},
-        {'q', Chess::utilities::PieceType::queen},
-        {'b', Chess::utilities::PieceType::bishop},
-        {'n', Chess::utilities::PieceType::knight},
-        {'r', Chess::utilities::PieceType::rook},
-        {'p', Chess::utilities::PieceType::pawn}
-    };
 }
 
 #endif
