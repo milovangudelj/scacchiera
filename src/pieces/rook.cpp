@@ -1,19 +1,19 @@
 #include"pieces/Rook.h"
 #include"Board.h"
 
-using Chess::RookPiece;
+using Chess::Rook;
 using Chess::Movement;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 using Chess::utilities::Color;
 using Chess::utilities::PieceType;
 
-RookPiece::RookPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate,color,type}
+Rook::Rook(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate,color,type}
 {
 	symbol= (color == Color::black) ? 'T' : 't';
 }
 
-std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
+std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 {
 
 	std::list<Movement> pseudo_movements;

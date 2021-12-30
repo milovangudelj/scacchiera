@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "pieces/King.h"
 
-using Chess::KingPiece;
+using Chess::King;
 
 using Chess::Movement;
 using Chess::utilities::Color;
@@ -9,12 +9,12 @@ using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 using Chess::utilities::PieceType;
 
-KingPiece::KingPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
+King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
-std::list<Movement> KingPiece::get_pseudo_valid_movements(Board &board)
+std::list<Movement> King::get_pseudo_valid_movements(Board &board)
 {
     std::list<Movement> pseudo_movements;
 

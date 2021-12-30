@@ -5,11 +5,11 @@
 
 using Chess::Board;
 using Chess::Piece;
-using Chess::KingPiece;
+using Chess::King;
 using Chess::Queen;
 using Chess::Bishop;
-using Chess::Knight_Piece;
-using Chess::RookPiece;
+using Chess::Knight;
+using Chess::Rook;
 using Chess::Coordinate;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
@@ -67,7 +67,7 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
 std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType type) {
     switch (type) {
         case PieceType::king :
-            return std::make_shared<KingPiece>(coordinate, color, type);
+            return std::make_shared<King>(coordinate, color, type);
             break;
         case PieceType::queen :
     }
