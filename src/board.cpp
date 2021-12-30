@@ -83,14 +83,17 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
             break;
         //TODO Pawn
     }
+    return nullptr;
 }
 
-std::ostream& Chess::operator<< (std::ostream& os, const Board& board) {
-    for(const auto& rank : board.cells) {
-        for(const auto& file : rank) {
-            os << file->get_symbol() << " ";
+namespace Chess {
+    std::ostream& operator<< (std::ostream& os, const Board& board) {
+        for(const auto& rank : board.cells) {
+            for(const auto& file : rank) {
+                os << file->get_symbol() << " ";
+            }
+            os << "\n";
         }
-        os << "\n";
+        return os;
     }
-    return os;
 }
