@@ -12,7 +12,8 @@ namespace Chess {
         Chess::Coordinate end;
         bool is_promotion;
         bool is_en_passant;
-        bool is_castling;
+        bool is_long_castling;
+        bool is_short_castling;
     };
 
     std::ostream& operator<< (std::ostream& os, Movement& movement);

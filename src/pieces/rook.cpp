@@ -73,7 +73,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
             {
                 offset = DirectionOffset.at(Direction::right);
                 test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true});
+                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
             }
         }
         i = 3;
@@ -100,7 +100,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
             {
                 offset = DirectionOffset.at(Direction::left);
                 test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true});
+                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
             }
         }
     }

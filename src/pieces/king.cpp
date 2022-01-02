@@ -64,7 +64,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
             //is castling is allowed then the king can move two positions to right/left
             Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::right), Direction::right);
-            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true});
+            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, false, true});
         }
 
         //long castling
@@ -82,7 +82,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         test_piece = board.get_piece_at(test_coordinate);
         if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
             Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::left), Direction::left);
-            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true});
+            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true, false});
         }
     }
 
