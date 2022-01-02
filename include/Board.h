@@ -38,6 +38,7 @@ namespace Chess {
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
             friend std::ostream& operator<< (std::ostream& os, const Board& board);
             Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
+            bool promote(Player& player, char piece_symbol);
     };
 
 }

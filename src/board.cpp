@@ -132,6 +132,31 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     if(movement.is_short_castling || movement.is_long_castling) {
         return handle_castling(current_player, other_player, movement);
     }
+
+    last_eaten = temporary_move(movement);
+    /* TODO waiting for undo()
+    if(is_check(current_player, other_player, *this)) {
+        undo();
+        return MoveResult::invalid;
+    }
+    */
+    if(movement.is_promotion) {
+        return MoveResult::promotion;
+    }
+}
+
+bool Board::promote(Player& player, char piece_symbol) {
+    std::list<std::shared_ptr<Piece>> lost_pieces = player.get_lost_pieces();
+    auto p = std::find_if(lost_pieces.begin(), lost_pieces.end(), 
+        [piece_symbol] (std::shared_ptr<Piece> piece) {
+            return piece_symbol == piece->get_symbol();
+        }
+    );
+    if(p == lost_pieces.end()) {
+        return false;
+    }
+    //TODO remove piece from lost_pieces and add to available pieces
+    //TODO find pawn which has promoted, remove from board, and replace with new piece
 }
 
 std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
