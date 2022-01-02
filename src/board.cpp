@@ -138,6 +138,8 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     if(is_check(current_player, other_player, *this)) {
         undo();
         return MoveResult::invalid;
+    } else {
+        remove piece from other player if is eaten
     }
     */
     if(movement.is_promotion) {
