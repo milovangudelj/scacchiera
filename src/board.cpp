@@ -16,6 +16,8 @@ using Chess::Movement;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
 using Chess::utilities::MoveResult;
+using Chess::utilities::DirectionOffset;
+using Chess::utilities::Direction;
 
 //helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece {
@@ -101,7 +103,7 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
     return false;
 }
 
-MoveResult Board::move(Player& current_player, Movement movement) {
+MoveResult Board::move(Player& current_player, Player& other_player, Movement movement) {
     //check if piece are of different colors
     Coordinate start_coordinate = movement.start;
     auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
@@ -126,6 +128,10 @@ MoveResult Board::move(Player& current_player, Movement movement) {
     if(p == pseudo_valid_movements.end()) {
         return MoveResult::invalid;
     }
+
+    if(movement.is_short_castling || movement.is_long_castling) {
+        return handle_castling(current_player, other_player, movement);
+    }
 }
 
 std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
@@ -137,6 +143,43 @@ std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
     cells[end_coordinate_rank][end_coordinate_file] = cells[start_coordinate_rank][start_coordinate_file];
     cells[start_coordinate_rank][start_coordinate_file] = nullptr;
     return eaten;
+}
+
+MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
+    Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+    Coordinate current_king_coordinate = king_coordinate;
+    //short castling(king or knight)
+    if(movement.end == movement.start + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right) ||
+        movement.end == movement.start + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left)) {
+        Coordinate to_right;
+        for(int i = 0; i < 2; i++) {
+            to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
+            temporary_move({current_king_coordinate, to_right});
+            if(is_check(current_player, other_player, *this)) {
+                return MoveResult::invalid;
+            }
+            current_king_coordinate = to_right;
+        }
+        to_right = current_king_coordinate + DirectionOffset.at(Direction::right); //coordinates of rook
+        auto [king_rank, king_file] = king_coordinate;
+        cells[king_rank][king_file] = cells[to_right.rank][to_right.file];
+        temporary_move({current_king_coordinate, to_right});
+    } else { //long castling
+        Coordinate to_left;
+        for(int i = 0; i < 3; i++) {
+            to_left = current_king_coordinate + DirectionOffset.at(Direction::left);
+            temporary_move({current_king_coordinate, to_left});
+            if(is_check(current_player, other_player, *this)) {
+                return MoveResult::invalid;
+            }
+            current_king_coordinate = to_left;
+        }
+        to_left = current_king_coordinate + DirectionOffset.at(Direction::left); //coordinates of rook
+        auto [king_rank, king_file] = king_coordinate;
+        cells[king_rank][king_file] = cells[to_left.rank][to_left.file];
+        temporary_move({current_king_coordinate, to_left});
+    }
+    return MoveResult::ok;
 }
 
 

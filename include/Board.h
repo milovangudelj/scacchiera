@@ -32,11 +32,12 @@ namespace Chess {
             std::shared_ptr<Piece> last_eaten;
             bool is_check(Player& current, Player& other, Board& board);
             std::shared_ptr<Piece> temporary_move(Movement movement);
+            Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
         public:
             Board(std::string fen);
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
             friend std::ostream& operator<< (std::ostream& os, const Board& board);
-            Chess::utilities::MoveResult move(Player& current_player, Movement movement);
+            Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
     };
 
 }
