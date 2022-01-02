@@ -19,6 +19,8 @@ namespace Chess::utilities {
 
     enum class Direction {left, up, right, down, left_up, right_up, right_down, left_down};
 
+    enum class MoveResult {ok, invalid, promotion, check, checkmate, draw};
+
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
 }
