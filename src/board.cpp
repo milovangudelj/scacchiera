@@ -11,8 +11,11 @@ using Chess::Bishop;
 using Chess::Knight;
 using Chess::Rook;
 using Chess::Coordinate;
+using Chess::Player;
+using Chess::Movement;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
+using Chess::utilities::MoveResult;
 
 //helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece {
@@ -96,6 +99,31 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
         }
     }
     return false;
+}
+
+MoveResult Board::move(Player& current_player, Movement movement) {
+    Coordinate start_coordinate = movement.start;
+    auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
+    std::shared_ptr<Piece> start_piece = cells[start_coordinate_rank][start_coordinate_file];
+    if(start_piece->get_color() != current_player.get_color()) {
+        return MoveResult::invalid;
+    }
+
+    Coordinate end_coordinate = movement.end;
+    auto [end_coordinate_rank, end_coordinate_file] = end_coordinate;
+    std::shared_ptr<Piece> end_piece = cells[end_coordinate_rank][end_coordinate_file];
+    std::list<Movement> pseudo_valid_movements = start_piece->get_pseudo_valid_movements(*this);
+    auto p = std::find_if(pseudo_valid_movements.begin(), pseudo_valid_movements.end(), 
+        [&] (Movement pseudo_movement) {
+            Coordinate pseudo_coordinate = movement.end;
+            auto [pseudo_coordinate_rank, pseudo_coordinate_file] = pseudo_coordinate;
+            std::shared_ptr<Piece> test_piece = cells[pseudo_coordinate_rank][pseudo_coordinate_file];
+            return *test_piece == *end_piece;
+        }
+    );
+    if(p == pseudo_valid_movements.end()) {
+        return MoveResult::invalid;
+    }
 }
 
 

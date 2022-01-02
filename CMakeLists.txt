@@ -9,6 +9,7 @@ add_library(chess STATIC
     src/coordinate.cpp 
     src/movement.cpp 
     src/utilities.cpp
+    src/piece.cpp
     src/pieces/king.cpp
     src/pieces/queen.cpp
     src/pieces/bishop.cpp
