@@ -102,6 +102,7 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
 }
 
 MoveResult Board::move(Player& current_player, Movement movement) {
+    //check if piece are of different colors
     Coordinate start_coordinate = movement.start;
     auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
     std::shared_ptr<Piece> start_piece = cells[start_coordinate_rank][start_coordinate_file];
@@ -109,6 +110,7 @@ MoveResult Board::move(Player& current_player, Movement movement) {
         return MoveResult::invalid;
     }
 
+    //check if ending position is contained in valid positions of piece
     Coordinate end_coordinate = movement.end;
     auto [end_coordinate_rank, end_coordinate_file] = end_coordinate;
     std::shared_ptr<Piece> end_piece = cells[end_coordinate_rank][end_coordinate_file];
@@ -124,6 +126,17 @@ MoveResult Board::move(Player& current_player, Movement movement) {
     if(p == pseudo_valid_movements.end()) {
         return MoveResult::invalid;
     }
+}
+
+std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
+    Coordinate start_coordinate = movement.start;
+    auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
+    Coordinate end_coordinate = movement.end;
+    auto [end_coordinate_rank, end_coordinate_file] = end_coordinate;
+    std::shared_ptr<Piece> eaten = cells[end_coordinate_rank][end_coordinate_file];
+    cells[end_coordinate_rank][end_coordinate_file] = cells[start_coordinate_rank][start_coordinate_file];
+    cells[start_coordinate_rank][start_coordinate_file] = nullptr;
+    return eaten;
 }
 
 

@@ -31,6 +31,7 @@ namespace Chess {
             Coordinate b_king_coordinate;
             std::shared_ptr<Piece> last_eaten;
             bool is_check(Player& current, Player& other, Board& board);
+            std::shared_ptr<Piece> temporary_move(Movement movement);
         public:
             Board(std::string fen);
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
