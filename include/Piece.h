@@ -34,6 +34,8 @@ namespace Chess {
             char get_symbol() const {return symbol;};
             bool get_had_moved() const { return had_moved;};
     };
+
+    bool operator == (Piece& piece1, Piece& piece2);
 }
 
 #endif
