@@ -104,7 +104,7 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
 }
 
 MoveResult Board::move(Player& current_player, Player& other_player, Movement movement) {
-    //check if piece are of different colors
+    //check if piece is owned by the player
     Coordinate start_coordinate = movement.start;
     auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
     std::shared_ptr<Piece> start_piece = cells[start_coordinate_rank][start_coordinate_file];
@@ -112,7 +112,7 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return MoveResult::invalid;
     }
 
-    //check if ending position is contained in valid positions of piece
+    //check if ending position is contained in pseudo_valid_movements of piece
     Coordinate end_coordinate = movement.end;
     auto [end_coordinate_rank, end_coordinate_file] = end_coordinate;
     std::shared_ptr<Piece> end_piece = cells[end_coordinate_rank][end_coordinate_file];
@@ -142,6 +142,7 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         remove piece from other player if is eaten
     }
     */
+   
     if(movement.is_promotion) {
         return MoveResult::promotion;
     }
@@ -162,6 +163,7 @@ bool Board::promote(Player& player, char piece_symbol) {
 }
 
 std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
+    //TODO remember last movement
     Coordinate start_coordinate = movement.start;
     auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
     Coordinate end_coordinate = movement.end;
@@ -183,6 +185,7 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
             temporary_move({current_king_coordinate, to_right});
             if(is_check(current_player, other_player, *this)) {
+                //TODO undo()
                 return MoveResult::invalid;
             }
             current_king_coordinate = to_right;
@@ -197,6 +200,7 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             to_left = current_king_coordinate + DirectionOffset.at(Direction::left);
             temporary_move({current_king_coordinate, to_left});
             if(is_check(current_player, other_player, *this)) {
+                //TODO undo()
                 return MoveResult::invalid;
             }
             current_king_coordinate = to_left;
