@@ -1,8 +1,9 @@
-#include "Knight.h"
+#include "pieces/Knight.h"
+#include "Board.h"
 
 #include <array>
 
-using Chess::Knight_Piece;
+using Chess::Knight;
 
 using Chess::Movement;
 using Chess::utilities::Color;
@@ -10,11 +11,11 @@ using Chess::utilities::PieceType;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 
-Knight_Piece::Knight_Piece(Coordinate coordinate, Color color, PieceType type) : Piece(coordinate, color, type) {
+Knight::Knight(Coordinate coordinate, Color color, PieceType type) : Piece(coordinate, color, type) {
     symbol = (color == Color::black) ? 'C' : 'c';
 }
 
-std::list<Movement> Knight_Piece::get_pseudo_valid_movements(Board& board) {
+std::list<Movement> Knight::get_pseudo_valid_movements(Board& board) {
     std::list<Movement> pseudo_movements;
 
     std::array<Coordinate, 8> possible_movements;
@@ -55,7 +56,7 @@ std::list<Movement> Knight_Piece::get_pseudo_valid_movements(Board& board) {
     for(Coordinate possible_move : possible_movements) {
         if(possible_move.is_valid()) {
             test_piece = board.get_piece_at(possible_move);
-            if(test_piece == nullptr) {
+            if(test_piece == nullptr || test_piece->get_color() != this->color) {
                 pseudo_movements.push_back({this->coordinate, possible_move});
             }
         }

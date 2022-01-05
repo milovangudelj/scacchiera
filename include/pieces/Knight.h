@@ -2,14 +2,13 @@
 #define knight_h
 
 #include "Piece.h"
-#include "Board.h"
 
 namespace Chess {
 
-    class Knight_Piece : public Piece {
+    class Knight : public Piece {
         using Piece::Piece;
         public:
-            Knight_Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
+            Knight(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
             std::list<Movement> get_pseudo_valid_movements(Board& board);
     };
 }
