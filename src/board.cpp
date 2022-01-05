@@ -16,8 +16,8 @@ using Chess::Movement;
 using Chess::utilities::PieceType;
 using Chess::utilities::Color;
 using Chess::utilities::MoveResult;
-using Chess::utilities::DirectionOffset;
 using Chess::utilities::Direction;
+using Chess::utilities::DirectionOffset;
 
 //helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece {
