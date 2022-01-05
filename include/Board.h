@@ -31,7 +31,7 @@ namespace Chess {
             Coordinate b_king_coordinate;
             std::shared_ptr<Piece> last_eaten;
             Movement last_movement;
-            bool is_check(Player& current, Player& other, Board& board);
+            bool is_check(Player& current, Player& other);
             void temporary_move(Movement movement);
             Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
             void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
@@ -42,6 +42,7 @@ namespace Chess {
             Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
             bool promote(Player& player, char piece_symbol);
             Movement get_last_movement() const { return last_movement; }
+            bool is_checkmate(Player& current, Player& other);
     };
 
 }

@@ -94,10 +94,10 @@ std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) {
     return cells[rank][file];
 }
 
-bool Board::is_check(Player& current, Player& other, Board& board) {
+bool Board::is_check(Player& current, Player& other) {
     Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king_coordinate : w_king_coordinate;
     for(std::shared_ptr<Piece> piece : other.get_available_pieces()) {
-        std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(board);
+        std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
         auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(), 
             [king_coordinate](Movement movement) {
                 return king_coordinate == movement.end;
@@ -107,6 +107,38 @@ bool Board::is_check(Player& current, Player& other, Board& board) {
         }
     }
     return false;
+}
+
+bool Board::is_checkmate(Player& current, Player& other) {
+    if(!is_check(current, other)) {
+        return false;
+    }
+    auto king_iterator = std::find_if(current.get_available_pieces().begin(), current.get_available_pieces().end(), 
+        [] (std::shared_ptr<Piece> piece) {
+            return piece->get_type() == PieceType::king;
+        }
+    );
+    std::shared_ptr<Piece> king = *king_iterator;
+    Movement previous_movement = last_movement;
+    std::shared_ptr<Piece> previous_eaten = last_eaten;
+    for(Movement movement : king->get_pseudo_valid_movements(*this)) {
+        MoveResult result = move(current, other, movement);
+        if(result != MoveResult::invalid) {
+            undo(previous_movement, previous_eaten);
+            return false;
+        }
+    }
+
+    for(std::shared_ptr<Piece> piece : current.get_available_pieces()) {
+        for(Movement movement : piece->get_pseudo_valid_movements(*this)) {
+            MoveResult result = move(current, other, movement);
+            if(result != MoveResult::invalid) {
+                undo(previous_movement, previous_eaten);
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 MoveResult Board::move(Player& current_player, Player& other_player, Movement movement) {
@@ -142,7 +174,7 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
     temporary_move(movement);
-    if(is_check(current_player, other_player, *this)) {
+    if(is_check(current_player, other_player)) {
         undo(previous_movement, previous_eaten);
         return MoveResult::invalid;
     } else {
@@ -213,7 +245,7 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             Movement previous_movement = last_movement;
             std::shared_ptr<Piece> previous_eaten = last_eaten;
             temporary_move({current_king_coordinate, to_right});
-            if(is_check(current_player, other_player, *this)) {
+            if(is_check(current_player, other_player)) {
                 undo(previous_movement, previous_eaten);
                 return MoveResult::invalid;
             }
@@ -230,7 +262,7 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             Movement previous_movement = last_movement;
             std::shared_ptr<Piece> previous_eaten = last_eaten;
             temporary_move({current_king_coordinate, to_left});
-            if(is_check(current_player, other_player, *this)) {
+            if(is_check(current_player, other_player)) {
                 undo(previous_movement, previous_eaten);
                 return MoveResult::invalid;
             }
