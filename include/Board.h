@@ -30,8 +30,9 @@ namespace Chess {
             Coordinate w_king_coordinate;
             Coordinate b_king_coordinate;
             std::shared_ptr<Piece> last_eaten;
+            Movement last_movement;
             bool is_check(Player& current, Player& other, Board& board);
-            std::shared_ptr<Piece> temporary_move(Movement movement);
+            void temporary_move(Movement movement);
             Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
         public:
             Board(std::string fen);
@@ -39,6 +40,7 @@ namespace Chess {
             friend std::ostream& operator<< (std::ostream& os, const Board& board);
             Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
             bool promote(Player& player, char piece_symbol);
+            Movement get_last_movement() const { return last_movement; }
     };
 
 }
