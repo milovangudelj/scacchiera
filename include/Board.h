@@ -34,6 +34,7 @@ namespace Chess {
             bool is_check(Player& current, Player& other, Board& board);
             void temporary_move(Movement movement);
             Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
+            void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
         public:
             Board(std::string fen);
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);

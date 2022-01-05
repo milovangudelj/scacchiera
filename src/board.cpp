@@ -133,8 +133,8 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return handle_castling(current_player, other_player, movement);
     }
 
-    Movement last_last_movement = last_movement;
-    std::shared_ptr<Piece> last_last_eaten = last_eaten;
+    Movement previous_movement = last_movement;
+    std::shared_ptr<Piece> previous_eaten = last_eaten;
     temporary_move(movement);
     /* TODO waiting for undo()
     if(is_check(current_player, other_player, *this)) {
@@ -184,6 +184,15 @@ void Board::temporary_move(Movement movement) {
     last_eaten = cells[end_coordinate_rank][end_coordinate_file];
     cells[end_coordinate_rank][end_coordinate_file] = cells[start_coordinate_rank][start_coordinate_file];
     cells[start_coordinate_rank][start_coordinate_file] = nullptr;
+}
+
+void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten) {
+    auto [start_rank, start_file] = last_movement.start;
+    auto [end_rank, end_file] = last_movement.end;
+    cells[start_rank][start_file] = cells[end_rank][end_file];
+    cells[end_rank][end_file] = last_eaten;
+    last_eaten = previous_eaten;
+    last_movement = previous_movement;
 }
 
 MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
