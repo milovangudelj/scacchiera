@@ -52,11 +52,11 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
 }
 //end helper
 
-Board::Board(std::string fen) {
-    initialize_with_fen(fen);
+Board::Board(std::string fen, Player& player1, Player& player2) : last_eaten{nullptr} {
+    initialize_with_fen(fen, player1, player2);
 }
 
-void Board::initialize_with_fen(std::string fen) {
+void Board::initialize_with_fen(std::string fen, Player& player1, Player& player2) {
     unsigned int file = 0, rank = 0;
     for(char character : fen) {
         if(character == '/') {
@@ -70,7 +70,13 @@ void Board::initialize_with_fen(std::string fen) {
         }
         Color color = std::islower(character) ? Color::black : Color::white;
         PieceType type = char_to_piece.at(std::tolower(character));
-        cells[rank][file] = make_piece({rank, file}, color, type);
+        std::shared_ptr<Piece> piece = make_piece({rank, file}, color, type);
+        cells[rank][file] = piece;
+        if(player1.get_color() == color) {
+            player1.add_to_available_pieces(piece);
+        } else {
+            player2.add_to_available_pieces(piece);
+        }
 
         if(type == PieceType::king) {
             if(color == Color::white) {
@@ -237,7 +243,6 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     }
     return MoveResult::ok;
 }
-
 
 namespace Chess {
     std::ostream& operator<< (std::ostream& os, const Board& board) {
