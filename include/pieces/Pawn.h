@@ -2,7 +2,7 @@
 #define pawn_h
 
 #include "Piece.h"
-#include<vector>
+#include<utility>
 namespace Chess
 {
     class PawnPiece : public Piece
@@ -14,8 +14,8 @@ namespace Chess
         private:
         Coordinate one_step(Board& board,Coordinate coordinate, Chess::utilities::Color color);
         Coordinate double_step(Board& board, Chess::utilities::Color color);
-        std::vector<Coordinate> diag_cap(Board& board,Chess::utilities::Color color);
-        bool promotion(Board& board,Chess::utilities::Color color);
+        std::pair<Coordinate,Coordinate> diag_cap(Board& board,Chess::utilities::Color color);
+        bool promotion(Coordinate coordinate,Chess::utilities::Color color);
         Coordinate en_passant(Board& board,Chess::utilities::Color color);
     };
 }
