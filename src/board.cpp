@@ -136,14 +136,12 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
     temporary_move(movement);
-    /* TODO waiting for undo()
     if(is_check(current_player, other_player, *this)) {
-        undo();
+        undo(previous_movement, previous_eaten);
         return MoveResult::invalid;
     } else {
-        remove piece from other player if is eaten
+        other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));
     }
-    */
    
     if(movement.is_promotion) {
         return MoveResult::promotion;
@@ -171,8 +169,10 @@ bool Board::promote(Player& player, char piece_symbol) {
             auto [rank, file] = piece->get_coordinate();
             cells[rank][file] = resurrected;
             player.add_to_lost_pieces(player.remove_from_available_pieces(piece));
+            break;
         }
     }
+    return true;
 }
 
 void Board::temporary_move(Movement movement) {
@@ -204,9 +204,11 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
         Coordinate to_right;
         for(int i = 0; i < 2; i++) {
             to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
+            Movement previous_movement = last_movement;
+            std::shared_ptr<Piece> previous_eaten = last_eaten;
             temporary_move({current_king_coordinate, to_right});
             if(is_check(current_player, other_player, *this)) {
-                //TODO undo()
+                undo(previous_movement, previous_eaten);
                 return MoveResult::invalid;
             }
             current_king_coordinate = to_right;
@@ -219,9 +221,11 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
         Coordinate to_left;
         for(int i = 0; i < 3; i++) {
             to_left = current_king_coordinate + DirectionOffset.at(Direction::left);
+            Movement previous_movement = last_movement;
+            std::shared_ptr<Piece> previous_eaten = last_eaten;
             temporary_move({current_king_coordinate, to_left});
             if(is_check(current_player, other_player, *this)) {
-                //TODO undo()
+                undo(previous_movement, previous_eaten);
                 return MoveResult::invalid;
             }
             current_king_coordinate = to_left;
