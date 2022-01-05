@@ -10,17 +10,28 @@ using Chess::Player;
 
 void Player::add_to_lost_pieces(std::shared_ptr<Piece> &piece)
 {
+	// Add piece to the back of the list
 	lost_pieces.push_back(piece);
-	available_pieces.remove(piece);
 };
 
-std::shared_ptr<Piece> &Player::remove_from_lost_pieces()
+void Player::add_to_available_pieces(std::shared_ptr<Piece> &piece)
 {
-	// Removing the last one in the list
-	std::shared_ptr<Piece> removed_piece = lost_pieces.back();
+	// Add piece to the back of the list
+	available_pieces.push_back(piece);
+};
 
-	available_pieces.push_back(removed_piece);
-	lost_pieces.pop_back();
+std::shared_ptr<Piece> &Player::remove_from_lost_pieces(std::shared_ptr<Piece> &piece)
+{
+	// Removing the given piece from the list
+	lost_pieces.remove(piece);
 
-	return removed_piece;
+	return piece;
+};
+
+std::shared_ptr<Piece> &Player::remove_from_available_pieces(std::shared_ptr<Piece> &piece)
+{
+	// Removing the given piece from the list
+	available_pieces.remove(piece);
+
+	return piece;
 };
