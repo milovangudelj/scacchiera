@@ -158,8 +158,19 @@ bool Board::promote(Player& player, char piece_symbol) {
     if(p == lost_pieces.end()) {
         return false;
     }
-    //TODO remove piece from lost_pieces and add to available pieces
-    //TODO find pawn which has promoted, remove from board, and replace with new piece
+
+    std::shared_ptr<Piece> resurrected = player.remove_from_lost_pieces(*p);
+    player.add_to_available_pieces(resurrected);
+
+    unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
+    for(std::shared_ptr<Piece>& piece : cells.at(promotion_rank)) {
+        if(piece->get_type() == PieceType::pawn) {
+            resurrected->set_coordinate(piece->get_coordinate());
+            auto [rank, file] = piece->get_coordinate();
+            cells[rank][file] = resurrected;
+            player.add_to_lost_pieces(player.remove_from_available_pieces(piece));
+        }
+    }
 }
 
 std::shared_ptr<Piece> Board::temporary_move(Movement movement) {
