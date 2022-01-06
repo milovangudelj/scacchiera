@@ -124,8 +124,8 @@ bool Board::is_checkmate(Player& current, Player& other) {
     std::shared_ptr<Piece> previous_eaten = last_eaten;
     for(Movement movement : king->get_pseudo_valid_movements(*this)) {
         MoveResult result = move(current, other, movement);
-        undo(previous_movement, previous_eaten);
         if(result != MoveResult::invalid) {
+            undo(previous_movement, previous_eaten);
             return false;
         }
     }
@@ -133,8 +133,8 @@ bool Board::is_checkmate(Player& current, Player& other) {
     for(std::shared_ptr<Piece> piece : current.get_available_pieces()) {
         for(Movement movement : piece->get_pseudo_valid_movements(*this)) {
             MoveResult result = move(current, other, movement);
-            undo(previous_movement, previous_eaten);
             if(result != MoveResult::invalid) {
+                undo(previous_movement, previous_eaten);
                 return false;
             }
         }
@@ -152,8 +152,8 @@ bool Board::is_draw(Player& current, Player& other) {
         for(std::shared_ptr<Piece> piece : current.get_available_pieces()) {
             for(Movement movement : piece->get_pseudo_valid_movements(*this)) {
                 MoveResult result = move(current, other, movement);
-                undo(previous_movement, previous_eaten);
                 if(result != MoveResult::invalid) {
+                    undo(previous_movement, previous_eaten);
                     return false;
                 }
             }
