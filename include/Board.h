@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <ostream>
+#include <map>
 
 #include "Piece.h"
 #include "pieces/King.h"
@@ -35,6 +36,9 @@ namespace Chess {
             void temporary_move(Movement movement);
             Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
             void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
+            std::map<std::string, int> position_history;
+            std::string to_fen();
+            bool can_draw_flag;
         public:
             Board(std::string fen, Player& player1, Player& player2);
             std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
@@ -44,6 +48,7 @@ namespace Chess {
             Movement get_last_movement() const { return last_movement; }
             bool is_checkmate(Player& current, Player& other);
             bool is_draw(Player& current, Player& other);
+            bool can_draw();
     };
 
 }
