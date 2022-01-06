@@ -1,10 +1,10 @@
-#include "Player.h"
-#include "Utilities.h"
-#include "Piece.h"
-
 #include <list>
 #include <memory>
 #include <ostream>
+
+#include "Player.h"
+#include "Utilities.h"
+#include "Piece.h"
 
 using Chess::Piece;
 using Chess::Player;
@@ -13,21 +13,11 @@ using Chess::utilities::PlayerType;
 
 // Constructors
 
-Player::Player(const std::string &_color, const std::string &_type, const std::string &_name)
+Player::Player(const Color &_color, const PlayerType &_type, const std::string &_name)
 {
-	if (_color.compare("white") != 0 && _color.compare("black") != 0)
-	{
-		throw "Invalid player color";
-	}
-
-	if (_type.compare("human") != 0 && _type.compare("computer") != 0)
-	{
-		throw "Invalid player type";
-	}
-
-	type = _type.compare("human") == 0 ? PlayerType::human : PlayerType::computer;
-	color = _color.compare("white") == 0 ? Color::white : Color::black;
-	name = (_name.length() == 0) ? ((type == PlayerType::human) ? "Human" : "Hal") : _name;
+	type = _type;
+	color = _color;
+	name = (_name.length() == 0) ? ((_type == PlayerType::human) ? "Human" : "Hal") : _name;
 	stale_since = 0;
 };
 
