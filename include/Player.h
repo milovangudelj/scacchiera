@@ -17,7 +17,8 @@ namespace Chess {
             Chess::utilities::Color color;
             std::list<std::shared_ptr<Piece>> available_pieces;
             std::list<std::shared_ptr<Piece>> lost_pieces;
-        
+            int stale_since;
+
         public:
             // Constructors
 
@@ -56,6 +57,7 @@ namespace Chess {
             {
                 return color;
             };
+            int get_stale_since() const { return stale_since; };
 
             // Management member functions
 
@@ -63,6 +65,8 @@ namespace Chess {
             void add_to_available_pieces(std::shared_ptr<Piece> &piece);
             std::shared_ptr<Piece> &remove_from_lost_pieces(std::shared_ptr<Piece> &piece);
             std::shared_ptr<Piece> &remove_from_available_pieces(std::shared_ptr<Piece> &piece);
+            void increment_stale_since() { stale_since++; };
+            void reset_stale_since() { stale_since = 0; };
 
             // Overloaded operators
 

@@ -28,6 +28,7 @@ Player::Player(const std::string &_color, const std::string &_type, const std::s
 	type = _type.compare("human") == 0 ? PlayerType::human : PlayerType::computer;
 	color = _color.compare("white") == 0 ? Color::white : Color::black;
 	name = (_name.length() == 0) ? ((type == PlayerType::human) ? "Human" : "Hal") : _name;
+	stale_since = 0;
 };
 
 // Management methods
