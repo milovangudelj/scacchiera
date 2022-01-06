@@ -43,6 +43,7 @@ namespace Chess {
             bool promote(Player& player, char piece_symbol);
             Movement get_last_movement() const { return last_movement; }
             bool is_checkmate(Player& current, Player& other);
+            bool is_draw(Player& current, Player& other);
     };
 
 }
