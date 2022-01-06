@@ -246,7 +246,7 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     }
 
     other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));  
-    start_piece->set_had_move();
+    start_piece->set_had_moved();
     start_piece->set_coordinate(movement.end);
     if(start_piece->get_type() == PieceType::pawn || last_eaten == nullptr) {
         //current_player.reset_stale_since();
