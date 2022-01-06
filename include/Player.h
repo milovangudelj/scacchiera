@@ -17,6 +17,7 @@ namespace Chess {
             std::list<std::shared_ptr<Piece>> lost_pieces;
         
         public:
+            // Simple inline getters
             const std::list<std::shared_ptr<Piece>> &get_available_pieces()
             {
                 return available_pieces;
@@ -25,8 +26,6 @@ namespace Chess {
             {
                 return lost_pieces;
             };
-            void add_to_lost_pieces(std::shared_ptr<Piece>& piece);
-            std::shared_ptr<Piece>& remove_from_lost_pieces();
             Chess::utilities::PlayerType get_type() const
             {
                 return type;
@@ -35,6 +34,12 @@ namespace Chess {
             {
                 return color;
             };
+
+            // Management member functions
+            void add_to_lost_pieces(std::shared_ptr<Piece> &piece);
+            void add_to_available_pieces(std::shared_ptr<Piece> &piece);
+            std::shared_ptr<Piece> &remove_from_lost_pieces(std::shared_ptr<Piece> &piece);
+            std::shared_ptr<Piece> &remove_from_available_pieces(std::shared_ptr<Piece> &piece);
     };
 }
 
