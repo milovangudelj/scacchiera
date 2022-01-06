@@ -47,3 +47,13 @@ std::list<Movement> Bishop::get_pseudo_valid_movements(Board &board)
 	}
 	return pseudo_movements;
 }
+
+Chess::utilities::Color Bishop::get_color() const
+{
+	return color;
+};
+
+void Bishop::set_color(Chess::utilities::Color _color)
+{
+	color = _color;
+};
