@@ -33,6 +33,10 @@ namespace Chess {
             Chess::utilities::PieceType get_type() const { return type;};
             char get_symbol() const {return symbol;};
             bool get_had_moved() const { return had_moved;};
+            void set_had_moved() { had_moved = true; };
+            void set_coordinate(Coordinate coordinate) {
+                this->coordinate = coordinate;
+            }
     };
 
     bool operator == (Piece& piece1, Piece& piece2);
