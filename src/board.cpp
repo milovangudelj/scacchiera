@@ -142,8 +142,10 @@ bool Board::is_checkmate(Player& current, Player& other) {
 }
 
 bool Board::is_draw(Player& current, Player& other) {
+    //needs to be invoked twice both for current and for other
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
+
     //stalemate
     if(!is_check(current, other)) {
         for(std::shared_ptr<Piece> piece : current.get_available_pieces()) {
@@ -156,6 +158,23 @@ bool Board::is_draw(Player& current, Player& other) {
             }
         }
     }
+
+    //dead position
+    std::list<std::shared_ptr<Piece>> current_pieces = current.get_available_pieces();
+    std::list<std::shared_ptr<Piece>> other_pieces = other.get_available_pieces();
+    if(current_pieces.size() == other_pieces.size() == 1) {
+        //only kings left
+        return true;
+    }
+    if(current_pieces.size() == 2 && other_pieces.size() == 1) {
+        std::shared_ptr<Piece> not_king = current_pieces.front()->get_type() == PieceType::king ? current_pieces.back() : current_pieces.front();
+        if(not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight) {
+            return true;
+        }
+    }
+
+    //TODO
+    //King + zero or more bishops vs king + zero or more bishops, where all bishops stands on same colored squares
 }
 
 MoveResult Board::move(Player& current_player, Player& other_player, Movement movement) {
