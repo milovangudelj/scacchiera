@@ -172,7 +172,6 @@ bool Board::is_draw(Player& current, Player& other) {
             return true;
         }
     }
-
     //TODO
     //King + zero or more bishops vs king + zero or more bishops, where all bishops stands on same colored squares
 }
@@ -215,10 +214,14 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return MoveResult::invalid;
     } else {
         other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));
+        auto [end_rank, end_file] = movement.end;
+        cells[end_rank][end_file]->set_had_move();
     }
    
     if(movement.is_promotion) {
         return MoveResult::promotion;
+    } else {
+        return MoveResult::ok;
     }
 }
 
