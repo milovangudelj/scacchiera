@@ -185,9 +185,30 @@ bool Board::is_draw(Player& current, Player& other) {
             }*/
         }
     }
+    if(current_pieces.size() <= 3 && other_pieces.size() <= 3) {
+        //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
+        std::list<std::shared_ptr<Piece>> bishops;
+        current_pieces.splice(current_pieces.end(), other_pieces);
+        for(std::shared_ptr<Piece> piece : current_pieces) {
+            if(piece->get_type() != PieceType::king) {
+                if(piece->get_type() == PieceType::bishop) {
+                    bishops.push_back(piece);
+                } else {
+                    return false;
+                }
+            }
+        }
+        //TODO
+        //Color cell_color = bishops.front()->get_cell_color();
+        /*for(std::shared_ptr<Piece> bishop : bishops) {
+            if(bishop->get_cell_color() != cell_color) {
+                return false;
+            }
+        }*/
+    }
     //end dead position
 
-    //50 move rule
+    //TODO 50 move rule
     /*
     if(current.get_stale_since() >= 50 && other.get_stale_since() >= 50) {
         return true;
