@@ -6,6 +6,7 @@ include_directories(include)
 
 add_library(chess STATIC
     src/board.cpp
+    src/player.cpp
     src/coordinate.cpp 
     src/movement.cpp 
     src/utilities.cpp

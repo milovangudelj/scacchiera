@@ -6,6 +6,7 @@
 
 #include <map>
 #include <utility>
+#include <ostream>
 
 namespace Chess::utilities {
 
@@ -19,10 +20,12 @@ namespace Chess::utilities {
 
     enum class Direction {left, up, right, down, left_up, right_up, right_down, left_down};
 
-    enum class MoveResult {ok, invalid, promotion, check, checkmate, draw};
+    enum class MoveResult {ok, invalid, promotion, check};
 
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
+    std::ostream &operator<<(std::ostream &os, const Color &color);
+    std::ostream &operator<<(std::ostream &os, const PlayerType &player);
 }
 
 #endif
