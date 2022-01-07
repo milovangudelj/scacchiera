@@ -28,14 +28,14 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 			test_piece = board.get_piece_at(test_coordinate);
 			if(test_piece == nullptr)
 			{
-				pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false});
+				pseudo_movements.push_back({this->coordinate,test_coordinate});
 			}
 			else
 			{
 				Color test_piece_color = test_piece->get_color();
 				if(color != test_piece_color)
 				{
-					pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false});
+					pseudo_movements.push_back({this->coordinate,test_coordinate});
 				}
 				break;
 			}

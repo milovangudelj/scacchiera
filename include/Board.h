@@ -48,7 +48,7 @@ namespace Chess {
             Movement get_last_movement() const { return last_movement; }
             bool is_checkmate(Player& current, Player& other);
             bool is_draw(Player& current, Player& other);
-            bool can_draw(); //threefold position
+            bool can_draw(); //threefold repetition
     };
 
 }
