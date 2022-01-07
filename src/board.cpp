@@ -233,7 +233,11 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     }
 
     if(movement.is_short_castling || movement.is_long_castling) {
-        return handle_castling(current_player, other_player, movement);
+        MoveResult castling_result = handle_castling(current_player, other_player, movement);
+        if(castling_result == MoveResult::ok) {
+            position_history[to_fen()]++;
+        }
+        return castling_result;
     }
 
     //try to move
@@ -313,10 +317,13 @@ void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eat
 MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
     Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
     Coordinate current_king_coordinate = king_coordinate;
+
+    //for undoing
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
-    //short castling(either by king or knight)
-    if(movement.is_short_castling) {
+
+    Coordinate rook_coordinate;
+    if(movement.is_short_castling) { //short castling(either by king or rook)
         Coordinate to_right;
         for(int i = 0; i < 2; i++) {
             to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
@@ -331,11 +338,8 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             }
             current_king_coordinate = to_right;
         }
-        Coordinate rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
-        cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
-        temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-        cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-        cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);
+        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
+        
     } else { //long castling
         Coordinate to_left;
         for(int i = 0; i < 3; i++) {
@@ -350,12 +354,14 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             }
             current_king_coordinate = to_left;
         }
-        Coordinate rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
-        cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
-        temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-        cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-        cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);
+        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::left);
     }
+    cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
+    temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
+    cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
+    cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);  
+    last_movement = {king_coordinate, rook_coordinate};
+    last_eaten = nullptr;
     return MoveResult::ok;
 }
 
