@@ -249,13 +249,15 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return MoveResult::invalid;
     }
 
-    other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));  
+    if(last_eaten != nullptr) {
+        other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));  
+    }
     start_piece->set_had_moved();
     start_piece->set_coordinate(movement.end);
     if(start_piece->get_type() == PieceType::pawn || last_eaten == nullptr) {
-        //current_player.reset_stale_since();
+        current_player.reset_stale_since();
     } else {
-        //current_player.increment_stale_since();
+        current_player.increment_stale_since();
     }
 
     position_history[to_fen()]++;
