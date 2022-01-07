@@ -85,12 +85,14 @@ void Board::initialize_with_fen(std::string fen, Player& player1, Player& player
                 b_king_coordinate = {rank, file};
             }
         }
-        //TODO if bishop add color awareness
+        if(type == PieceType::bishop) {
+            std::static_pointer_cast<Bishop>(piece)->update_cell_color();
+        }
         file++;
     }
 }
 
-std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) {
+std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) const {
     auto [rank, file] = coordinate;
     return cells[rank][file];
 }
@@ -182,7 +184,7 @@ bool Board::is_draw(Player& current, Player& other) {
     if(current_pieces.size() <= 3 && other_pieces.size() <= 3) {
         //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
         std::list<std::shared_ptr<Piece>> bishops;
-        current_pieces.splice(current_pieces.end(), other_pieces);
+        current_pieces.splice(current_pieces.end(), other_pieces); //move other_pieces elements at the end of current_pieces
         for(std::shared_ptr<Piece> piece : current_pieces) {
             if(piece->get_type() != PieceType::king) {
                 if(piece->get_type() == PieceType::bishop) {
@@ -192,21 +194,23 @@ bool Board::is_draw(Player& current, Player& other) {
                 }
             }
         }
-        //TODO
-        //Color cell_color = bishops.front()->get_cell_color();
-        /*for(std::shared_ptr<Piece> bishop : bishops) {
-            if(bishop->get_cell_color() != cell_color) {
+        if(bishops.size() == 0) {
+            return false;
+        }
+        Color cell_color = std::static_pointer_cast<Bishop>(bishops.front())->get_cell_color();
+        for(std::shared_ptr<Piece> bishop : bishops) {
+            if(std::static_pointer_cast<Bishop>(bishop)->get_cell_color() != cell_color) {
                 return false;
             }
-        }*/
+        }
+        return true;
     }
-    //end dead position
 
-    //TODO 50 move rule
-    /*
+    //50 move rule
     if(current.get_stale_since() >= 50 && other.get_stale_since() >= 50) {
         return true;
-    }*/
+    }
+
     return false;
 }
 
