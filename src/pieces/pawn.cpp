@@ -14,77 +14,78 @@ PawnPiece::PawnPiece(Coordinate coordinate, Color color, PieceType type) : Piece
 }
 std::list<Movement> PawnPiece::get_pseudo_valid_movements(Board& board)
 {
-    std::list<Movement> pseudo_moviments;
+    std::list<Movement> pseudo_movements;
     Coordinate test_coordinate;
     std::pair<Coordinate,Coordinate> possible_movements;
+    bool is_promo;
     if(this->color == Color::white)
     {
         //if it's the pawn's first move, it can move two squares straight forward
         test_coordinate = double_step(board, Color::white);
-        pseudo_moviments.push_back({this->coordinate,test_coordinate,false,false,false,false});
+        if(!(test_coordinate == this->coordinate))
+        {
+            pseudo_movements.push_back({this->coordinate,test_coordinate});
+        }
         //otherwise it can move only one square straight forward
         test_coordinate = one_step(board,this->coordinate,Color::white);
-        if(promotion(test_coordinate,Color::white))
+        if(!(test_coordinate == this->coordinate))
         {
-            pseudo_moviments.push_back({this->coordinate,test_coordinate,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,test_coordinate,false,false,false,false});
+            is_promo = promotion(test_coordinate,Color::white) ? true : false;
+            pseudo_movements.push_back({this->coordinate,test_coordinate,is_promo}); 
         }
         //unlike other pieces, a pawn captures in front of it diagonally
         possible_movements = diag_cap(board,Color::white);
-        if(promotion(possible_movements.first,Color::white))
+        if(!(possible_movements.first == this->coordinate))
         {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.first,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.first,false,false,false,false});
+            is_promo = promotion(possible_movements.first,Color::white) ? true : false;
+            pseudo_movements.push_back({this->coordinate,possible_movements.first,is_promo});
         }
-        if(promotion(possible_movements.second,Color::white))
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.second,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.second,false,false,false,false});
-        }
+        if(!(possible_movements.second == this->coordinate))
+        {    
+            is_promo = promotion(possible_movements.second,Color::white) ? true : false;      
+            pseudo_movements.push_back({this->coordinate,possible_movements.second,is_promo});
+        }    
         //en passant's implementation
         test_coordinate = en_passant(board,Color::white);
-        pseudo_moviments.push_back({this->coordinate,test_coordinate,false,true,false,false});
+        if(!(test_coordinate == this->coordinate))
+        {
+            pseudo_movements.push_back({this->coordinate,test_coordinate,false,true});
+        }
     }else
     {
         //double step straight forward black
         test_coordinate = double_step(board,Color::black);
-        pseudo_moviments.push_back({this->coordinate,test_coordinate,false,false,false,false});
+        if(!(test_coordinate == this->coordinate))
+        {
+            pseudo_movements.push_back({this->coordinate,test_coordinate});
+        }
         //one step straight forward black
         test_coordinate = one_step(board,this->coordinate,Color::black);
-        if(promotion(test_coordinate,Color::black))
+        if(!(test_coordinate == this->coordinate))
         {
-            pseudo_moviments.push_back({this->coordinate,test_coordinate,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,test_coordinate,false,false,false,false});
+            is_promo = promotion(test_coordinate,Color::black) ? true : false;
+            pseudo_movements.push_back({this->coordinate,test_coordinate,is_promo}); 
         }
         //capture diagonally black
         possible_movements = diag_cap(board,Color::black);
-        if(promotion(possible_movements.first,Color::black))
+        if(!(possible_movements.first == this->coordinate))
         {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.first,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.first,false,false,false,false});
+            is_promo = promotion(possible_movements.first,Color::black) ? true : false;
+            pseudo_movements.push_back({this->coordinate,possible_movements.first,is_promo});
         }
-        if(promotion(possible_movements.second,Color::black))
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.second,true,false,false,false});    
-        }else
-        {
-            pseudo_moviments.push_back({this->coordinate,possible_movements.second,false,false,false,false});
-        }
+        if(!(possible_movements.second == this->coordinate))
+        {    
+            is_promo = promotion(possible_movements.second,Color::black) ? true : false;      
+            pseudo_movements.push_back({this->coordinate,possible_movements.second,is_promo});
+        }    
         //en passant black
         test_coordinate = en_passant(board,Color::black);
-        pseudo_moviments.push_back({this->coordinate,test_coordinate,false,true,false,false});
+        if(!(test_coordinate == this->coordinate))
+        {
+            pseudo_movements.push_back({this->coordinate,test_coordinate,false,true});
+        }
     }
-    return pseudo_moviments;
+    return pseudo_movements;
 }
 /************************** one step *****************************/
 Chess::Coordinate PawnPiece::one_step(Board& board,Coordinate test_coordinate, Color color)
@@ -147,88 +148,40 @@ std::pair<Chess::Coordinate,Chess::Coordinate> PawnPiece::diag_cap(Board& board,
 /************************** en passant (!)*****************************/
 Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
 {
-    Coordinate test_coordinate, test_coordinate1;
+    Coordinate end_p, start_p;
     std::shared_ptr<Piece> test_piece;
-    std::list<Movement> list_of_movements;
-    Movement last_move;
-    if(color == Color::white)
+    Direction direction = (color == Color::white ? Direction::up : Direction::down);
+    Direction direction_l = (color == Color::white ? Direction::left_up : Direction::left_down);
+    Direction direction_r = (color == Color::white ? Direction::right_up : Direction::right_down);
+    end_p = this->coordinate + DirectionOffset.at(Direction::left);
+    start_p = end_p + DirectionOffset.at(direction) + DirectionOffset.at(direction);
+    if(end_p.is_valid() && start_p.is_valid())
     {
-        test_coordinate = this->coordinate + DirectionOffset.at(Direction::left);
-        if(test_coordinate.is_valid())
+        test_piece = board.get_piece_at(end_p);
+        if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
         {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
+            if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
-                list_of_movements = test_piece->get_pseudo_valid_movements(board);
-                last_move = list_of_movements.back();
-                if(last_move.start.rank == 1)
-                {
-                    test_coordinate = this->coordinate + DirectionOffset.at(Direction::left_up);
-                    if(test_coordinate.is_valid())
-                    {
-                        return test_coordinate;
-                    }
-                }
-            }
-        }
-        test_coordinate = this->coordinate + DirectionOffset.at(Direction::right);
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
-            {
-                list_of_movements = test_piece->get_pseudo_valid_movements(board);
-                last_move = list_of_movements.back();
-                if(last_move.start.rank == 1)
-                {
-                    test_coordinate = this->coordinate + DirectionOffset.at(Direction::right_up);
-                    if(test_coordinate.is_valid())
-                    {
-                        return test_coordinate;
-                    }
-                }
-            }
-        }
-    }else
-    {
-        test_coordinate = this->coordinate + DirectionOffset.at(Direction::left);
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
-            {
-                list_of_movements = test_piece->get_pseudo_valid_movements(board);
-                last_move = list_of_movements.back();
-                if(last_move.start.rank == 6)
-                {
-                    test_coordinate = this->coordinate + DirectionOffset.at(Direction::left_down);
-                    if(test_coordinate.is_valid())
-                    {
-                        return test_coordinate;
-                    }
-                }
-            }
-        }
-        test_coordinate = this->coordinate + DirectionOffset.at(Direction::right);
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
-            {
-                list_of_movements = test_piece->get_pseudo_valid_movements(board);
-                last_move = list_of_movements.back();
-                if(last_move.start.rank == 6)
-                {
-                    test_coordinate = this->coordinate + DirectionOffset.at(Direction::right_down);
-                    if(test_coordinate.is_valid())
-                    {
-                        return test_coordinate;
-                    }
-                }
+                end_p = this->coordinate + DirectionOffset.at(direction_l);
+                return end_p;
             }
         }
     }
-    return test_coordinate;
+    end_p = this->coordinate + DirectionOffset.at(Direction::right);
+    start_p = end_p + DirectionOffset.at(direction) + DirectionOffset.at(direction);
+    if(end_p.is_valid() && start_p.is_valid())
+    {
+        test_piece = board.get_piece_at(end_p);
+        if(test_piece != nullptr && this->color != test_piece->get_color() && this->type == test_piece->get_type())
+        {
+            if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
+            {
+                end_p = this->coordinate + DirectionOffset.at(direction_r);
+                return end_p;
+            }
+        }
+    }
+    return this->coordinate;
 }
 
 /************************** promotion *****************************/
