@@ -16,6 +16,7 @@ add_library(chess STATIC
     src/pieces/bishop.cpp
     src/pieces/knight.cpp
     src/pieces/rook.cpp
+    src/pieces/pawn.cpp
 )
 
 add_executable(test 
