@@ -8,7 +8,6 @@
 #include <list>
 #include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
 
-
 namespace Chess {
 
     class Board; //predeclaration to avoid circular dependency
@@ -27,11 +26,13 @@ namespace Chess {
                 color{color}, 
                 type{type}, 
                 had_moved{false} {}
+
             virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
+            
             Coordinate get_coordinate() const { return coordinate;};
             Chess::utilities::Color get_color() const { return color;};
             Chess::utilities::PieceType get_type() const { return type;};
-            char get_symbol() const {return symbol;};
+            char get_symbol() const { return symbol;};
             bool get_had_moved() const { return had_moved;};
             void set_had_moved() { had_moved = true; };
             void set_coordinate(Coordinate coordinate) {
