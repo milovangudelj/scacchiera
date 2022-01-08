@@ -12,6 +12,7 @@ Pawn::Pawn(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
 {
     symbol = (color == Color::black) ? 'P': 'p';
 }
+
 std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
 {
     std::list<Movement> pseudo_movements;
@@ -87,6 +88,7 @@ std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
     }
     return pseudo_movements;
 }
+
 /************************** one step *****************************/
 Chess::Coordinate Pawn::one_step(Board& board,Coordinate test_coordinate, Color color)
 {
@@ -103,6 +105,7 @@ Chess::Coordinate Pawn::one_step(Board& board,Coordinate test_coordinate, Color 
     }
     return this->coordinate; 
 }
+
 /************************** double step *****************************/
 Chess::Coordinate Pawn::double_step(Board& board,Color color)
 {
@@ -162,7 +165,8 @@ Chess::Coordinate Pawn::en_passant(Board& board,Color color)
         {
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
-                return this->coordinate + DirectionOffset.at(direction_l);
+                end_p = this->coordinate + DirectionOffset.at(direction_l);
+                return end_p;
             }
         }
     }
@@ -175,7 +179,8 @@ Chess::Coordinate Pawn::en_passant(Board& board,Color color)
         {
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
-                return this->coordinate + DirectionOffset.at(direction_r);
+                end_p = this->coordinate + DirectionOffset.at(direction_r);
+                return end_p;
             }
         }
     }
