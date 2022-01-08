@@ -13,6 +13,7 @@
 #include "pieces/Bishop.h"
 #include "pieces/Knight.h"
 #include "pieces/Rook.h"
+#include "pieces/Pawn.h"
 #include "Coordinate.h"
 #include "Player.h"
 #include "Utilities.h"

@@ -10,6 +10,7 @@ using Chess::Queen;
 using Chess::Bishop;
 using Chess::Knight;
 using Chess::Rook;
+using Chess::Pawn;
 using Chess::Coordinate;
 using Chess::Player;
 using Chess::Movement;
@@ -33,20 +34,16 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
     switch (type) {
         case PieceType::king :
             return std::make_shared<King>(coordinate, color, type);
-            break;
         case PieceType::queen :
             return std::make_shared<Queen>(coordinate, color, type);
-            break;
         case PieceType::bishop :
             return std::make_shared<Bishop>(coordinate, color, type);
-            break;
         case PieceType::knight :
             return std::make_shared<Knight>(coordinate, color, type);
-            break;
         case PieceType::rook :
             return std::make_shared<Rook>(coordinate, color, type);
-            break;
-        //TODO Pawn
+        case PieceType::pawn :
+            return std::make_shared<Pawn>(coordinate, color, type);
     }
     return nullptr;
 }
