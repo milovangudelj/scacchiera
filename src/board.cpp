@@ -10,6 +10,7 @@ using Chess::Queen;
 using Chess::Bishop;
 using Chess::Knight;
 using Chess::Rook;
+using Chess::Pawn;
 using Chess::Coordinate;
 using Chess::Player;
 using Chess::Movement;
@@ -33,20 +34,16 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
     switch (type) {
         case PieceType::king :
             return std::make_shared<King>(coordinate, color, type);
-            break;
         case PieceType::queen :
             return std::make_shared<Queen>(coordinate, color, type);
-            break;
         case PieceType::bishop :
             return std::make_shared<Bishop>(coordinate, color, type);
-            break;
         case PieceType::knight :
             return std::make_shared<Knight>(coordinate, color, type);
-            break;
         case PieceType::rook :
             return std::make_shared<Rook>(coordinate, color, type);
-            break;
-        //TODO Pawn
+        case PieceType::pawn :
+            return std::make_shared<Pawn>(coordinate, color, type);
     }
     return nullptr;
 }
@@ -244,6 +241,12 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return castling_result;
     }
 
+    if(movement.is_en_passant) {
+        handle_en_passant(current_player, other_player, movement);
+        position_history[to_fen()]++;
+        return MoveResult::ok;
+    }
+
     //try to move
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
@@ -262,6 +265,14 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         current_player.reset_stale_since();
     } else {
         current_player.increment_stale_since();
+    }
+
+    if(start_piece->get_type() == PieceType::king) {
+        if(current_player.get_color() == Color::black) {
+            b_king_coordinate = movement.end;
+        } else {
+            w_king_coordinate = movement.end;
+        }
     }
 
     position_history[to_fen()]++;
@@ -324,54 +335,79 @@ void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eat
 }
 
 MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
-    Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
-    Coordinate current_king_coordinate = king_coordinate;
+    Coordinate& initial_king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+    Coordinate final_king_coordinate;
+    Coordinate initial_rook_coordinate;
+    Coordinate final_rook_coordinate;
+    std::list<Coordinate> empty_cells;
+    if(movement.is_short_castling) {
+        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::right));
+        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right));
 
-    //for undoing
+        initial_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right);
+        final_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right);
+        final_king_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right);
+    } else {
+        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left));
+        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left));
+        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left));
+
+        initial_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left);
+        final_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left);
+        final_king_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left);
+    }
+    //check that cells in between king and rook aren't under attack
+    for(std::shared_ptr<Piece> piece : other_player.get_available_pieces()) {
+        for(Movement pseudo_movement : piece->get_pseudo_valid_movements(*this)) {            
+            for(Coordinate empty_cell : empty_cells) {
+                if(empty_cell == pseudo_movement.end) {
+                    return MoveResult::invalid;
+                }
+            }
+        }
+    }
+
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
+    Coordinate initial_king_coordinate_copy = initial_king_coordinate;
 
-    Coordinate rook_coordinate;
-    if(movement.is_short_castling) { //short castling(either by king or rook)
-        Coordinate to_right;
-        for(int i = 0; i < 2; i++) {
-            to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
-            temporary_move({current_king_coordinate, to_right});
-            if(is_check(current_player, other_player)) {
-                //revert king to original coordinates
-                cells[king_coordinate.rank][king_coordinate.file] = cells[to_right.rank][to_right.file];
-                cells[to_right.rank][to_right.file] = nullptr;
-                last_eaten = previous_eaten;
-                last_movement = previous_movement;
-                return MoveResult::invalid;
-            }
-            current_king_coordinate = to_right;
-        }
-        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
-        
-    } else { //long castling
-        Coordinate to_left;
-        for(int i = 0; i < 3; i++) {
-            to_left = current_king_coordinate + DirectionOffset.at(Direction::left);
-            temporary_move({current_king_coordinate, to_left});
-            if(is_check(current_player, other_player)) {
-                cells[king_coordinate.rank][king_coordinate.file] = cells[to_left.rank][to_left.file];
-                cells[to_left.rank][to_left.file] = nullptr;
-                last_eaten = previous_eaten;
-                last_movement = previous_movement;
-                return MoveResult::invalid;
-            }
-            current_king_coordinate = to_left;
-        }
-        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::left);
+    std::shared_ptr<Piece> king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
+    std::shared_ptr<Piece> rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
+
+    temporary_move({initial_king_coordinate, final_king_coordinate});
+    initial_king_coordinate = final_king_coordinate;
+    if(is_check(current_player, other_player)) {
+        undo(previous_movement,previous_eaten);
+        initial_king_coordinate = initial_king_coordinate_copy;
+        return MoveResult::invalid;
     }
-    cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
-    temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-    cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-    cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);  
-    last_movement = {king_coordinate, rook_coordinate};
-    last_eaten = nullptr;
+    temporary_move({initial_rook_coordinate, final_rook_coordinate});
+    king->set_coordinate(final_king_coordinate);
+    king->set_had_moved();
+    rook->set_coordinate(final_rook_coordinate);
+    rook->set_had_moved();
+    current_player.increment_stale_since();
     return MoveResult::ok;
+}
+
+void Board::handle_en_passant(Player& current_player, Player& other_player, Movement movement) {
+    Direction capture_direction;
+    if(movement.end == movement.start + DirectionOffset.at(Direction::left_up) ||
+       movement.end == movement.start + DirectionOffset.at(Direction::left_down)) { //en passant to left
+        capture_direction = Direction::left;
+    }  else {
+        capture_direction = Direction::right;
+    }
+    temporary_move(movement);
+    Coordinate capture_coordinate = movement.start + DirectionOffset.at(capture_direction);
+    std::shared_ptr<Piece> captured_piece = get_piece_at(capture_coordinate);
+    cells[capture_coordinate.rank][capture_coordinate.file] = nullptr;
+    last_eaten = captured_piece;
+    std::shared_ptr<Piece> pawn = cells[movement.end.rank][movement.end.file];
+    pawn->get_had_moved();
+    pawn->set_coordinate(movement.end);
+    other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(captured_piece));
+    current_player.reset_stale_since();
 }
 
 std::string Board::to_fen() {

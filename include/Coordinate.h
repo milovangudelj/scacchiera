@@ -10,8 +10,9 @@ namespace Chess {
         unsigned int rank;
         unsigned int file;
         bool is_valid() const { return rank < 8 && file < 8; }
-        Coordinate& operator+ (std::pair<int, int> offset);
     };
+
+    Coordinate operator+ (Coordinate coordinate, std::pair<int, int> offset);
 
     bool operator== (const Coordinate& coordinate1, const Coordinate& coordinate2);
 
