@@ -85,12 +85,14 @@ void Board::initialize_with_fen(std::string fen, Player& player1, Player& player
                 b_king_coordinate = {rank, file};
             }
         }
-        //TODO if bishop add color awareness
+        if(type == PieceType::bishop) {
+            std::static_pointer_cast<Bishop>(piece)->update_cell_color();
+        }
         file++;
     }
 }
 
-std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) {
+std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) const {
     auto [rank, file] = coordinate;
     return cells[rank][file];
 }
@@ -182,7 +184,7 @@ bool Board::is_draw(Player& current, Player& other) {
     if(current_pieces.size() <= 3 && other_pieces.size() <= 3) {
         //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
         std::list<std::shared_ptr<Piece>> bishops;
-        current_pieces.splice(current_pieces.end(), other_pieces);
+        current_pieces.splice(current_pieces.end(), other_pieces); //move other_pieces elements at the end of current_pieces
         for(std::shared_ptr<Piece> piece : current_pieces) {
             if(piece->get_type() != PieceType::king) {
                 if(piece->get_type() == PieceType::bishop) {
@@ -192,21 +194,23 @@ bool Board::is_draw(Player& current, Player& other) {
                 }
             }
         }
-        //TODO
-        //Color cell_color = bishops.front()->get_cell_color();
-        /*for(std::shared_ptr<Piece> bishop : bishops) {
-            if(bishop->get_cell_color() != cell_color) {
+        if(bishops.size() == 0) {
+            return false;
+        }
+        Color cell_color = std::static_pointer_cast<Bishop>(bishops.front())->get_cell_color();
+        for(std::shared_ptr<Piece> bishop : bishops) {
+            if(std::static_pointer_cast<Bishop>(bishop)->get_cell_color() != cell_color) {
                 return false;
             }
-        }*/
+        }
+        return true;
     }
-    //end dead position
 
-    //TODO 50 move rule
-    /*
+    //50 move rule
     if(current.get_stale_since() >= 50 && other.get_stale_since() >= 50) {
         return true;
-    }*/
+    }
+
     return false;
 }
 
@@ -233,7 +237,11 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     }
 
     if(movement.is_short_castling || movement.is_long_castling) {
-        return handle_castling(current_player, other_player, movement);
+        MoveResult castling_result = handle_castling(current_player, other_player, movement);
+        if(castling_result == MoveResult::ok) {
+            position_history[to_fen()]++;
+        }
+        return castling_result;
     }
 
     //try to move
@@ -245,13 +253,15 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return MoveResult::invalid;
     }
 
-    other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));  
+    if(last_eaten != nullptr) {
+        other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));  
+    }
     start_piece->set_had_moved();
     start_piece->set_coordinate(movement.end);
     if(start_piece->get_type() == PieceType::pawn || last_eaten == nullptr) {
-        //current_player.reset_stale_since();
+        current_player.reset_stale_since();
     } else {
-        //current_player.increment_stale_since();
+        current_player.increment_stale_since();
     }
 
     position_history[to_fen()]++;
@@ -275,6 +285,9 @@ bool Board::promote(Player& player, char piece_symbol) {
     }
 
     std::shared_ptr<Piece> resurrected = player.remove_from_lost_pieces(*p);
+    if(resurrected->get_type() == PieceType::bishop) {
+        std::static_pointer_cast<Bishop>(resurrected)->update_cell_color();
+    }
     player.add_to_available_pieces(resurrected);
 
     unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
@@ -313,10 +326,13 @@ void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eat
 MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
     Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
     Coordinate current_king_coordinate = king_coordinate;
+
+    //for undoing
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
-    //short castling(either by king or knight)
-    if(movement.is_short_castling) {
+
+    Coordinate rook_coordinate;
+    if(movement.is_short_castling) { //short castling(either by king or rook)
         Coordinate to_right;
         for(int i = 0; i < 2; i++) {
             to_right = current_king_coordinate + DirectionOffset.at(Direction::right);
@@ -331,11 +347,8 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             }
             current_king_coordinate = to_right;
         }
-        Coordinate rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
-        cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
-        temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-        cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-        cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);
+        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
+        
     } else { //long castling
         Coordinate to_left;
         for(int i = 0; i < 3; i++) {
@@ -350,12 +363,14 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
             }
             current_king_coordinate = to_left;
         }
-        Coordinate rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::right);
-        cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
-        temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-        cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-        cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);
+        rook_coordinate = current_king_coordinate + DirectionOffset.at(Direction::left);
     }
+    cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
+    temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
+    cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
+    cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);  
+    last_movement = {king_coordinate, rook_coordinate};
+    last_eaten = nullptr;
     return MoveResult::ok;
 }
 

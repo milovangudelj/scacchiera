@@ -9,11 +9,14 @@ namespace Chess
 	{
 		using Piece::Piece;
 
+	private:
+		Chess::utilities::Color cell_color;
+
 	public:
 		Bishop(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
 		std::list<Movement> get_pseudo_valid_movements(Board &board);
-		Chess::utilities::Color get_color() const;
-		void set_color(Chess::utilities::Color _color);
+		Chess::utilities::Color get_cell_color() const;
+		void update_cell_color();
 	};
 } // namespace Chess
 

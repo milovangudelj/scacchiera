@@ -48,12 +48,12 @@ std::list<Movement> Bishop::get_pseudo_valid_movements(Board &board)
 	return pseudo_movements;
 }
 
-Chess::utilities::Color Bishop::get_color() const
+Chess::utilities::Color Bishop::get_cell_color() const
 {
-	return color;
+	return cell_color;
 };
 
-void Bishop::set_color(Chess::utilities::Color _color)
+void Bishop::update_cell_color()
 {
-	color = _color;
+	cell_color = (coordinate.rank + coordinate.file % 2 == 0) ? Color::white : Color::black;
 };
