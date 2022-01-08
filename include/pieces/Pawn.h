@@ -5,11 +5,11 @@
 #include<utility>
 namespace Chess
 {
-    class PawnPiece : public Piece
+    class Pawn : public Piece
     {
         using Piece::Piece;
         public:
-        PawnPiece(Coordinate coordinate,Chess::utilities::Color color, Chess::utilities::PieceType type);
+        Pawn(Coordinate coordinate,Chess::utilities::Color color, Chess::utilities::PieceType type);
         std::list<Movement> get_pseudo_valid_movements(Board& board);
         private:
         Coordinate one_step(Board& board,Coordinate coordinate, Chess::utilities::Color color);

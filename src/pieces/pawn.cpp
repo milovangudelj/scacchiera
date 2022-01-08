@@ -1,18 +1,19 @@
 #include "pieces/Pawn.h"
 #include "Board.h"
 
-using Chess::PawnPiece;
+using Chess::Pawn;
 using Chess::Movement;
 using Chess::utilities::Color;
 using Chess::utilities::PieceType;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 
-PawnPiece::PawnPiece(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate,color,type}
+Pawn::Pawn(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate,color,type}
 {
     symbol = (color == Color::black) ? 'P': 'p';
 }
-std::list<Movement> PawnPiece::get_pseudo_valid_movements(Board& board)
+
+std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
 {
     std::list<Movement> pseudo_movements;
     Coordinate test_coordinate;
@@ -87,8 +88,9 @@ std::list<Movement> PawnPiece::get_pseudo_valid_movements(Board& board)
     }
     return pseudo_movements;
 }
+
 /************************** one step *****************************/
-Chess::Coordinate PawnPiece::one_step(Board& board,Coordinate test_coordinate, Color color)
+Chess::Coordinate Pawn::one_step(Board& board,Coordinate test_coordinate, Color color)
 {
     std::shared_ptr<Piece> test_piece;
     Direction direction = (color == Color::white ? Direction::up : Direction::down);
@@ -103,8 +105,9 @@ Chess::Coordinate PawnPiece::one_step(Board& board,Coordinate test_coordinate, C
     }
     return this->coordinate; 
 }
+
 /************************** double step *****************************/
-Chess::Coordinate PawnPiece::double_step(Board& board,Color color)
+Chess::Coordinate Pawn::double_step(Board& board,Color color)
 {
     Coordinate test_coordinate = this->coordinate;
     std::shared_ptr<Piece> test_piece;
@@ -117,7 +120,7 @@ Chess::Coordinate PawnPiece::double_step(Board& board,Color color)
 }
 
 /************************** diagonally step *****************************/
-std::pair<Chess::Coordinate,Chess::Coordinate> PawnPiece::diag_cap(Board& board, Color color)
+std::pair<Chess::Coordinate,Chess::Coordinate> Pawn::diag_cap(Board& board, Color color)
 {
     Coordinate test_coordinate;
     std::shared_ptr<Piece> test_piece;
@@ -146,7 +149,7 @@ std::pair<Chess::Coordinate,Chess::Coordinate> PawnPiece::diag_cap(Board& board,
 }
 
 /************************** en passant (!)*****************************/
-Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
+Chess::Coordinate Pawn::en_passant(Board& board,Color color)
 {
     Coordinate end_p, start_p;
     std::shared_ptr<Piece> test_piece;
@@ -163,11 +166,7 @@ Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
                 end_p = this->coordinate + DirectionOffset.at(direction_l);
-                test_piece = board.get_piece_at(end_p);
-                if(test_piece == nullptr || test_piece->get_color() != this->color)
-                {
-                    return end_p;
-                }
+                return end_p;
             }
         }
     }
@@ -181,11 +180,7 @@ Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
                 end_p = this->coordinate + DirectionOffset.at(direction_r);
-                test_piece = board.get_piece_at(end_p);
-                if(test_piece == nullptr || test_piece->get_color() != this->color)
-                {
-                    return end_p;
-                }
+                return end_p;
             }
         }
     }
@@ -193,7 +188,7 @@ Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
 }
 
 /************************** promotion *****************************/
-bool PawnPiece::promotion(Coordinate coordinate,Color color)
+bool Pawn::promotion(Coordinate coordinate,Color color)
 {
     if(color == Color::white )
     {
