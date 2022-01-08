@@ -241,6 +241,12 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         return castling_result;
     }
 
+    if(movement.is_en_passant) {
+        handle_en_passant(current_player, other_player, movement);
+        position_history[to_fen()]++;
+        return MoveResult::ok;
+    }
+
     //try to move
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
@@ -369,6 +375,23 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     last_movement = {king_coordinate, rook_coordinate};
     last_eaten = nullptr;
     return MoveResult::ok;
+    //TODO add is_check to king at last
+}
+
+void Board::handle_en_passant(Player& current_player, Player& other_player, Movement movement) {
+    Direction capture_direction;
+    if(movement.end == movement.start + DirectionOffset.at(Direction::left_up) ||
+       movement.end == movement.start + DirectionOffset.at(Direction::left_down)) { //en passant to left
+        capture_direction = Direction::left;
+    }  else {
+        capture_direction = Direction::right;
+    }
+    temporary_move(movement);
+    Coordinate capture_coordinate = movement.start + DirectionOffset.at(capture_direction);
+    std::shared_ptr<Piece> captured_piece = get_piece_at(capture_coordinate);
+    cells[capture_coordinate.rank][capture_coordinate.file] = nullptr;
+    last_eaten = captured_piece;
+    other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(captured_piece));
 }
 
 std::string Board::to_fen() {

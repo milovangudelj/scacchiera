@@ -34,8 +34,9 @@ namespace Chess {
             std::shared_ptr<Piece> last_eaten;
             Movement last_movement;
             bool is_check(Player& current, Player& other);
-            void temporary_move(Movement movement);
+            void temporary_move(Movement movement); //modifies last_eaten
             Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
+            void handle_en_passant(Player& current_player, Player& other_player, Movement movement);
             void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
             std::map<std::string, int> position_history;
             std::string to_fen();
