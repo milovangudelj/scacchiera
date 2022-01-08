@@ -243,7 +243,6 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
 
     if(movement.is_en_passant) {
         handle_en_passant(current_player, other_player, movement);
-        start_piece->set_coordinate(movement.end);
         position_history[to_fen()]++;
         return MoveResult::ok;
     }
@@ -384,7 +383,10 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     }
     temporary_move({initial_rook_coordinate, final_rook_coordinate});
     king->set_coordinate(final_king_coordinate);
+    king->set_had_moved();
     rook->set_coordinate(final_rook_coordinate);
+    rook->set_had_moved();
+    current_player.increment_stale_since();
     return MoveResult::ok;
 }
 
@@ -401,7 +403,11 @@ void Board::handle_en_passant(Player& current_player, Player& other_player, Move
     std::shared_ptr<Piece> captured_piece = get_piece_at(capture_coordinate);
     cells[capture_coordinate.rank][capture_coordinate.file] = nullptr;
     last_eaten = captured_piece;
+    std::shared_ptr<Piece> pawn = cells[movement.end.rank][movement.end.file];
+    pawn->get_had_moved();
+    pawn->set_coordinate(movement.end);
     other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(captured_piece));
+    current_player.reset_stale_since();
 }
 
 std::string Board::to_fen() {
