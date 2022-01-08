@@ -162,12 +162,7 @@ Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
         {
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
-                end_p = this->coordinate + DirectionOffset.at(direction_l);
-                test_piece = board.get_piece_at(end_p);
-                if(test_piece == nullptr || test_piece->get_color() != this->color)
-                {
-                    return end_p;
-                }
+                return this->coordinate + DirectionOffset.at(direction_l);
             }
         }
     }
@@ -180,12 +175,7 @@ Chess::Coordinate PawnPiece::en_passant(Board& board,Color color)
         {
             if(board.get_last_movement().start == start_p && board.get_last_movement().end == end_p)
             {
-                end_p = this->coordinate + DirectionOffset.at(direction_r);
-                test_piece = board.get_piece_at(end_p);
-                if(test_piece == nullptr || test_piece->get_color() != this->color)
-                {
-                    return end_p;
-                }
+                return this->coordinate + DirectionOffset.at(direction_r);
             }
         }
     }
