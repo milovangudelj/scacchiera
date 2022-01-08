@@ -267,6 +267,14 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
         current_player.increment_stale_since();
     }
 
+    if(start_piece->get_type() == PieceType::king) {
+        if(current_player.get_color() == Color::black) {
+            b_king_coordinate = movement.end;
+        } else {
+            w_king_coordinate = movement.end;
+        }
+    }
+
     position_history[to_fen()]++;
    
     if(movement.is_promotion) {
@@ -370,12 +378,26 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     }
     cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file]; //move rook to where king was
     temporary_move({current_king_coordinate, rook_coordinate}); //move king to where rook was
-    cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
-    cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);  
-    last_movement = {king_coordinate, rook_coordinate};
-    last_eaten = nullptr;
-    return MoveResult::ok;
-    //TODO add is_check to king at last
+    if(is_check(current_player, other_player)) {
+        std::shared_ptr<Piece> rook = cells[king_coordinate.rank][king_coordinate.file];
+        cells[king_coordinate.rank][king_coordinate.file] = cells[rook_coordinate.rank][rook_coordinate.file];
+        cells[rook_coordinate.rank][rook_coordinate.file] = rook;
+        last_movement = previous_movement;
+        last_eaten = previous_eaten;
+        return MoveResult::invalid;
+    } else {
+        cells[king_coordinate.rank][king_coordinate.file]->set_coordinate(king_coordinate);
+        cells[rook_coordinate.rank][rook_coordinate.file]->set_coordinate(rook_coordinate);  
+        last_movement = {king_coordinate, rook_coordinate};
+        last_eaten = nullptr;
+        //update king coordinate
+        if(current_player.get_color() == Color::black) {
+            b_king_coordinate = rook_coordinate;
+        } else {
+            w_king_coordinate = rook_coordinate;
+        }
+        return MoveResult::ok;
+    }
 }
 
 void Board::handle_en_passant(Player& current_player, Player& other_player, Movement movement) {
