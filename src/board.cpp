@@ -285,6 +285,9 @@ bool Board::promote(Player& player, char piece_symbol) {
     }
 
     std::shared_ptr<Piece> resurrected = player.remove_from_lost_pieces(*p);
+    if(resurrected->get_type() == PieceType::bishop) {
+        std::static_pointer_cast<Bishop>(resurrected)->update_cell_color();
+    }
     player.add_to_available_pieces(resurrected);
 
     unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
