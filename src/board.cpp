@@ -1,6 +1,7 @@
 #include "Board.h"
 
 #include <list>
+#include <string>
 #include <algorithm>
 
 using Chess::Board;
@@ -447,6 +448,10 @@ bool Board::can_draw() {
     return true;
 }
 
+std::string black = "\033[0m";
+std::string white = "\033[7m";
+std::string colors[8][8] = {{white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}};
+
 namespace Chess {
     std::ostream& operator<< (std::ostream& os, const Board& board) {
         std::shared_ptr<Piece> piece;
@@ -455,17 +460,19 @@ namespace Chess {
             os << 8 - rank << " ";
             for(int file = 0; file < SIZE; file++) {
                 piece = board.cells[rank][file];
+                os << colors[rank][file];
                 if(piece == nullptr) {
-                    os << " ";
+                    os << "   ";
                 } else {
-                    os << piece->get_symbol();
+                    os << " " << piece->get_symbol() << " ";
                 }
             }
+            os << "\033[0m"; // Color reset
             os << "\n";
         }
         os << "\n" << "  ";
         for(int i = 0; i < SIZE; i++) {
-            os << static_cast<char>('A' + i);
+            os << " " << static_cast<char>('A' + i) << " ";
         }
         return os;
     }
