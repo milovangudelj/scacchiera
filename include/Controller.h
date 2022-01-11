@@ -2,25 +2,30 @@
 #define CONTROLLER_H
 
 #include <list>
+#include <memory>
 
 #include "Player.h"
 #include "Movement.h"
+#include "Board.h"
 
 namespace Chess
 {
 	class Controller
 	{
 	private:
-		Chess::Player white;
-		Chess::Player black;
+		std::shared_ptr<Chess::Player> white;
+		std::shared_ptr<Chess::Player> black;
 		std::list<Chess::Movement> history;
-		void display();
-		void play();
+		std::unique_ptr<Chess::Board> board;
+		Chess::Movement get_move();
 		void export_game();
+		void init(const std::string &type);
 
 	public:
-		Controller(/* args */);
-		~Controller();
+		Controller();
+
+		void play();
+		void display(bool is_checkmate, bool is_draw, bool is_check = false);
 	};
 } // namespace Chess
 
