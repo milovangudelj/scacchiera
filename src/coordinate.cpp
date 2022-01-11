@@ -3,18 +3,21 @@
 
 using Chess::Coordinate;
 
-Coordinate Chess::operator+ (Coordinate coordinate, std::pair<int, int> offset) {
+Coordinate Chess::operator+(Coordinate coordinate, std::pair<int, int> offset)
+{
     auto [rank_offset, file_offset] = offset;
     coordinate.rank += rank_offset;
     coordinate.file += file_offset;
     return coordinate;
 }
 
-bool Chess::operator== (const Coordinate& coordinate1, const Coordinate& coordinate2) {
+bool Chess::operator==(const Coordinate &coordinate1, const Coordinate &coordinate2)
+{
     return coordinate1.rank == coordinate2.rank && coordinate1.file == coordinate2.file;
 }
 
-std::ostream& Chess::operator<< (std::ostream& os, Coordinate& coordinate) {
+std::ostream &Chess::operator<<(std::ostream &os, Coordinate &coordinate)
+{
     std::string file_character;
     switch (coordinate.file)
     {
