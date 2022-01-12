@@ -146,13 +146,16 @@ void Controller::play()
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
-
+			// Add movement to history
+			history.push_back(mvmt);
 			break;
 
 		default:
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
+			// Add movement to history
+			history.push_back(mvmt);
 			break;
 		}
 
