@@ -60,7 +60,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         }
 
         //long castling
-        i = 2;
+        i = 3;
         test_coordinate = this->coordinate;
         do {
             test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
@@ -70,7 +70,6 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
             }
             i--;
         } while(i > 0);
-        test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
         test_piece = board.get_piece_at(test_coordinate);
         if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
