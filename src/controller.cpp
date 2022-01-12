@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <set>
 
 #include "Controller.h"
 #include "Board.h"
@@ -10,8 +11,10 @@ using Chess::Controller;
 using Chess::utilities::Color;
 using Chess::utilities::PlayerType;
 
-#define BRIGHT "\033[1m"
-#define RESET "\033[0m"
+static const char *BRIGHT = "\033[1m";
+static const char *RESET = "\033[0m";
+static const char *RED_FG = "\033[31m";
+static const char *BLUE_FG = "\033[34m";
 
 Controller::Controller() : white(nullptr), black(nullptr), board(nullptr)
 {
@@ -79,49 +82,97 @@ Chess::Movement Controller::get_move()
 	return {start, end}; // {{yf, xf},{yt, xt}} where f = from, t = to
 }
 
+/// @brief A helper function for setting error messages
+/// @param errors The reference to the errors set
+/// @param message The error message you want to set
+/// @returns void
+void set_error(std::set<std::string> &errors, const std::string &message)
+{
+	std::stringstream msg;
+	msg << RED_FG << BRIGHT << "Error: " << RESET << message;
+
+	errors.insert(msg.str());
+}
+
+/// @brief A helper function for clearing error messages
+/// @param errors The reference to the errors set
+/// @returns void
+void clear_errors(std::set<std::string> &errors)
+{
+	errors.clear();
+};
+
+/// @brief Starts the game and goes on until either checkmate or draw occurs
 void Controller::play()
 {
+	std::shared_ptr<Chess::Player> current_player = white;
+	std::shared_ptr<Chess::Player> other_player = black;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
+	bool invalid_move = false;
+	std::set<std::string> errors;
 
 	Chess::utilities::MoveResult result;
 
 	while (!checkmate && !draw)
 	{
-		display(checkmate, draw, check);
+		display(current_player.get()->get_name(), checkmate, draw, check);
 		std::cout << ": ";
+		for (std::string e : errors)
+		{
+			std::cout << "\n"
+						 << e << "\033[A\r: ";
+		}
 
+		// Ask for input again if move was invalid
 		Chess::Movement mvmt = get_move();
 		if (!mvmt.start.is_valid() && !mvmt.end.is_valid())
-			continue;
-
-		result = board.get()->move(*white.get(), *black.get(), mvmt);
-		if (result == Chess::utilities::MoveResult::invalid)
 		{
-			std::cout << "Invalid move...";
+			clear_errors(errors);
+			continue;
+		}
+
+		result = board.get()->move(*current_player.get(), *other_player.get(), mvmt);
+		invalid_move = result == Chess::utilities::MoveResult::invalid;
+
+		switch (result)
+		{
+		case Chess::utilities::MoveResult::invalid:
+			set_error(errors, "Invalid move. Try again...");
+			break;
+		case Chess::utilities::MoveResult::ok:
+			clear_errors(errors);
+			// Swap players
+			current_player = current_player == white ? black : white;
+			other_player = other_player == white ? black : white;
+
+			break;
+
+		default:
+			// Swap players
+			current_player = current_player == white ? black : white;
+			other_player = other_player == white ? black : white;
+			break;
 		}
 
 		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board.get()->is_checkmate(*white.get(), *black.get());
-		draw = board.get()->is_draw(*white.get(), *black.get());
+		checkmate = board.get()->is_checkmate(*current_player.get(), *other_player.get());
+		draw = board.get()->is_draw(*current_player.get(), *other_player.get());
 	}
-	display(checkmate, draw, check);
+	display(current_player.get()->get_name(), checkmate, draw, check);
 
 	std::cout << "Game Over...\n\n";
 }
 
-void Controller::display(bool is_checkmate, bool is_draw, bool is_check)
+void Controller::display(const std::string &whose_turn, bool is_checkmate, bool is_draw, bool is_check)
 {
-	std::string checkmate = is_checkmate ? "true" : "false";
-	std::string draw = is_draw ? "true" : "false";
+	const char *checkmate = is_checkmate ? "true" : "false";
+	const char *draw = is_draw ? "true" : "false";
 
-	std::cout << BRIGHT // Bright
-				 << "Checkmate:"
-				 << RESET << " " << checkmate << "   "
-				 << BRIGHT
-				 << "Draw:"
-				 << RESET << " " << draw << "\n\n";
+	printf("%sNow playing:%s %s	", BRIGHT, RESET, whose_turn.c_str());
+	printf("%sCheckmate:%s %s	", BRIGHT, RESET, checkmate);
+	printf("%sDraw:%s %s\n\n", BRIGHT, RESET, draw);
 
 	std::cout << *board.get() << "\n\n";
 }
