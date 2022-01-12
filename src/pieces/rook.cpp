@@ -59,7 +59,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
                 test_piece = board.get_piece_at(test_coordinate);
                 if(test_piece != nullptr)
                 {
-                    return pseudo_movements;
+                    break;
                 }
             }
             i--;
@@ -71,7 +71,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
             test_piece = board.get_piece_at(test_coordinate);
             if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
             {
-                offset = DirectionOffset.at(Direction::right);
+                offset = DirectionOffset.at(Direction::left);
                 test_coordinate = test_coordinate + offset;
                 pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
             }
@@ -86,7 +86,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
                 test_piece = board.get_piece_at(test_coordinate);
                 if(test_piece != nullptr)
                 {
-                    return pseudo_movements;
+                    break;
                 }
             }
             i--;
@@ -98,7 +98,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
             test_piece = board.get_piece_at(test_coordinate);
             if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
             {
-                offset = DirectionOffset.at(Direction::left);
+                offset = DirectionOffset.at(Direction::right);
                 test_coordinate = test_coordinate + offset;
                 pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
             }
