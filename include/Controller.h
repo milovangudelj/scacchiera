@@ -25,7 +25,7 @@ namespace Chess
 		Controller();
 
 		void play();
-		void display(bool is_checkmate, bool is_draw, bool is_check = false);
+		void display(const std::string &whose_turn, bool is_checkmate, bool is_draw, bool is_check = false);
 	};
 } // namespace Chess
 
