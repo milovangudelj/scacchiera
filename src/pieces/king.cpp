@@ -49,7 +49,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
             test_piece = board.get_piece_at(test_coordinate);
             //castling allowed when there are no other pieces between king and rook
             if(test_piece != nullptr) {
-                return pseudo_movements;
+                break;
             }
             i--;
         } while (i > 0);
@@ -66,7 +66,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
             test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
             test_piece = board.get_piece_at(test_coordinate);
             if(test_piece != nullptr) {
-                return pseudo_movements;
+                break;
             }
             i--;
         } while(i > 0);

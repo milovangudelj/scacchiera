@@ -18,13 +18,15 @@ int main()
 
     std::cout << player_1 << "\n\n"
               << player_2 << '\n';
-    board.move(player_1, player_2, {{6, 4}, {5, 4}});
+    board.move(player_1, player_2, {{6, 3}, {4, 3}});
     std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 5}, {6, 4}});
+    board.move(player_1, player_2, {{7, 3}, {5, 3}});
     std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 6}, {5, 7}});
+    board.move(player_1, player_2, {{7, 2}, {6, 3}});
     std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 4}, {7, 7}});
+    board.move(player_1, player_2, {{7, 1}, {5, 0}});
+    std::cout << board << "\n\n";
+    board.move(player_1, player_2, {{7, 0}, {7, 4}});
     std::cout << board << "\n\n";
     return 0;
 }
