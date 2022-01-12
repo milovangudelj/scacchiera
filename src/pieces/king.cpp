@@ -56,13 +56,11 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::right);
         test_piece = board.get_piece_at(test_coordinate);
         if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
-            //is castling is allowed then the king can move two positions to right/left
-            Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::right), Direction::right);
-            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, false, true});
+            pseudo_movements.push_back({this->coordinate, test_coordinate, false, false, false, true});
         }
 
         //long castling
-        i = 3;
+        i = 2;
         test_coordinate = this->coordinate;
         do {
             test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
@@ -73,10 +71,10 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
             i--;
         } while(i > 0);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
+        test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
         test_piece = board.get_piece_at(test_coordinate);
         if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
-            Coordinate end_coordinate = get_testing_coordinate(get_testing_coordinate(this->coordinate, Direction::left), Direction::left);
-            pseudo_movements.push_back({this->coordinate, end_coordinate, false, false, true, false});
+            pseudo_movements.push_back({this->coordinate, test_coordinate, false, false, true, false});
         }
     }
 
