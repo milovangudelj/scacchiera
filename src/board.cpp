@@ -444,9 +444,8 @@ bool Board::can_draw() {
     return true;
 }
 
-std::string black = "\033[0m";
-std::string white = "\033[7m";
-std::string colors[8][8] = {{white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}, {white, black, white, black, white, black, white, black}, {black, white, black, white, black, white, black, white}};
+std::string black = "\033[0m"; // Reset to terminal default colors
+std::string white = "\033[7m"; // Invert terminal colors
 
 namespace Chess {
     std::ostream& operator<< (std::ostream& os, const Board& board) {
@@ -456,7 +455,8 @@ namespace Chess {
             os << 8 - rank << " ";
             for(int file = 0; file < SIZE; file++) {
                 piece = board.cells[rank][file];
-                os << colors[rank][file];
+
+                os << ((rank + file) % 2 == 0 ? white : black); // Cell color
                 if(piece == nullptr) {
                     os << "   ";
                 } else {
