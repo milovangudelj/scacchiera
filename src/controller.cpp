@@ -41,7 +41,9 @@ void Controller::init(const std::string &type)
 		throw "Invalid game type";
 	}
 
-	board = std::make_unique<Board>("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", *white.get(), *black.get());
+	std::string base_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+	std::string fen = "1r3k2/6br/n2BQ3/pp3p1p/2p4P/2N1P3/PPP2PR1/2K5";
+	board = std::make_unique<Board>(fen, *white.get(), *black.get());
 }
 
 std::map<char, unsigned int> col_mapping{
