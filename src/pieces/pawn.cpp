@@ -124,7 +124,7 @@ std::pair<Chess::Coordinate,Chess::Coordinate> Pawn::diag_cap(Board& board, Colo
 {
     Coordinate test_coordinate;
     std::shared_ptr<Piece> test_piece;
-    std::pair<Coordinate,Coordinate> valid_coordinate;
+    std::pair<Coordinate,Coordinate> valid_coordinate {{9,9},{9,9}};
     Direction direction1 = (color == Color::white ? Direction::left_up : Direction::left_down);
     Direction direction2 = (color == Color::white ? Direction::right_up : Direction::right_down);
     test_coordinate = this->coordinate + DirectionOffset.at(direction1);
