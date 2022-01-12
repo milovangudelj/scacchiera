@@ -62,7 +62,7 @@ void Board::initialize_with_fen(std::string fen, Player& player1, Player& player
             continue;
         }
         if(std::isdigit(character)) {
-            file += character;
+            file += (character - '0');
             continue;
         }
         Color color = std::islower(character) ? Color::black : Color::white;
@@ -113,12 +113,8 @@ bool Board::is_checkmate(Player& current, Player& other) {
     if(!is_check(current, other)) {
         return false;
     }
-    auto king_iterator = std::find_if(current.get_available_pieces().begin(), current.get_available_pieces().end(), 
-        [] (std::shared_ptr<Piece> piece) {
-            return piece->get_type() == PieceType::king;
-        }
-    );
-    std::shared_ptr<Piece> king = *king_iterator;
+    Coordinate king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+    std::shared_ptr<Piece> king = cells[king_coordinate.rank][king_coordinate.file];
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
     for(Movement movement : king->get_pseudo_valid_movements(*this)) {
