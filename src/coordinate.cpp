@@ -44,6 +44,6 @@ std::ostream &Chess::operator<<(std::ostream &os, Coordinate &coordinate)
         file_character = "H";
         break;
     }
-    os << file_character + std::to_string(coordinate.rank);
+    os << file_character + std::to_string(8 - coordinate.rank);
     return os;
 }
