@@ -15,14 +15,14 @@ Rook::Rook(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
 
 std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 {
-
+    Coordinate test_coordinate;
 	std::list<Movement> pseudo_movements;
 	for(int i = 0; i < 4; i++)
 	{
 		std::shared_ptr<Piece> test_piece;
 		Direction direction = static_cast<Direction>(i);
 		std::pair<int,int> offset = DirectionOffset.at(direction);
-		Coordinate test_coordinate = this->coordinate + offset;
+		test_coordinate = this->coordinate + offset;
 		while(test_coordinate.is_valid())
 		{
 			test_piece = board.get_piece_at(test_coordinate);
@@ -41,78 +41,100 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 			}
 			test_coordinate = test_coordinate + offset;
 		}
-
 	}
 
     if(!get_had_moved())
-    {
-        int i;
-        std::shared_ptr<Piece> test_piece;
-        Coordinate test_coordinate = this->coordinate;
-        std::pair<int, int> offset;
-        //short castling : when the rook is in the position H1
-        if(this->coordinate.rank == 7 && this->coordinate.file == 7)
+    {        
+        test_coordinate = short_castling(board,this->color);
+        if(!(test_coordinate == this->coordinate))
         {
-            i = 2;
-            do
-            {   
-                offset = DirectionOffset.at(Direction::left);
-                test_coordinate = test_coordinate + offset;
-                if(test_coordinate.is_valid())
-                {
-                    test_piece = board.get_piece_at(test_coordinate);
-                    //condition : no pieces between king and rook
-                    if(test_piece != nullptr)
-                    {
-                        break;
-                    }
-                }
-                i--;
-            }while(i>0);
-            offset = DirectionOffset.at(Direction::left);
-            test_coordinate = test_coordinate + offset;
-            if(test_coordinate.is_valid())
-            {
-                test_piece = board.get_piece_at(test_coordinate);
-                //condition : king's first move
-                if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
-                {
-                    pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
-                }
-            }   
+            pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
         }
-        //long castling : when the rook is in the position A1
-        if(this->coordinate.rank == 7 && this->coordinate.file == 0)
+        test_coordinate = long_castling(board,this->color);
+        if(!(test_coordinate == this->coordinate))
         {
-            i = 3;
-            do
-            {
-                offset = DirectionOffset.at(Direction::right);
-                test_coordinate = test_coordinate + offset;
-                if(test_coordinate.is_valid())
-                {
-                    test_piece = board.get_piece_at(test_coordinate);
-                    //condition : no pieces between king and rook
-                    if(test_piece != nullptr)
-                    {
-                        break;
-                    }
-                }
-                i--;
-            }while(i>0);
-            offset = DirectionOffset.at(Direction::right);
-            test_coordinate = test_coordinate + offset;
-            if(test_coordinate.is_valid())
-            {
-                test_piece = board.get_piece_at(test_coordinate);
-                //condition : king's first move
-                if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
-                {
-                    pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
-                }
-            }
+            pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
         }
     }
-	return pseudo_movements;
-
+    return pseudo_movements;
+}
+/************************** short castling *****************************/
+Chess::Coordinate Rook::short_castling(Board& board,Color color)
+{
+    int i = 2;
+    std::shared_ptr<Piece> test_piece;
+    Coordinate test_coordinate = this->coordinate;
+    int rook_rank = (color == Color::white ? 7 : 0); 
+    int rook_file = (color == Color::white ? 7 : 0);
+    Direction direction = (color == Color::white ? Direction::left : Direction::right);
+    //if it's white rook, position H1
+    //if it's black rook, position A8 
+    if(this->coordinate.rank == rook_rank && this->coordinate.file == rook_file)
+    {
+        do
+        {
+            test_coordinate = test_coordinate + DirectionOffset.at(direction);
+            if(test_coordinate.is_valid())
+            {
+                test_piece = board.get_piece_at(test_coordinate);
+                //condition : no pieces between king abd rook
+                if(test_piece != nullptr)
+                {
+                    break;
+                }
+            }
+            i--;
+        }while(i>0);
+        test_coordinate = test_coordinate + DirectionOffset.at(direction);
+        if(test_coordinate.is_valid())
+        {
+            test_piece = board.get_piece_at(test_coordinate);
+            //condition : king's first move
+            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
+            {
+                return test_coordinate;
+            }
+        }
+    }   
+    return test_coordinate;
+}
+/************************** long castling *****************************/
+Chess::Coordinate Rook::long_castling(Board& board, Color color)
+{
+    int i = 3;
+    std::shared_ptr<Piece> test_piece;
+    Coordinate test_coordinate = this->coordinate;
+    int rook_rank = (color == Color::white ? 7 : 0); 
+    int rook_file = (color == Color::white ? 0 : 7);
+    Direction direction = (color == Color::white ? Direction::right : Direction::left);
+    //if it's white rook, position A1
+    //if it's black rook, position H8
+    if(this->coordinate.rank == rook_rank && this->coordinate.file == rook_file)
+    {
+        do
+        {
+            test_coordinate = test_coordinate + DirectionOffset.at(direction);
+            if(test_coordinate.is_valid())
+            {
+                test_piece = board.get_piece_at(test_coordinate);
+                //condition : no pieces between king abd rook
+                if(test_piece != nullptr)
+                {
+                    break;
+                }
+            }
+            i--;
+        }while(i>0);
+        test_coordinate = test_coordinate + DirectionOffset.at(direction);
+        if(test_coordinate.is_valid())
+        {
+            test_piece = board.get_piece_at(test_coordinate);
+            //condition : king's first move
+            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
+            {
+                return test_coordinate;
+            }
+        }
+    }   
+    return test_coordinate;
 }
