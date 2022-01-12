@@ -366,8 +366,6 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
         }
     }
 
-    Movement previous_movement = last_movement;
-    std::shared_ptr<Piece> previous_eaten = last_eaten;
     Coordinate initial_king_coordinate_copy = initial_king_coordinate;
 
     std::shared_ptr<Piece> king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
