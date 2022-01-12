@@ -58,6 +58,10 @@ namespace Chess
         {
             return color;
         };
+        std::string get_name() const
+        {
+            return name;
+        }
         int get_stale_since() const { return stale_since; };
 
         // Management member functions
