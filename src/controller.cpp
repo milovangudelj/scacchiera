@@ -166,6 +166,7 @@ void Controller::play()
 	display(current_player.get()->get_name(), checkmate, draw, check);
 
 	std::cout << "Game Over...\n\n";
+	export_game(); // Right now it only prints the history to the terminal
 }
 
 void Controller::display(const std::string &whose_turn, bool is_checkmate, bool is_draw, bool is_check)
@@ -178,4 +179,13 @@ void Controller::display(const std::string &whose_turn, bool is_checkmate, bool 
 	printf("%sDraw:%s %s\n\n", BRIGHT, RESET, draw);
 
 	std::cout << *board.get() << "\n\n";
+}
+
+void Controller::export_game()
+{
+	printf("%s%sHistory:%s\n", BLUE_FG, BRIGHT, RESET);
+	for (Chess::Movement m : history)
+	{
+		std::cout << m << '\n';
+	}
 }
