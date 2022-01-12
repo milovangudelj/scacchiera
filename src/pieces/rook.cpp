@@ -46,61 +46,70 @@ std::list<Movement> RookPiece::get_pseudo_valid_movements(Board& board)
 
     if(!get_had_moved())
     {
-        int i = 2;
+        int i;
         std::shared_ptr<Piece> test_piece;
         Coordinate test_coordinate = this->coordinate;
         std::pair<int, int> offset;
-        do
+        //short castling : when the rook is in the position H1
+        if(this->coordinate.rank == 7 && this->coordinate.file == 7)
         {
+            i = 2;
+            do
+            {   
+                offset = DirectionOffset.at(Direction::left);
+                test_coordinate = test_coordinate + offset;
+                if(test_coordinate.is_valid())
+                {
+                    test_piece = board.get_piece_at(test_coordinate);
+                    //condition : no pieces between king and rook
+                    if(test_piece != nullptr)
+                    {
+                        break;
+                    }
+                }
+                i--;
+            }while(i>0);
             offset = DirectionOffset.at(Direction::left);
             test_coordinate = test_coordinate + offset;
             if(test_coordinate.is_valid())
             {
                 test_piece = board.get_piece_at(test_coordinate);
-                if(test_piece != nullptr)
+                //condition : king's first move
+                if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
                 {
-                    return pseudo_movements;
+                    pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
                 }
-            }
-            i--;
-        }while(i>0);
-        offset = DirectionOffset.at(Direction::left);
-        test_coordinate = test_coordinate + offset;
-        if(test_coordinate.is_valid())
+            }   
+        }
+        //long castling : when the rook is in the position A1
+        if(this->coordinate.rank == 7 && this->coordinate.file == 0)
         {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
+            i = 3;
+            do
             {
                 offset = DirectionOffset.at(Direction::right);
                 test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true});
-            }
-        }
-        i = 3;
-        do
-        {
+                if(test_coordinate.is_valid())
+                {
+                    test_piece = board.get_piece_at(test_coordinate);
+                    //condition : no pieces between king and rook
+                    if(test_piece != nullptr)
+                    {
+                        break;
+                    }
+                }
+                i--;
+            }while(i>0);
             offset = DirectionOffset.at(Direction::right);
             test_coordinate = test_coordinate + offset;
             if(test_coordinate.is_valid())
             {
                 test_piece = board.get_piece_at(test_coordinate);
-                if(test_piece != nullptr)
+                //condition : king's first move
+                if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
                 {
-                    return pseudo_movements;
+                    pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
                 }
-            }
-            i--;
-        }while(i>0);
-        offset = DirectionOffset.at(Direction::right);
-        test_coordinate = test_coordinate + offset;
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
-            {
-                offset = DirectionOffset.at(Direction::left);
-                test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true});
             }
         }
     }
