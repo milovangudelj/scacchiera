@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <set>
 
 #include "Controller.h"
@@ -181,11 +182,21 @@ void Controller::display(const std::string &whose_turn, bool is_checkmate, bool 
 	std::cout << *board.get() << "\n\n";
 }
 
+/// @brief Exports the game's movements history
+/// @details Opens a file stream and saves the movements history to that file
 void Controller::export_game()
 {
-	printf("%s%sHistory:%s\n", BLUE_FG, BRIGHT, RESET);
+	std::ofstream history_file;
+
+	// printf("%s%sHistory:%s\n", BLUE_FG, BRIGHT, RESET);
+
+	history_file.open("history.txt");
+
 	for (Chess::Movement m : history)
 	{
-		std::cout << m << '\n';
+		// std::cout << m << '\n';
+		history_file << m << '\n';
 	}
+
+	history_file.close();
 }
