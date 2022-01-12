@@ -5,9 +5,15 @@
 #include <memory>
 #include <string>
 #include <ostream>
+#include <map>
 
 #include "Piece.h"
 #include "pieces/King.h"
+#include "pieces/Queen.h"
+#include "pieces/Bishop.h"
+#include "pieces/Knight.h"
+#include "pieces/Rook.h"
+#include "pieces/Pawn.h"
 #include "Coordinate.h"
 #include "Player.h"
 #include "Utilities.h"
@@ -15,32 +21,52 @@
 template<typename T, unsigned int SIZE> 
 using Matrix = std::array<std::array<T, SIZE>, SIZE>;
 
+constexpr int SIZE = 8;
+
 namespace Chess {
 
     class Board {
         private:
-            Matrix<std::shared_ptr<Piece>, 8> cells;
-            void initialize_with_fen(std::string fen); //TODO exceptions
+            Matrix<std::shared_ptr<Piece>, SIZE> cells;
+            void initialize_with_fen(std::string fen, Player& player1, Player& player2);
+
+            //makes checking for check condition easier and faster
             Coordinate w_king_coordinate;
             Coordinate b_king_coordinate;
+            
+            //needed for undoing invalid moves
             std::shared_ptr<Piece> last_eaten;
-            bool is_check(Player& current, Player& other, Board& board);
+            Movement last_movement;
+            void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
+
+            //side effect: modifies last_eaten and last_movement
+            void temporary_move(Movement movement);
+
+            bool is_check(Player& current, Player& other);
+            Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
+            void handle_en_passant(Player& current_player, Player& other_player, Movement movement);
+
+            //needed by can_draw for threefold repetition
+            std::map<std::string, int> position_history;
+            std::string to_fen(); //takes snapshot of current board position
+            bool can_draw_flag;
+
         public:
-            Board(std::string fen);
-            std::shared_ptr<Piece> get_piece_at(Coordinate coordinate);
+            Board(std::string fen, Player& player1, Player& player2);
+            Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
+            bool promote(Player& player, char piece_symbol);
+
+            bool is_checkmate(Player& current, Player& other);
+            bool is_draw(Player& current, Player& other); //stalemate, dead position and 50 moves rule
+            bool can_draw(); //returns true if threefold repetition occured
+
+            //used by Pawn for checking for en passant conditions
+            Movement get_last_movement() const { return last_movement; }
+
+            std::shared_ptr<Piece> get_piece_at(Coordinate coordinate) const;
             friend std::ostream& operator<< (std::ostream& os, const Board& board);
     };
 
-    std::shared_ptr<Piece> make_piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
-
-    std::map<char, Chess::utilities::PieceType> char_to_piece {
-        {'k', Chess::utilities::PieceType::king},
-        {'q', Chess::utilities::PieceType::queen},
-        {'b', Chess::utilities::PieceType::bishop},
-        {'n', Chess::utilities::PieceType::knight},
-        {'r', Chess::utilities::PieceType::rook},
-        {'p', Chess::utilities::PieceType::pawn}
-    };
 }
 
 #endif
