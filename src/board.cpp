@@ -174,6 +174,14 @@ bool Board::is_draw(Player& current, Player& other) {
         }
     }
 
+    if(current_pieces.size() == 1 && other_pieces.size() == 2) {
+        //king vs king + (bishop/knight)
+        std::shared_ptr<Piece> not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
+        if(not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight) {
+            return true;
+        }
+    }
+
     if(current_pieces.size() <= 3 && other_pieces.size() <= 3) {
         //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
         std::list<std::shared_ptr<Piece>> bishops;
