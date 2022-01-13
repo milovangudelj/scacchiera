@@ -90,7 +90,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
             bool had_moved = *flag_iterator;
             flag_iterator++;
             if(had_moved) {
-                piece->get_had_moved();
+                piece->set_had_moved();
             }
         }
         file++;
