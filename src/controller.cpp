@@ -43,7 +43,7 @@ void Controller::init(const std::string &type)
 
 	std::string base_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 	std::string fen = "1r3k2/6br/n3Q3/pp2Bp1p/2p4P/2N1P3/PPP2PR1/2K5";
-	board = std::make_unique<Board>(fen, *white.get(), *black.get());
+	board = std::make_unique<Board>(base_fen, *white.get(), *black.get());
 }
 
 std::map<char, unsigned int> col_mapping{
@@ -108,8 +108,8 @@ void clear_errors(std::set<std::string> &errors)
 /// @brief Starts the game and goes on until either checkmate or draw occurs
 void Controller::play()
 {
-	std::shared_ptr<Chess::Player> current_player = white;
-	std::shared_ptr<Chess::Player> other_player = black;
+	std::shared_ptr<Chess::Player> current_player = black;
+	std::shared_ptr<Chess::Player> other_player = white;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
@@ -147,16 +147,16 @@ void Controller::play()
 		case Chess::utilities::MoveResult::ok:
 			clear_errors(errors);
 			// Swap players
-			current_player = current_player == white ? black : white;
-			other_player = other_player == white ? black : white;
+			// current_player = current_player == white ? black : white;
+			// other_player = other_player == white ? black : white;
 			// Add movement to history
 			history.push_back(mvmt);
 			break;
 
 		default:
 			// Swap players
-			current_player = current_player == white ? black : white;
-			other_player = other_player == white ? black : white;
+			// current_player = current_player == white ? black : white;
+			// other_player = other_player == white ? black : white;
 			// Add movement to history
 			history.push_back(mvmt);
 			break;
