@@ -55,7 +55,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         } while (i > 0);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::right);
         test_piece = board.get_piece_at(test_coordinate);
-        if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
+        if(test_piece != nullptr && test_piece->get_type() == PieceType::rook && test_piece->get_color() == this->get_color() && test_piece->get_had_moved() == false) {
             pseudo_movements.push_back({this->coordinate, test_coordinate, false, false, false, true});
         }
 
@@ -72,7 +72,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
         } while(i > 0);
         test_coordinate = get_testing_coordinate(test_coordinate, Direction::left);
         test_piece = board.get_piece_at(test_coordinate);
-        if(test_piece->get_type() == PieceType::rook && test_piece->get_had_moved() == false) {
+        if(test_piece != nullptr && test_piece->get_type() == PieceType::rook && test_piece->get_color() == this->get_color() && test_piece->get_had_moved() == false) {
             pseudo_movements.push_back({this->coordinate, test_coordinate, false, false, true, false});
         }
     }
