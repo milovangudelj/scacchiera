@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "Controller.h"
 #include "Board.h"
@@ -6,35 +7,30 @@
 
 using Chess::Board;
 using Chess::Controller;
+using Chess::Coordinate;
+using Chess::Movement;
 using Chess::Player;
 using Chess::utilities::Color;
 using Chess::utilities::PlayerType;
-using Chess::Movement;
-using Chess::Coordinate;
 
-int main()
+int main(int argc, char *argv[])
 {
-    Controller controller{};
+    const char *BRIGHT = "\033[1m";
+    const char *RESET = "\033[0m";
+
+    if (argc > 1 && strcmp(argv[1], "pc") != 0 && strcmp(argv[1], "cc") != 0)
+    {
+        std::cout << "Se fornito, il primo argomento deve essere uno tra i seguenti:\n"
+                  << BRIGHT << "   pc" << RESET << "   Player vs Computer\n"
+                  << BRIGHT << "   cc" << RESET << "   Computer vs Computer\n";
+        return 0;
+    }
+
+    std::string mode = argc > 1 ? argv[1] : "pc";
+
+    Controller controller{mode};
 
     controller.play();
 
-    /*
-    std::cout << player_1 << "\n\n"
-              << player_2 << '\n';
-    board.move(player_1, player_2, {{6, 3}, {4, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 3}, {5, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 2}, {6, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 1}, {5, 0}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 0}, {7, 4}});
-    std::cout << board << "\n\n";
-    */
-    Coordinate start {6, 3};
-    Coordinate end {3, 3};
-    Movement movement {start, end};
-   std::cout << movement;
     return 0;
 }
