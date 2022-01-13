@@ -23,4 +23,9 @@ add_executable(test
     src/targets/test.cpp
 )
 
+add_executable(replay 
+    src/targets/replay.cpp
+)
+
 target_link_libraries(test PUBLIC chess)
+target_link_libraries(replay PUBLIC chess)
