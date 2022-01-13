@@ -6,6 +6,7 @@
 #include <string>
 #include <ostream>
 #include <map>
+#include <initializer_list>
 
 #include "Piece.h"
 #include "pieces/King.h"
@@ -28,7 +29,7 @@ namespace Chess {
     class Board {
         private:
             Matrix<std::shared_ptr<Piece>, SIZE> cells;
-            void initialize_with_fen(std::string fen, Player& player1, Player& player2);
+            void initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player& player1, Player& player2);
 
             //makes checking for check condition easier and faster
             Coordinate w_king_coordinate;
@@ -52,7 +53,7 @@ namespace Chess {
             bool can_draw_flag;
 
         public:
-            Board(std::string fen, Player& player1, Player& player2);
+            Board(std::string fen, std::initializer_list<bool> had_moved_flags, Player& player1, Player& player2);
             Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
             bool promote(Player& player, char piece_symbol);
 
