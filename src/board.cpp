@@ -49,12 +49,13 @@ std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType 
 }
 //end helper
 
-Board::Board(std::string fen, Player& player1, Player& player2) : last_eaten{nullptr}, can_draw_flag{false} {
-    initialize_with_fen(fen, player1, player2);
+Board::Board(std::string fen, std::initializer_list<bool> had_moved_flags, Player& player1, Player& player2) : last_eaten{nullptr}, can_draw_flag{false} {
+    initialize_with_fen(fen, had_moved_flags, player1, player2);
 }
 
-void Board::initialize_with_fen(std::string fen, Player& player1, Player& player2) {
+void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player& player1, Player& player2) {
     unsigned int file = 0, rank = 0;
+    auto flag_iterator = had_moved_flags.begin();
     for(char character : fen) {
         if(character == '/') {
             rank++;
@@ -84,6 +85,13 @@ void Board::initialize_with_fen(std::string fen, Player& player1, Player& player
         }
         if(type == PieceType::bishop) {
             std::static_pointer_cast<Bishop>(piece)->update_cell_color();
+        }
+        if(type == PieceType::king || type == PieceType::rook) {
+            bool had_moved = *flag_iterator;
+            flag_iterator++;
+            if(had_moved) {
+                piece->set_had_moved();
+            }
         }
         file++;
     }
