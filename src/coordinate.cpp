@@ -14,7 +14,7 @@ bool Chess::operator== (const Coordinate& coordinate1, const Coordinate& coordin
     return coordinate1.rank == coordinate2.rank && coordinate1.file == coordinate2.file;
 }
 
-std::ostream& operator<< (std::ostream& os, Coordinate& coordinate) {
+std::ostream& Chess::operator<< (std::ostream& os, Coordinate& coordinate) {
     std::string file_character;
     switch (coordinate.file)
     {
@@ -43,6 +43,6 @@ std::ostream& operator<< (std::ostream& os, Coordinate& coordinate) {
         file_character = "H";
         break;
     }
-    os << file_character + std::to_string(coordinate.rank);
+    os << file_character + std::to_string(8 - coordinate.rank);
     return os;
 }

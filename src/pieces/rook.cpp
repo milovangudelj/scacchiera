@@ -42,5 +42,6 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 			test_coordinate = test_coordinate + offset;
 		}
 	}
-    return pseudo_movements;
+  return pseudo_movements;
+
 }

@@ -62,7 +62,7 @@ void Board::initialize_with_fen(std::string fen, Player& player1, Player& player
             continue;
         }
         if(std::isdigit(character)) {
-            file += character;
+            file += (character - '0');
             continue;
         }
         Color color = std::islower(character) ? Color::black : Color::white;
@@ -113,12 +113,8 @@ bool Board::is_checkmate(Player& current, Player& other) {
     if(!is_check(current, other)) {
         return false;
     }
-    auto king_iterator = std::find_if(current.get_available_pieces().begin(), current.get_available_pieces().end(), 
-        [] (std::shared_ptr<Piece> piece) {
-            return piece->get_type() == PieceType::king;
-        }
-    );
-    std::shared_ptr<Piece> king = *king_iterator;
+    Coordinate king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+    std::shared_ptr<Piece> king = cells[king_coordinate.rank][king_coordinate.file];
     Movement previous_movement = last_movement;
     std::shared_ptr<Piece> previous_eaten = last_eaten;
     for(Movement movement : king->get_pseudo_valid_movements(*this)) {
@@ -178,6 +174,14 @@ bool Board::is_draw(Player& current, Player& other) {
         }
     }
 
+    if(current_pieces.size() == 1 && other_pieces.size() == 2) {
+        //king vs king + (bishop/knight)
+        std::shared_ptr<Piece> not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
+        if(not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight) {
+            return true;
+        }
+    }
+
     if(current_pieces.size() <= 3 && other_pieces.size() <= 3) {
         //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
         std::list<std::shared_ptr<Piece>> bishops;
@@ -232,6 +236,8 @@ MoveResult Board::move(Player& current_player, Player& other_player, Movement mo
     if(p == pseudo_valid_movements.end()) {
         return MoveResult::invalid;
     }
+
+    movement = *p; //copy flags
 
     if(movement.is_short_castling || movement.is_long_castling) {
         MoveResult castling_result = handle_castling(current_player, other_player, movement);
@@ -339,18 +345,17 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     Coordinate final_king_coordinate;
     Coordinate initial_rook_coordinate;
     Coordinate final_rook_coordinate;
-    std::list<Coordinate> empty_cells;
+    std::pair<Coordinate, Coordinate> empty_cells;
     if(movement.is_short_castling) {
-        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::right));
-        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right));
+        empty_cells.first = (initial_king_coordinate + DirectionOffset.at(Direction::right));
+        empty_cells.second = (initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right));
 
         initial_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right);
         final_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right);
         final_king_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::right) + DirectionOffset.at(Direction::right);
     } else {
-        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left));
-        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left));
-        empty_cells.push_back(initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left));
+        empty_cells.first = (initial_king_coordinate + DirectionOffset.at(Direction::left));
+        empty_cells.second = (initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left));
 
         initial_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left);
         final_rook_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left);
@@ -359,16 +364,12 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
     //check that cells in between king and rook aren't under attack
     for(std::shared_ptr<Piece> piece : other_player.get_available_pieces()) {
         for(Movement pseudo_movement : piece->get_pseudo_valid_movements(*this)) {            
-            for(Coordinate empty_cell : empty_cells) {
-                if(empty_cell == pseudo_movement.end) {
-                    return MoveResult::invalid;
-                }
+            if(empty_cells.first == pseudo_movement.end || empty_cells.second == pseudo_movement.end) {
+                return MoveResult::invalid;
             }
         }
     }
 
-    Movement previous_movement = last_movement;
-    std::shared_ptr<Piece> previous_eaten = last_eaten;
     Coordinate initial_king_coordinate_copy = initial_king_coordinate;
 
     std::shared_ptr<Piece> king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
@@ -376,11 +377,6 @@ MoveResult Board::handle_castling(Player& current_player, Player& other_player, 
 
     temporary_move({initial_king_coordinate, final_king_coordinate});
     initial_king_coordinate = final_king_coordinate;
-    if(is_check(current_player, other_player)) {
-        undo(previous_movement,previous_eaten);
-        initial_king_coordinate = initial_king_coordinate_copy;
-        return MoveResult::invalid;
-    }
     temporary_move({initial_rook_coordinate, final_rook_coordinate});
     king->set_coordinate(final_king_coordinate);
     king->set_had_moved();
