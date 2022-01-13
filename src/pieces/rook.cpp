@@ -15,14 +15,14 @@ Rook::Rook(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
 
 std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 {
-
+    Coordinate test_coordinate;
 	std::list<Movement> pseudo_movements;
 	for(int i = 0; i < 4; i++)
 	{
 		std::shared_ptr<Piece> test_piece;
 		Direction direction = static_cast<Direction>(i);
 		std::pair<int,int> offset = DirectionOffset.at(direction);
-		Coordinate test_coordinate = this->coordinate + offset;
+		test_coordinate = this->coordinate + offset;
 		while(test_coordinate.is_valid())
 		{
 			test_piece = board.get_piece_at(test_coordinate);
@@ -41,69 +41,7 @@ std::list<Movement> Rook::get_pseudo_valid_movements(Board& board)
 			}
 			test_coordinate = test_coordinate + offset;
 		}
-
 	}
-
-    if(!get_had_moved())
-    {
-        int i = 2;
-        std::shared_ptr<Piece> test_piece;
-        Coordinate test_coordinate = this->coordinate;
-        std::pair<int, int> offset;
-        do
-        {
-            offset = DirectionOffset.at(Direction::left);
-            test_coordinate = test_coordinate + offset;
-            if(test_coordinate.is_valid())
-            {
-                test_piece = board.get_piece_at(test_coordinate);
-                if(test_piece != nullptr)
-                {
-                    break;
-                }
-            }
-            i--;
-        }while(i>0);
-        offset = DirectionOffset.at(Direction::left);
-        test_coordinate = test_coordinate + offset;
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
-            {
-                offset = DirectionOffset.at(Direction::left);
-                test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,false,true});
-            }
-        }
-        i = 3;
-        do
-        {
-            offset = DirectionOffset.at(Direction::right);
-            test_coordinate = test_coordinate + offset;
-            if(test_coordinate.is_valid())
-            {
-                test_piece = board.get_piece_at(test_coordinate);
-                if(test_piece != nullptr)
-                {
-                    break;
-                }
-            }
-            i--;
-        }while(i>0);
-        offset = DirectionOffset.at(Direction::right);
-        test_coordinate = test_coordinate + offset;
-        if(test_coordinate.is_valid())
-        {
-            test_piece = board.get_piece_at(test_coordinate);
-            if(test_piece->get_type() == PieceType::king && test_piece->get_had_moved()==false)
-            {
-                offset = DirectionOffset.at(Direction::right);
-                test_coordinate = test_coordinate + offset;
-                pseudo_movements.push_back({this->coordinate,test_coordinate,false,false,true,false});
-            }
-        }
-    }
-	return pseudo_movements;
+  return pseudo_movements;
 
 }
