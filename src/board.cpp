@@ -85,18 +85,7 @@ void Board::from_fen(std::string fen)
 	std::string pattern = "^([1-8kqbnrpKQBNRP]{1,8}\\/){7}[1-8kqbnrpKQBNRP]{1,8}[\\s]{1}[wb]{1}[\\s]{1}(([-]{1})|[K?Q?k?q?]{1,4})[\\s]{1}([-]{1}|([a-h]{1}(3|6){1}))[\\s]{1}[0-9]+[\\s]{1}[0-9]+$";
 
 	// Map of piece starting positions (not including pawns)
-	std::map<char, std::vector<Coordinate>> starting_pos = {
-		{'r', {{0, 0}, {7, 0}}},
-		{'n', {{1, 0}, {6, 0}}},
-		{'b', {{2, 0}, {5, 0}}},
-		{'q', {{3, 0}}},
-		{'k', {{4, 0}}},
-		{'R', {{0, 7}, {7, 7}}},
-		{'N', {{1, 7}, {6, 7}}},
-		{'B', {{2, 7}, {5, 7}}},
-		{'Q', {{3, 7}}},
-		{'K', {{4, 7}}},
-	};
+	std::pair<std::string, std::string> starting_pos = {"rnbqkbnr", "RNBQKBNR"};
 
 	// Validate fen string against regex pattern
 	if (!std::regex_match(fen, std::regex(pattern, std::regex::ECMAScript)))
@@ -181,12 +170,17 @@ void Board::from_fen(std::string fen)
 			}
 			else
 			{
-				std::vector<bool> moved(2);
-				for (size_t i = 0; i < starting_pos[c].size(); i++)
-				{
-					moved[i] = (p_pos == starting_pos[c][i]);
-				}
-				if (moved[0] && moved[1])
+				unsigned int test_rank = std::islower(c) ? 0 : 7;
+				unsigned int test_file = std::islower(c) ? starting_pos.first.find_first_of(c) : starting_pos.first.find_first_of(c);
+
+				Coordinate test_pos1 = {test_rank, test_file};
+
+				// Update test file before reassigning it
+				test_file = std::islower(c) ? starting_pos.first.find_last_of(c) : starting_pos.first.find_last_of(c);
+
+				Coordinate test_pos2 = {test_rank, test_file};
+
+				if (p_pos != test_pos1 && p_pos != test_pos2)
 					piece.get()->set_had_moved();
 			}
 
