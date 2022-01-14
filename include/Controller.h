@@ -13,6 +13,7 @@ namespace Chess
 	class Controller
 	{
 	private:
+		std::string mode;
 		std::shared_ptr<Chess::Player> white;
 		std::shared_ptr<Chess::Player> black;
 		std::list<Chess::Movement> history;
@@ -22,10 +23,10 @@ namespace Chess
 		void init(const std::string &type);
 
 	public:
-		Controller();
+		Controller(std::string mode = "pc");
 
 		void play();
-		void display(const std::string &whose_turn, bool is_checkmate, bool is_draw, bool is_check = false);
+		void display(const Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check = false);
 	};
 } // namespace Chess
 
