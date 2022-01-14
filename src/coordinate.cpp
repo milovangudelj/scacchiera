@@ -16,6 +16,11 @@ bool Chess::operator==(const Coordinate &coordinate1, const Coordinate &coordina
     return coordinate1.rank == coordinate2.rank && coordinate1.file == coordinate2.file;
 }
 
+bool Chess::operator!=(const Coordinate &coordinate1, const Coordinate &coordinate2)
+{
+    return coordinate1.rank != coordinate2.rank || coordinate1.file != coordinate2.file;
+}
+
 std::ostream &Chess::operator<<(std::ostream &os, Coordinate &coordinate)
 {
     std::string file_character;

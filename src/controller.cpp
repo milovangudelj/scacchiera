@@ -42,9 +42,10 @@ void Controller::init(const std::string &type)
 		throw "Invalid game type";
 	}
 
-	std::string base_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-	std::string fen = "1r3k2/6br/n3Q3/pp2Bp1p/2p4P/2N1P3/PPP2PR1/2K5";
-	board = std::make_unique<Board>(base_fen, *white.get(), *black.get());
+	std::string base_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+	std::string fen = "1r3k2/6br/n3Q3/pp2Bp1p/2p4P/2N1P3/PPP2PR1/2K5 w - - 0 0";
+	std::string fen_castling = "r3kbnr/pppp1ppp/n12qb2/4p3/8/8/PPPPPPPP/RNBQKBNR w KQk - 0 0";
+	board = std::make_unique<Board>(fen_castling, white, black);
 }
 
 std::map<char, unsigned int> col_mapping{
