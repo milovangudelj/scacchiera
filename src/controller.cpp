@@ -140,6 +140,10 @@ void Controller::play()
 		result = board.get()->move(*current_player.get(), *other_player.get(), mvmt);
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
+		check = result == Chess::utilities::MoveResult::check;
+		checkmate = board.get()->is_checkmate(*current_player.get(), *other_player.get());
+		draw = board.get()->is_draw(*current_player.get(), *other_player.get());
+
 		switch (result)
 		{
 		case Chess::utilities::MoveResult::invalid:
@@ -162,10 +166,6 @@ void Controller::play()
 			history.push_back(mvmt);
 			break;
 		}
-
-		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board.get()->is_checkmate(*current_player.get(), *other_player.get());
-		draw = board.get()->is_draw(*current_player.get(), *other_player.get());
 	}
 	display(current_player.get(), checkmate, draw, check);
 
