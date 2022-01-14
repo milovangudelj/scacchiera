@@ -157,15 +157,17 @@ bool Board::is_draw(Player& current, Player& other) {
     if(!is_check(current, other)) {
         for(std::shared_ptr<Piece> piece : current.get_available_pieces()) {
             for(Movement movement : piece->get_pseudo_valid_movements(*this)) {
-                MoveResult result = move(current, other, movement);
-                if(result != MoveResult::invalid) {
-                    undo(previous_movement, previous_eaten);
+                temporary_move(movement);
+                bool can_move = is_check(current, other) ? false : true;
+                undo(previous_movement, previous_eaten);
+                if(can_move) {
                     return false;
                 }
             }
         }
     }
-
+    return true;
+ 
     //dead position
     std::list<std::shared_ptr<Piece>> current_pieces = current.get_available_pieces();
     std::list<std::shared_ptr<Piece>> other_pieces = other.get_available_pieces();
