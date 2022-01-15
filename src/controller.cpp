@@ -17,9 +17,23 @@ static const char *RESET = "\033[0m";
 static const char *RED_FG = "\033[31m";
 static const char *BLUE_FG = "\033[34m";
 
-Controller::Controller(std::string mode) : white(nullptr), black(nullptr), board(nullptr)
+Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(nullptr), black(nullptr), board(nullptr)
 {
-	init(mode);
+	init(_mode);
+}
+
+Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr)
+{
+	init_replay();
+}
+
+void Controller::init_replay()
+{
+	white = std::make_shared<Player>(Color::white, PlayerType::computer);
+	black = std::make_shared<Player>(Color::black, PlayerType::computer);
+	fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+
+	board = std::make_unique<Board>(fen, white, black);
 }
 
 void Controller::init(const std::string &type)
@@ -42,10 +56,7 @@ void Controller::init(const std::string &type)
 		throw "Invalid game type";
 	}
 
-	std::string base_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-	std::string fen = "1r3k2/6br/n3Q3/pp2Bp1p/2p4P/2N1P3/PPP2PR1/2K5 w - - 0 0";
-	std::string fen_castling = "r3kbnr/ppp1pppp/2nqb3/3p4/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
-	board = std::make_unique<Board>(fen_castling, white, black);
+	board = std::make_unique<Board>(fen, white, black);
 }
 
 std::map<char, unsigned int> col_mapping{
@@ -122,7 +133,7 @@ void Controller::play()
 
 	while (!checkmate && !draw)
 	{
-		display(current_player.get(), checkmate, draw, check);
+		display(current_player, checkmate, draw, check);
 		std::cout << ": ";
 		for (std::string e : errors)
 		{
@@ -168,18 +179,46 @@ void Controller::play()
 			break;
 		}
 	}
-	display(current_player.get(), checkmate, draw, check);
+	display(current_player, checkmate, draw, check);
 
 	std::cout << "Game Over...\n\n";
 	export_game(); // Right now it only prints the history to the terminal
 }
 
-void Controller::display(const Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check)
+std::list<std::string> Controller::replay(char out)
+{
+	if (out != 't' && out != 'f')
+		throw std::invalid_argument("Output flag must be either 't' (terminal) or 'f' (file).");
+
+	std::list<std::string> to_print; // List of strings to be printed to terminal/file
+	bool to_terminal = out == 't';
+
+	std::shared_ptr<Chess::Player> current_player = white;
+	std::shared_ptr<Chess::Player> other_player = black;
+	bool check = false;
+	bool checkmate = false;
+	bool draw = false;
+	bool invalid_move = false;
+
+	if (!is_replay)
+		throw std::invalid_argument("Cannot replay if not provided a list of movements.");
+
+	if (to_terminal)
+		display(current_player, checkmate, draw);
+
+	// Moves to be replayed and saved to 'to_print'
+	for (Movement movement : log_list)
+	{
+		std::cout << movement << '\n';
+	}
+}
+
+void Controller::display(std::shared_ptr<Chess::Player> current_player, bool is_checkmate, bool is_draw, bool is_check)
 {
 	const char *checkmate = is_checkmate ? "true" : "false";
 	const char *draw = is_draw ? "true" : "false";
-	const char *name = current_player->get_name().c_str();
-	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
+	const char *name = current_player.get()->get_name().c_str();
+	const char *color = current_player.get()->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
 	printf("%sNow playing:%s %s %s	", BRIGHT, RESET, name, color);
 	printf("%sCheckmate:%s %s	", BRIGHT, RESET, checkmate);
