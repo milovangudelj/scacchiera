@@ -86,7 +86,7 @@ void Board::from_fen(std::string fen)
 	std::string pattern = "^([1-8kqbnrpKQBNRP]{1,8}\\/){7}[1-8kqbnrpKQBNRP]{1,8}[\\s]{1}[wb]{1}[\\s]{1}(([-]{1})|[K?Q?k?q?]{1,4})[\\s]{1}([-]{1}|([a-h]{1}(3|6){1}))[\\s]{1}[0-9]+[\\s]{1}[0-9]+$";
 
 	// Map of piece starting positions (not including pawns)
-	std::pair<std::string, std::string> starting_pos = {"rnbqkbnr", "RNBQKBNR"};
+	std::string starting_pos = "rnbqkbnr";
 
 	// Validate fen string against regex pattern
 	if (!std::regex_match(fen, std::regex(pattern, std::regex::ECMAScript)))
@@ -173,12 +173,12 @@ void Board::from_fen(std::string fen)
 			else
 			{
 				unsigned int test_rank = std::islower(c) ? 0 : 7;
-				unsigned int test_file = std::islower(c) ? starting_pos.first.find_first_of(c) : starting_pos.first.find_first_of(c);
+				unsigned int test_file = starting_pos.find_first_of(std::tolower(c));
 
 				Coordinate test_pos1 = {test_rank, test_file};
 
 				// Update test file before reassigning it
-				test_file = std::islower(c) ? starting_pos.first.find_last_of(c) : starting_pos.first.find_last_of(c);
+				test_file = starting_pos.find_last_of(std::tolower(c));
 
 				Coordinate test_pos2 = {test_rank, test_file};
 
