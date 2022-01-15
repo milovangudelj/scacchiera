@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <vector>
 #include <regex>
 #include <stdexcept>
@@ -26,17 +27,17 @@ using Chess::utilities::MoveResult;
 using Chess::utilities::PieceType;
 
 static const std::string BRIGHT = "\033[1m"; // Enphasises the text
-static const std::string RESET = "\033[0m";	 // Reset to terminal default colors
+static const std::string RESET = "\033[0m";	// Reset to terminal default colors
 static const std::string INVERT = "\033[7m"; // Invert terminal colors
 
 //helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece{
-	{'k', Chess::utilities::PieceType::king},
-	{'q', Chess::utilities::PieceType::queen},
-	{'b', Chess::utilities::PieceType::bishop},
-	{'n', Chess::utilities::PieceType::knight},
-	{'r', Chess::utilities::PieceType::rook},
-	{'p', Chess::utilities::PieceType::pawn}};
+	 {'k', Chess::utilities::PieceType::king},
+	 {'q', Chess::utilities::PieceType::queen},
+	 {'b', Chess::utilities::PieceType::bishop},
+	 {'n', Chess::utilities::PieceType::knight},
+	 {'r', Chess::utilities::PieceType::rook},
+	 {'p', Chess::utilities::PieceType::pawn}};
 
 std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType type)
 {
@@ -162,11 +163,12 @@ void Board::from_fen(std::string fen)
 			}
 
 			// Set had_moved flags
-
-			// Pawns
-			if (p_type == PieceType::pawn && ((p_color == Color::white && (i != 6)) || p_color == Color::black && (i != 1)))
+			if (p_type == PieceType::pawn)
 			{
-				piece.get()->set_had_moved();
+				if ((p_color == Color::white && (i != 6)) || (p_color == Color::black && (i != 1)))
+				{
+					piece.get()->set_had_moved();
+				}
 			}
 			else
 			{
@@ -185,18 +187,19 @@ void Board::from_fen(std::string fen)
 			}
 
 			// Castling & had moved for rooks
-			if (!c_rights.compare("-") && p_type == PieceType::rook)
+			if (!(c_rights.compare("-") == 0) && p_type == PieceType::rook)
 			{
-				if (p_color == Color::black)
-				{
-					if ((!c_rights.find('q') && file == 0) || (!c_rights.find('k') && file == 7))
-						piece.get()->set_had_moved();
-				}
-				else
-				{
-					if ((!c_rights.find('Q') && file == 0) || (!c_rights.find('K') && file == 7))
-						piece.get()->set_had_moved();
-				}
+				// Castling flags to check for based on color
+				std::pair<char, char> c_flags = (p_color == Color::white) ? std::pair<char, char>{'K', 'Q'} : std::pair<char, char>{'k', 'q'};
+
+				// If flag corresponding to the rook's side is missing set had_moved
+				bool king_side_missing = c_rights.find(c_flags.first) == std::string::npos;
+				bool queen_side_missing = c_rights.find(c_flags.second) == std::string::npos;
+				bool is_queen_side = file == 0;
+				bool is_king_side = file == 7;
+
+				if ((king_side_missing && is_king_side) || (queen_side_missing && is_queen_side))
+					piece.get()->set_had_moved();
 			}
 
 			file++;
@@ -278,10 +281,10 @@ bool Board::is_check(Player &current, Player &other)
 	{
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
 		auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(),
-							  [king_coordinate](Movement movement)
-							  {
-								  return king_coordinate == movement.end;
-							  });
+									 [king_coordinate](Movement movement)
+									 {
+										 return king_coordinate == movement.end;
+									 });
 		if (p != pseudo_movements.end())
 		{
 			return true;
@@ -442,10 +445,10 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	//check if ending position is contained in pseudo_valid_movements of piece
 	std::list<Movement> pseudo_valid_movements = start_piece->get_pseudo_valid_movements(*this);
 	auto p = std::find_if(pseudo_valid_movements.begin(), pseudo_valid_movements.end(),
-						  [movement](Movement pseudo_movement)
-						  {
-							  return pseudo_movement.end == movement.end;
-						  });
+								 [movement](Movement pseudo_movement)
+								 {
+									 return pseudo_movement.end == movement.end;
+								 });
 	if (p == pseudo_valid_movements.end())
 	{
 		return MoveResult::invalid;
@@ -523,10 +526,10 @@ bool Board::promote(Player &player, char piece_symbol)
 {
 	std::list<std::shared_ptr<Piece>> lost_pieces = player.get_lost_pieces();
 	auto p = std::find_if(lost_pieces.begin(), lost_pieces.end(),
-						  [piece_symbol](std::shared_ptr<Piece> piece)
-						  {
-							  return piece_symbol == piece->get_symbol();
-						  });
+								 [piece_symbol](std::shared_ptr<Piece> piece)
+								 {
+									 return piece_symbol == piece->get_symbol();
+								 });
 	if (p == lost_pieces.end())
 	{
 		return false;
@@ -633,7 +636,7 @@ void Board::handle_en_passant(Player &current_player, Player &other_player, Move
 {
 	Direction capture_direction;
 	if (movement.end == movement.start + DirectionOffset.at(Direction::left_up) ||
-		movement.end == movement.start + DirectionOffset.at(Direction::left_down))
+		 movement.end == movement.start + DirectionOffset.at(Direction::left_down))
 	{ //en passant to left
 		capture_direction = Direction::left;
 	}
@@ -683,10 +686,10 @@ bool Board::can_draw()
 		return true;
 	}
 	auto p = std::find_if(position_history.begin(), position_history.end(),
-						  [](std::pair<std::string, int> position)
-						  {
-							  return position.second == 3;
-						  });
+								 [](std::pair<std::string, int> position)
+								 {
+									 return position.second == 3;
+								 });
 	if (p == position_history.end())
 	{
 		return false;
@@ -722,7 +725,7 @@ namespace Chess
 			os << "\n";
 		}
 		os << "\n"
-		   << "  ";
+			<< "  ";
 		for (int i = 0; i < SIZE; i++)
 		{
 			os << " " << static_cast<char>('A' + i) << " ";
