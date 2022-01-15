@@ -211,6 +211,8 @@ std::list<std::string> Controller::replay(char out)
 	{
 		std::cout << movement << '\n';
 	}
+
+	return to_print;
 }
 
 void Controller::display(std::shared_ptr<Chess::Player> current_player, bool is_checkmate, bool is_draw, bool is_check)
