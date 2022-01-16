@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(include)
 
 add_library(chess STATIC
+    src/controller.cpp
     src/board.cpp
     src/player.cpp
     src/coordinate.cpp 
@@ -24,4 +25,9 @@ add_executable(test
     src/targets/test.cpp
 )
 
+add_executable(replay 
+    src/targets/replay.cpp
+)
+
 target_link_libraries(test PUBLIC chess)
+target_link_libraries(replay PUBLIC chess)
