@@ -54,7 +54,7 @@ namespace Chess {
 
         //needed by can_draw for threefold repetition
         std::map<std::string, int> position_history;
-        std::string to_fen(); //takes snapshot of current board position
+        std::string to_fen(Chess::utilities::Color current_color); //takes snapshot of current board position
         bool can_draw_flag;
 
     public:
