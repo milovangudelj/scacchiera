@@ -65,7 +65,7 @@ Chess::Movement Controller::get_move()
 	std::string to = "";
 
 	std::cin >> from >> to;
-	std::cout << "\033[14A\033[J";
+	std::cout << "\033[15A\033[J";
 
 	if (from.compare("XX") == 0 && to.compare("XX") == 0)
 	{
