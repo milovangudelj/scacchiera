@@ -23,8 +23,6 @@ namespace Chess
     public:
         // Constructors
 
-        Player() = delete;
-
         /// @brief Constructs a Player object with the given color, type and name.
         /// @param _color The color of the player. Either 'white' or 'black'
         /// @param _type The type of the player. Either 'human' or 'computer'
@@ -38,7 +36,9 @@ namespace Chess
 
         /// @brief Constructs a 'human' Player object of the given color.
         /// @param _color The color of the player. Either 'white' or 'black'
-        Player(const Chess::utilities::Color &_color) : Player(_color, Chess::utilities::PlayerType::human, ""){};
+        Player(const Chess::utilities::Color &_color) : Player(_color, Chess::utilities::PlayerType::human){};
+
+        Player() : Player(Chess::utilities::Color::white){};
 
         // Simple inline getters
 
@@ -58,6 +58,10 @@ namespace Chess
         {
             return color;
         };
+        std::string get_name() const
+        {
+            return name;
+        }
         int get_stale_since() const { return stale_since; };
 
         // Management member functions

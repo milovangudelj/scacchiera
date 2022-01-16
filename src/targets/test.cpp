@@ -1,40 +1,73 @@
 #include <iostream>
+#include <cstring>
 
+#include "Controller.h"
 #include "Board.h"
 #include "Player.h"
 
 using Chess::Board;
+using Chess::Controller;
+using Chess::Coordinate;
+using Chess::Movement;
 using Chess::Player;
 using Chess::utilities::Color;
 using Chess::utilities::PlayerType;
-using Chess::Movement;
-using Chess::Coordinate;
 
-int main()
+const char *BRIGHT = "\033[1m";
+const char *RESET = "\033[0m";
+
+std::pair<std::string, std::string> parse_args(int argc, char *argv[]);
+
+int main(int argc, char *argv[])
 {
-    Player player_1(Color::white, PlayerType::human, "Milo");
-    Player player_2(Color::black, PlayerType::computer);
+	std::pair<std::string, std::string> params = parse_args(argc, argv);
 
-    Board board{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", player_1, player_2};
-    std::cout << board << "\n\n";
+	std::string mode = params.first;
+	std::string fen = params.second;
 
-    /*
-    std::cout << player_1 << "\n\n"
-              << player_2 << '\n';
-    board.move(player_1, player_2, {{6, 3}, {4, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 3}, {5, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 2}, {6, 3}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 1}, {5, 0}});
-    std::cout << board << "\n\n";
-    board.move(player_1, player_2, {{7, 0}, {7, 4}});
-    std::cout << board << "\n\n";
-    */
-    Coordinate start {6, 3};
-    Coordinate end {3, 3};
-    Movement movement {start, end};
-   std::cout << movement;
-    return 0;
+	std::string fen_castling = "r3kbnr/ppp1pppp/2nqb3/3p4/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+	std::string fen_checkmate = "1r3k2/6br/n3Q3/pp2Bp1p/2p4P/2N1P3/PPP2PR1/2K5 w - - 0 0"; // Moving `E5 D6` should cause checkmate for black
+
+	Controller controller{mode, fen};
+
+	controller.play();
+
+	return 0;
+}
+
+void print_help()
+{
+	std::cout << "Se fornito, il primo argomento deve essere uno tra i seguenti:\n\n"
+				 << BRIGHT << "	pc" << RESET << "		Player vs Computer\n"
+				 << BRIGHT << "	cc" << RESET << "		Computer vs Computer\n"
+				 << BRIGHT << "	help" << RESET << "		Stampa questo messaggio\n\n"
+				 << "Il secondo argomento deve essere una stringa in notazione "
+				 << BRIGHT << "FEN" << RESET << ".\nOgni argomento sucessivo al secondo verrà ignorato.\n\n";
+	std::exit(0);
+}
+
+std::pair<std::string, std::string> parse_args(int argc, char *argv[])
+{
+	std::string def_mode = "pc";
+	std::string def_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
+	std::pair<std::string, std::string> params;
+
+	switch (argc)
+	{
+	case 1:
+		params = std::pair<std::string, std::string>(def_mode, def_fen);
+		break;
+	case 2:
+		if ((strcmp(argv[1], "pc") != 0 && strcmp(argv[1], "cc") != 0) || strcmp(argv[1], "help") == 0)
+			print_help();
+		params = std::pair<std::string, std::string>(argv[1], def_fen);
+		break;
+	default:
+		if ((strcmp(argv[1], "pc") != 0 && strcmp(argv[1], "cc") != 0) || strcmp(argv[1], "help") == 0)
+			print_help();
+		params = std::pair<std::string, std::string>(argv[1], argv[2]);
+		break;
+	}
+
+	return params;
 }

@@ -15,6 +15,7 @@ namespace Chess {
     Coordinate operator+ (Coordinate coordinate, std::pair<int, int> offset);
 
     bool operator== (const Coordinate& coordinate1, const Coordinate& coordinate2);
+    bool operator!=(const Coordinate &coordinate1, const Coordinate &coordinate2);
 
     std::ostream& operator<< (std::ostream& os, Coordinate& coordinate);
 }
