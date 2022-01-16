@@ -270,8 +270,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 
 std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) const
 {
-	auto [rank, file] = coordinate;
-	return cells[rank][file];
+	return cells[coordinate.rank][coordinate.file];
 }
 
 bool Board::is_check(Player &current, Player &other)
@@ -431,8 +430,7 @@ bool Board::is_draw(Player &current, Player &other)
 MoveResult Board::move(Player &current_player, Player &other_player, Movement movement)
 {
 	//check if piece is owned by the player
-	auto [start_coordinate_rank, start_coordinate_file] = movement.start;
-	std::shared_ptr<Piece> start_piece = cells[start_coordinate_rank][start_coordinate_file];
+	std::shared_ptr<Piece> start_piece = cells[movement.start.rank][movement.start.file];
 	if (start_piece == nullptr)
 	{
 		return MoveResult::invalid;
@@ -548,8 +546,7 @@ bool Board::promote(Player &player, char piece_symbol)
 		if (piece->get_type() == PieceType::pawn)
 		{
 			resurrected->set_coordinate(piece->get_coordinate());
-			auto [rank, file] = piece->get_coordinate();
-			cells[rank][file] = resurrected;
+			cells[piece->get_coordinate().rank][piece->get_coordinate().file] = resurrected;
 			player.add_to_lost_pieces(player.remove_from_available_pieces(piece));
 			break;
 		}
@@ -561,20 +558,18 @@ void Board::temporary_move(Movement movement)
 {
 	last_movement = movement;
 	Coordinate start_coordinate = movement.start;
-	auto [start_coordinate_rank, start_coordinate_file] = start_coordinate;
 	Coordinate end_coordinate = movement.end;
-	auto [end_coordinate_rank, end_coordinate_file] = end_coordinate;
-	last_eaten = cells[end_coordinate_rank][end_coordinate_file];
-	cells[end_coordinate_rank][end_coordinate_file] = cells[start_coordinate_rank][start_coordinate_file];
-	cells[start_coordinate_rank][start_coordinate_file] = nullptr;
+	last_eaten = cells[end_coordinate.rank][end_coordinate.file];
+	cells[end_coordinate.rank][end_coordinate.file] = cells[start_coordinate.rank][start_coordinate.file];
+	cells[start_coordinate.rank][start_coordinate.file] = nullptr;
 }
 
 void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten)
 {
-	auto [start_rank, start_file] = last_movement.start;
-	auto [end_rank, end_file] = last_movement.end;
-	cells[start_rank][start_file] = cells[end_rank][end_file];
-	cells[end_rank][end_file] = last_eaten;
+	Coordinate start = last_movement.start;
+	Coordinate end = last_movement.end;
+	cells[start.rank][start.file] = cells[end.rank][end.file];
+	cells[end.rank][end.file] = last_eaten;
 	last_eaten = previous_eaten;
 	last_movement = previous_movement;
 }
