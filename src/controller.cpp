@@ -73,7 +73,7 @@ Chess::Movement Controller::get_move()
 	}
 
 	Chess::Coordinate start = {(unsigned int)(8 - (from.at(1) - '0')), (unsigned int)(from.at(0) - 'A')};
-	Chess::Coordinate end = {(unsigned int)(8 - (from.at(1) - '0')), (unsigned int)(to.at(0) - 'A')};
+	Chess::Coordinate end = {(unsigned int)(8 - (to.at(1) - '0')), (unsigned int)(to.at(0) - 'A')};
 
 	return {start, end}; // {{yf, xf},{yt, xt}} where f = from, t = to
 }
