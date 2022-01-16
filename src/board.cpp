@@ -280,10 +280,9 @@ bool Board::is_check(Player &current, Player &other)
 	{
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
 		auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(),
-									 [king_coordinate](Movement movement)
-									 {
-										 return king_coordinate == movement.end;
-									 });
+			[king_coordinate](Movement movement) {
+				return king_coordinate == movement.end;
+			});
 		if (p != pseudo_movements.end())
 		{
 			return true;
@@ -298,23 +297,31 @@ bool Board::is_checkmate(Player &current, Player &other)
 	{
 		return false;
 	}
-	Coordinate king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate_copy = king_coordinate;
 	std::shared_ptr<Piece> king = cells[king_coordinate.rank][king_coordinate.file];
 	Movement previous_movement = last_movement;
 	std::shared_ptr<Piece> previous_eaten = last_eaten;
 	for (Movement movement : king->get_pseudo_valid_movements(*this))
 	{
 		temporary_move(movement);
+		king_coordinate = movement.end;
 		bool can_move = is_check(current, other) ? false : true;
 		undo(previous_movement, previous_eaten);
 		if (can_move)
 		{
 			return false;
 		}
+		king_coordinate = king_coordinate_copy;
+	}
+
+	if(current.get_available_pieces().size() == 1) {
+		return true;
 	}
 
 	for (std::shared_ptr<Piece> piece : current.get_available_pieces())
 	{
+		if(piece->get_type() == PieceType::king) continue;
 		for (Movement movement : piece->get_pseudo_valid_movements(*this))
 		{
 			temporary_move(movement);
@@ -478,7 +485,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	if (is_check(current_player, other_player))
 	{
 		undo(previous_movement, previous_eaten);
-		return MoveResult::invalid;
+		return MoveResult::check;
 	}
 
 	if (last_eaten != nullptr)
