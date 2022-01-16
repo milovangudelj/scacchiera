@@ -5,9 +5,8 @@ using Chess::Coordinate;
 
 Coordinate Chess::operator+(Coordinate coordinate, std::pair<int, int> offset)
 {
-    auto [rank_offset, file_offset] = offset;
-    coordinate.rank += rank_offset;
-    coordinate.file += file_offset;
+    coordinate.rank += offset.first;
+    coordinate.file += offset.second;
     return coordinate;
 }
 
