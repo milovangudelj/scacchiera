@@ -59,16 +59,6 @@ void Controller::init(const std::string &type)
 	board = std::make_unique<Board>(fen, white, black);
 }
 
-std::map<char, unsigned int> col_mapping{
-	 {'A', 0},
-	 {'B', 1},
-	 {'C', 2},
-	 {'D', 3},
-	 {'E', 4},
-	 {'F', 5},
-	 {'G', 6},
-	 {'H', 7}};
-
 std::map<char, unsigned int> row_mapping{
 	 {'1', 7},
 	 {'2', 6},
@@ -92,8 +82,8 @@ Chess::Movement Controller::get_move()
 		return {{9, 9}, {9, 9}};
 	}
 
-	Chess::Coordinate start = {row_mapping[from.at(1)], col_mapping[from.at(0)]};
-	Chess::Coordinate end = {row_mapping[to.at(1)], col_mapping[to.at(0)]};
+	Chess::Coordinate start = {row_mapping[from.at(1)], from.at(0) - 'A'};
+	Chess::Coordinate end = {row_mapping[to.at(1)], to.at(0) - 'A'};
 
 	return {start, end}; // {{yf, xf},{yt, xt}} where f = from, t = to
 }
