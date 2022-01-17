@@ -65,7 +65,7 @@ Chess::Movement Controller::get_move()
 	std::string to = "";
 
 	std::cin >> from >> to;
-	std::cout << "\033[14A\033[J";
+	std::cout << "\033[15A\033[J";
 
 	if (from.compare("XX") == 0 && to.compare("XX") == 0)
 	{
@@ -133,7 +133,7 @@ void Controller::play()
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
 		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board.get()->is_checkmate(*current_player.get(), *other_player.get());
+		checkmate = board.get()->is_checkmate(*other_player.get(), *current_player.get()); //checks if enemy is losing
 		draw = board.get()->is_draw(*current_player.get(), *other_player.get());
 
 		switch (result)

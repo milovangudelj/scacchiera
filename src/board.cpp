@@ -280,10 +280,9 @@ bool Board::is_check(Player &current, Player &other)
 	{
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
 		auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(),
-									 [king_coordinate](Movement movement)
-									 {
-										 return king_coordinate == movement.end;
-									 });
+			[king_coordinate](Movement movement) {
+				return king_coordinate == movement.end;
+			});
 		if (p != pseudo_movements.end())
 		{
 			return true;
@@ -298,23 +297,31 @@ bool Board::is_checkmate(Player &current, Player &other)
 	{
 		return false;
 	}
-	Coordinate king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate_copy = king_coordinate;
 	std::shared_ptr<Piece> king = cells[king_coordinate.rank][king_coordinate.file];
 	Movement previous_movement = last_movement;
 	std::shared_ptr<Piece> previous_eaten = last_eaten;
 	for (Movement movement : king->get_pseudo_valid_movements(*this))
 	{
 		temporary_move(movement);
+		king_coordinate = movement.end;
 		bool can_move = is_check(current, other) ? false : true;
 		undo(previous_movement, previous_eaten);
 		if (can_move)
 		{
 			return false;
 		}
+		king_coordinate = king_coordinate_copy;
+	}
+
+	if(current.get_available_pieces().size() == 1) {
+		return true;
 	}
 
 	for (std::shared_ptr<Piece> piece : current.get_available_pieces())
 	{
+		if(piece->get_type() == PieceType::king) continue;
 		for (Movement movement : piece->get_pseudo_valid_movements(*this))
 		{
 			temporary_move(movement);
@@ -335,6 +342,9 @@ bool Board::is_draw(Player &current, Player &other)
 	Movement previous_movement = last_movement;
 	std::shared_ptr<Piece> previous_eaten = last_eaten;
 
+	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate_copy = king_coordinate;
+
 	//stalemate
 	if (!is_check(current, other))
 	{
@@ -342,9 +352,13 @@ bool Board::is_draw(Player &current, Player &other)
 		{
 			for (Movement movement : piece->get_pseudo_valid_movements(*this))
 			{
+				if(piece->get_type() == PieceType::king) {
+					king_coordinate = movement.end;
+				}
 				temporary_move(movement);
 				bool can_move = is_check(current, other) ? false : true;
 				undo(previous_movement, previous_eaten);
+				king_coordinate = king_coordinate_copy;
 				if (can_move)
 				{
 					return false;
@@ -459,7 +473,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 		MoveResult castling_result = handle_castling(current_player, other_player, movement);
 		if (castling_result == MoveResult::ok)
 		{
-			position_history[to_fen()]++;
+			position_history[to_fen(current_player.get_color())]++;
 		}
 		return castling_result;
 	}
@@ -467,7 +481,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	if (movement.is_en_passant)
 	{
 		handle_en_passant(current_player, other_player, movement);
-		position_history[to_fen()]++;
+		position_history[to_fen(current_player.get_color())]++;
 		return MoveResult::ok;
 	}
 
@@ -478,7 +492,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	if (is_check(current_player, other_player))
 	{
 		undo(previous_movement, previous_eaten);
-		return MoveResult::invalid;
+		return MoveResult::check;
 	}
 
 	if (last_eaten != nullptr)
@@ -508,7 +522,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 		}
 	}
 
-	position_history[to_fen()]++;
+	position_history[to_fen(current_player.get_color())]++;
 
 	if (movement.is_promotion)
 	{
@@ -651,25 +665,86 @@ void Board::handle_en_passant(Player &current_player, Player &other_player, Move
 	current_player.reset_stale_since();
 }
 
-std::string Board::to_fen()
-{
+std::string Board::to_fen(Color current_color) {
 	std::string fen;
+
+	//pieces positions
 	int empty_count = 0;
-	for (std::array<std::shared_ptr<Piece>, 8> rank : cells)
-	{
-		for (std::shared_ptr<Piece> piece : rank)
-		{
-			if (piece == nullptr)
-			{
+	for(std::array<std::shared_ptr<Piece>, 8> rank : cells) {
+		for(std::shared_ptr<Piece> piece : rank) {
+			if(piece == nullptr) {
 				empty_count++;
-			}
-			else
-			{
-				fen += empty_count + piece->get_symbol();
+			} else {
+				if(empty_count != 0) {
+					fen += std::to_string(empty_count) + piece->get_symbol();
+				} else {
+					fen += piece->get_symbol();
+				}
 				empty_count = 0;
 			}
 		}
+		if(empty_count != 0) {
+			fen += std::to_string(empty_count) + "/";
+		} else {
+			fen += "/";
+		}
+		empty_count = 0;
 	}
+
+	//next turn
+	fen += (current_color == Color::black) ? " w " : " b ";
+
+	//castling rights
+	bool w_kingside_c = false, w_queenside_c = false;
+	std::shared_ptr<Piece> w_king = cells[w_king_coordinate.rank][w_king_coordinate.file];
+	for(Movement movement : w_king->get_pseudo_valid_movements(*this)) {
+		if(movement.is_long_castling) {
+			w_queenside_c = true;
+		}
+		if(movement.is_short_castling) {
+			w_kingside_c = true;
+		}
+	}
+	bool b_kingside_c = false, b_queenside_c = false;
+	std::shared_ptr<Piece> b_king = cells[b_king_coordinate.rank][b_king_coordinate.file];
+	for(Movement movement : b_king->get_pseudo_valid_movements(*this)) {
+		if(movement.is_long_castling) {
+			b_queenside_c = true;
+		}
+		if(movement.is_short_castling) {
+			b_queenside_c = true;
+		}
+	}
+	if(w_kingside_c) fen += "K";
+	if(w_queenside_c) fen += "Q";
+	if(b_kingside_c) fen += "k";
+	if(b_queenside_c) fen += "q";
+	if(!w_kingside_c && !w_queenside_c && !b_kingside_c && !b_queenside_c) fen += "-";
+
+	//en passant position
+	std::shared_ptr<Piece> last_moved = cells[last_movement.end.rank][last_movement.end.file];
+	if(last_moved != nullptr && last_moved->get_type() == PieceType::pawn) {
+		if(last_movement.end == last_movement.start + std::pair<int, int>(2, 0) || last_movement.end == last_movement.start + std::pair<int, int>(-2, 0)) {
+			char file = last_movement.end.file + 'a';
+			if(current_color == Color::black) {
+				fen += " " + std::string(1, file) + "3";
+			} else {
+				fen += " " + std::string(1, file) + "6";
+			}
+		}
+	} else {
+		fen += " -";
+	}
+
+	//number of half moves
+	if(player1->get_color() == current_color) {
+		fen += " " + std::to_string(player1->get_stale_since());
+	} else {
+		fen += " " + std::to_string(player2->get_stale_since());
+	}
+
+	//number of moves
+	fen += " " + std::to_string(position_history.size() + 1);
 	return fen;
 }
 
