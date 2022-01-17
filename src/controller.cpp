@@ -90,7 +90,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 
 		while (checked_pieces.size() < current_player->get_available_pieces().size() && found == false)
 		{
-			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, available_pieces.size());
+			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, available_pieces.size() - 1);
 
 			int random_piece_index = piece_dist(rng);
 			std::list<Piece *>::iterator piece_it = available_pieces.begin();
@@ -106,7 +106,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 				continue;
 			}
 
-			std::uniform_int_distribution<std::mt19937::result_type> mvmt_dist(0, available_movements.size());
+			std::uniform_int_distribution<std::mt19937::result_type> mvmt_dist(0, available_movements.size() - 1);
 			int random_mvmt_index = mvmt_dist(rng);
 			std::list<Movement>::iterator mvmt_it = available_movements.begin();
 			std::advance(mvmt_it, random_piece_index);
