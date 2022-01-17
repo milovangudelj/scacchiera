@@ -459,7 +459,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 		MoveResult castling_result = handle_castling(current_player, other_player, movement);
 		if (castling_result == MoveResult::ok)
 		{
-			position_history[to_fen()]++;
+			position_history[to_fen(current_player.get_color())]++;
 		}
 		return castling_result;
 	}
@@ -467,7 +467,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	if (movement.is_en_passant)
 	{
 		handle_en_passant(current_player, other_player, movement);
-		position_history[to_fen()]++;
+		position_history[to_fen(current_player.get_color())]++;
 		return MoveResult::ok;
 	}
 
@@ -508,7 +508,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 		}
 	}
 
-	position_history[to_fen()]++;
+	position_history[to_fen(current_player.get_color())]++;
 
 	if (movement.is_promotion)
 	{
@@ -651,25 +651,86 @@ void Board::handle_en_passant(Player &current_player, Player &other_player, Move
 	current_player.reset_stale_since();
 }
 
-std::string Board::to_fen()
-{
+std::string Board::to_fen(Color current_color) {
 	std::string fen;
+
+	//pieces positions
 	int empty_count = 0;
-	for (std::array<std::shared_ptr<Piece>, 8> rank : cells)
-	{
-		for (std::shared_ptr<Piece> piece : rank)
-		{
-			if (piece == nullptr)
-			{
+	for(std::array<std::shared_ptr<Piece>, 8> rank : cells) {
+		for(std::shared_ptr<Piece> piece : rank) {
+			if(piece == nullptr) {
 				empty_count++;
-			}
-			else
-			{
-				fen += empty_count + piece->get_symbol();
+			} else {
+				if(empty_count != 0) {
+					fen += std::to_string(empty_count) + piece->get_symbol();
+				} else {
+					fen += piece->get_symbol();
+				}
 				empty_count = 0;
 			}
 		}
+		if(empty_count != 0) {
+			fen += std::to_string(empty_count) + "/";
+		} else {
+			fen += "/";
+		}
+		empty_count = 0;
 	}
+
+	//next turn
+	fen += (current_color == Color::black) ? " w " : " b ";
+
+	//castling rights
+	bool w_kingside_c = false, w_queenside_c = false;
+	std::shared_ptr<Piece> w_king = cells[w_king_coordinate.rank][w_king_coordinate.file];
+	for(Movement movement : w_king->get_pseudo_valid_movements(*this)) {
+		if(movement.is_long_castling) {
+			w_queenside_c = true;
+		}
+		if(movement.is_short_castling) {
+			w_kingside_c = true;
+		}
+	}
+	bool b_kingside_c = false, b_queenside_c = false;
+	std::shared_ptr<Piece> b_king = cells[b_king_coordinate.rank][b_king_coordinate.file];
+	for(Movement movement : b_king->get_pseudo_valid_movements(*this)) {
+		if(movement.is_long_castling) {
+			b_queenside_c = true;
+		}
+		if(movement.is_short_castling) {
+			b_queenside_c = true;
+		}
+	}
+	if(w_kingside_c) fen += "K";
+	if(w_queenside_c) fen += "Q";
+	if(b_kingside_c) fen += "k";
+	if(b_queenside_c) fen += "q";
+	if(!w_kingside_c && !w_queenside_c && !b_kingside_c && !b_queenside_c) fen += "-";
+
+	//en passant position
+	std::shared_ptr<Piece> last_moved = cells[last_movement.end.rank][last_movement.end.file];
+	if(last_moved != nullptr && last_moved->get_type() == PieceType::pawn) {
+		if(last_movement.end == last_movement.start + std::pair<int, int>(2, 0) || last_movement.end == last_movement.start + std::pair<int, int>(-2, 0)) {
+			char file = last_movement.end.file + 'a';
+			if(current_color == Color::black) {
+				fen += " " + std::string(1, file) + "3";
+			} else {
+				fen += " " + std::string(1, file) + "6";
+			}
+		}
+	} else {
+		fen += " -";
+	}
+
+	//number of half moves
+	if(player1->get_color() == current_color) {
+		fen += " " + std::to_string(player1->get_stale_since());
+	} else {
+		fen += " " + std::to_string(player2->get_stale_since());
+	}
+
+	//number of moves
+	fen += " " + std::to_string(position_history.size() + 1);
 	return fen;
 }
 
