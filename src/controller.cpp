@@ -111,9 +111,6 @@ Chess::Movement Controller::get_move(Player *current_player)
 			std::list<Movement>::iterator mvmt_it = available_movements.begin();
 			std::advance(mvmt_it, random_piece_index);
 
-			std::cout << "\033[13A\033[J";
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
 			found = true;
 			mvmt = *mvmt_it;
 		}
@@ -123,6 +120,9 @@ Chess::Movement Controller::get_move(Player *current_player)
 			std::cout << "Player has no more available movements.\n\n";
 			exit(0);
 		}
+
+		std::cout << "\033[13A\033[J";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 		return mvmt;
 	}
