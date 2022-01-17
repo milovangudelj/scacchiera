@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <set>
+#include <random>
 #include <thread>
 
 #include "Controller.h"
@@ -20,13 +21,11 @@ static const char *BLUE_FG = "\033[34m";
 
 Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(nullptr), black(nullptr), board(nullptr)
 {
-	time_seed = time(NULL);
 	init(_mode);
 }
 
 Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr)
 {
-	time_seed = time(NULL);
 	init_replay();
 }
 
@@ -85,11 +84,15 @@ Chess::Movement Controller::get_move(Player *current_player)
 		std::list<Piece *> checked_pieces;
 		bool found = false;
 
+		// Random numbers
+		std::random_device dev;
+		std::mt19937 rng(dev()); // Random number generator
+
 		while (checked_pieces.size() < current_player->get_available_pieces().size() && found == false)
 		{
-			srand(time_seed); // Seed random number generator
+			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, available_pieces.size());
 
-			int random_piece_index = rand() % available_pieces.size();
+			int random_piece_index = piece_dist(rng);
 			std::list<Piece *>::iterator piece_it = available_pieces.begin();
 			std::advance(piece_it, random_piece_index);
 
@@ -103,7 +106,8 @@ Chess::Movement Controller::get_move(Player *current_player)
 				continue;
 			}
 
-			int random_mvmt_index = rand() % available_movements.size();
+			std::uniform_int_distribution<std::mt19937::result_type> mvmt_dist(0, available_movements.size());
+			int random_mvmt_index = mvmt_dist(rng);
 			std::list<Movement>::iterator mvmt_it = available_movements.begin();
 			std::advance(mvmt_it, random_piece_index);
 
