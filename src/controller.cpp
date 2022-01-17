@@ -201,7 +201,7 @@ std::list<std::string> Controller::replay(char out)
 		throw std::invalid_argument("Output flag must be either 't' (terminal) or 'f' (file).");
 
 	std::list<std::string> to_print; // List of strings to be printed to terminal/file
-	bool to_terminal = out == 't';
+	bool to_terminal = (out == 't');
 
 	Chess::Player *current_player = white;
 	Chess::Player *other_player = black;
@@ -216,10 +216,35 @@ std::list<std::string> Controller::replay(char out)
 	if (to_terminal)
 		display(current_player, checkmate, draw);
 
-	// Moves to be replayed and saved to 'to_print'
+	// Create string stream and print initial board layout
+	std::stringstream ss;
+	ss << *board.get();
+	to_print.push_back(ss.str());
+
+	// Loop through the movements and add them to 'to_print'
 	for (Movement movement : log_list)
 	{
-		std::cout << movement << '\n';
+		// Reset the string stream
+		ss.str(std::string());
+
+		// Make teh movement
+		board.get()->move(*current_player.get(), *other_player.get(), movement);
+
+		// Print the board to the string stream and add it to the list of strings to print
+		if (to_terminal)
+		{
+			ss << board.get()->pretty_print();
+		}
+		else
+		{
+			ss << *board.get();
+		}
+		to_print.push_back(ss.str());
+
+		// Swap players
+		std::shared_ptr<Chess::Player> temp = current_player;
+		current_player = other_player;
+		other_player = temp;
 	}
 
 	return to_print;
@@ -236,7 +261,7 @@ void Controller::display(Player *current_player, bool is_checkmate, bool is_draw
 	printf("%sCheckmate:%s %s	", BRIGHT, RESET, checkmate);
 	printf("%sDraw:%s %s\n\n", BRIGHT, RESET, draw);
 
-	std::cout << *board << "\n\n";
+	std::cout << board->pretty_print() << "\n\n";
 }
 
 /// @brief Exports the game's movements history

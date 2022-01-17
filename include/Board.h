@@ -71,6 +71,7 @@ namespace Chess {
         Movement get_last_movement() const { return last_movement; }
 
         Piece *get_piece_at(Coordinate coordinate) const;
+        std::string pretty_print();
         friend std::ostream &operator<<(std::ostream &os, const Board &board);
     };
 
