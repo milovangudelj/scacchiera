@@ -768,6 +768,41 @@ bool Board::can_draw()
 	return true;
 }
 
+std::string Board::pretty_print()
+{
+	std::stringstream ss;
+
+	std::shared_ptr<Piece> piece;
+	for (int rank = 0; rank < SIZE; rank++)
+	{
+		//algebric notation is reversed from internal matrix representation
+		ss << 8 - rank << " ";
+		for (int file = 0; file < SIZE; file++)
+		{
+			piece = cells[rank][file];
+
+			ss << ((rank + file) % 2 == 0 ? INVERT : RESET); // Cell color
+			if (piece == nullptr)
+			{
+				ss << "   ";
+			}
+			else
+			{
+				ss << " " << piece->get_symbol() << " ";
+			}
+		}
+		ss << "\033[0m"; // Color reset
+		ss << "\n";
+	}
+	ss << "\n"
+		<< "  ";
+	for (int i = 0; i < SIZE; i++)
+	{
+		ss << " " << static_cast<char>('A' + i) << " ";
+	}
+	return ss.str();
+}
+
 namespace Chess
 {
 	std::ostream &operator<<(std::ostream &os, const Board &board)
@@ -781,24 +816,22 @@ namespace Chess
 			{
 				piece = board.cells[rank][file];
 
-				os << ((rank + file) % 2 == 0 ? INVERT : RESET); // Cell color
 				if (piece == nullptr)
 				{
-					os << "   ";
+					os << " ";
 				}
 				else
 				{
-					os << " " << piece->get_symbol() << " ";
+					os << piece->get_symbol();
 				}
 			}
-			os << "\033[0m"; // Color reset
 			os << "\n";
 		}
 		os << "\n"
 			<< "  ";
 		for (int i = 0; i < SIZE; i++)
 		{
-			os << " " << static_cast<char>('A' + i) << " ";
+			os << static_cast<char>('A' + i);
 		}
 		return os;
 	}
