@@ -20,11 +20,13 @@ static const char *BLUE_FG = "\033[34m";
 
 Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(nullptr), black(nullptr), board(nullptr)
 {
+	time_seed = time(NULL);
 	init(_mode);
 }
 
 Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr)
 {
+	time_seed = time(NULL);
 	init_replay();
 }
 
@@ -85,7 +87,8 @@ Chess::Movement Controller::get_move(Player *current_player)
 
 		while (checked_pieces.size() < current_player->get_available_pieces().size() && found == false)
 		{
-			srand(time(NULL)); // Seed random number generator
+			srand(time_seed); // Seed random number generator
+
 			int random_piece_index = rand() % available_pieces.size();
 			std::list<Piece *>::iterator piece_it = available_pieces.begin();
 			std::advance(piece_it, random_piece_index);

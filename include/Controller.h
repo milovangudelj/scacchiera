@@ -13,6 +13,9 @@ namespace Chess
 {
 	class Controller
 	{
+	protected:
+		unsigned int time_seed;
+
 	private:
 		std::string fen;
 		std::list<Chess::Movement> log_list;
