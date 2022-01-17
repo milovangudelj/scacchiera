@@ -36,12 +36,12 @@ std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
         }
         //unlike other pieces, a pawn captures in front of it diagonally
         possible_movements = diag_cap(board,Color::white);
-        if(!(possible_movements.first == this->coordinate))
+        if(!(possible_movements.first == Coordinate{9, 9}))
         {
             is_promo = promotion(possible_movements.first,Color::white) ? true : false;
             pseudo_movements.push_back({this->coordinate,possible_movements.first,is_promo});
         }
-        if(!(possible_movements.second == this->coordinate))
+        if(!(possible_movements.second == Coordinate{9, 9}))
         {    
             is_promo = promotion(possible_movements.second,Color::white) ? true : false;      
             pseudo_movements.push_back({this->coordinate,possible_movements.second,is_promo});
@@ -69,12 +69,12 @@ std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
         }
         //capture diagonally black
         possible_movements = diag_cap(board,Color::black);
-        if(!(possible_movements.first == this->coordinate))
+        if(!(possible_movements.first == Coordinate{9, 9}))
         {
             is_promo = promotion(possible_movements.first,Color::black) ? true : false;
             pseudo_movements.push_back({this->coordinate,possible_movements.first,is_promo});
         }
-        if(!(possible_movements.second == this->coordinate))
+        if(!(possible_movements.second == Coordinate{9, 9}))
         {    
             is_promo = promotion(possible_movements.second,Color::black) ? true : false;      
             pseudo_movements.push_back({this->coordinate,possible_movements.second,is_promo});
