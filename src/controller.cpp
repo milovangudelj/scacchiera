@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <set>
+#include <thread>
 
 #include "Controller.h"
 #include "Board.h"
@@ -27,13 +28,20 @@ Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_lis
 	init_replay();
 }
 
+Controller::~Controller()
+{
+	delete white;
+	delete black;
+	delete board;
+}
+
 void Controller::init_replay()
 {
-	white = std::make_shared<Player>(Color::white, PlayerType::computer);
-	black = std::make_shared<Player>(Color::black, PlayerType::computer);
+	white = new Player(Color::white, PlayerType::computer);
+	black = new Player(Color::black, PlayerType::computer);
 	fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 
-	board = std::make_unique<Board>(fen, white, black);
+	board = new Board(fen, white, black);
 }
 
 void Controller::init(const std::string &type)
@@ -43,29 +51,50 @@ void Controller::init(const std::string &type)
 		srand(time(NULL));
 		bool white_is_human = rand() % 2 == 1;
 
-		white = std::make_shared<Player>(Color::white, PlayerType{white_is_human ? PlayerType::human : PlayerType::computer});
-		black = std::make_shared<Player>(Color::black, PlayerType{white_is_human ? PlayerType::computer : PlayerType::human});
+		white = new Player(Color::white, PlayerType{white_is_human ? PlayerType::human : PlayerType::computer});
+		black = new Player(Color::black, PlayerType{white_is_human ? PlayerType::computer : PlayerType::human});
 	}
 	else if (type.compare("cc") == 0)
 	{
-		white = std::make_shared<Player>(Color::white, PlayerType::computer);
-		black = std::make_shared<Player>(Color::black, PlayerType::computer);
+		white = new Player(Color::white, PlayerType::computer);
+		black = new Player(Color::black, PlayerType::computer);
 	}
 	else
 	{
 		throw "Invalid game type";
 	}
 
-	board = std::make_unique<Board>(fen, white, black);
+	board = new Board(fen, white, black);
 }
 
-Chess::Movement Controller::get_move()
+Chess::Movement Controller::get_move(Player *current_player)
 {
+	if (current_player->get_type() == PlayerType::computer)
+	{
+		std::list<Chess::Piece *> available_pieces = current_player->get_available_pieces();
+
+		int random_piece_index = rand() % available_pieces.size();
+		std::list<Chess::Piece *>::iterator piece_it = available_pieces.begin();
+		std::advance(piece_it, random_piece_index);
+
+		Chess::Piece *piece = *piece_it;
+
+		std::list<Movement> available_movements = piece->get_pseudo_valid_movements(*board);
+
+		int random_mvmt_index = rand() % available_movements.size();
+		std::list<Movement>::iterator mvmt_it = available_movements.begin();
+		std::advance(mvmt_it, random_piece_index);
+
+		std::cout << "\033[13A\033[J";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		return *mvmt_it;
+	}
+
 	std::string from = "";
 	std::string to = "";
 
 	std::cin >> from >> to;
-	std::cout << "\033[15A\033[J";
+	std::cout << "\033[14A\033[J";
 
 	if (from.compare("XX") == 0 && to.compare("XX") == 0)
 	{
@@ -101,8 +130,8 @@ void clear_errors(std::set<std::string> &errors)
 /// @brief Starts the game and goes on until either checkmate or draw occurs
 void Controller::play()
 {
-	std::shared_ptr<Chess::Player> current_player = white;
-	std::shared_ptr<Chess::Player> other_player = black;
+	Chess::Player *current_player = white;
+	Chess::Player *other_player = black;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
@@ -122,19 +151,20 @@ void Controller::play()
 		}
 
 		// Ask for input again if move was invalid
-		Chess::Movement mvmt = get_move();
+		Chess::Movement mvmt = get_move(current_player);
+
 		if (!mvmt.start.is_valid() && !mvmt.end.is_valid())
 		{
 			clear_errors(errors);
 			continue;
 		}
 
-		result = board.get()->move(*current_player.get(), *other_player.get(), mvmt);
+		result = board->move(*current_player, *other_player, mvmt);
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
 		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board.get()->is_checkmate(*other_player.get(), *current_player.get()); //checks if enemy is losing
-		draw = board.get()->is_draw(*current_player.get(), *other_player.get());
+		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		draw = board->is_draw(*current_player, *other_player);
 
 		switch (result)
 		{
@@ -173,8 +203,8 @@ std::list<std::string> Controller::replay(char out)
 	std::list<std::string> to_print; // List of strings to be printed to terminal/file
 	bool to_terminal = out == 't';
 
-	std::shared_ptr<Chess::Player> current_player = white;
-	std::shared_ptr<Chess::Player> other_player = black;
+	Chess::Player *current_player = white;
+	Chess::Player *other_player = black;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
@@ -195,18 +225,18 @@ std::list<std::string> Controller::replay(char out)
 	return to_print;
 }
 
-void Controller::display(std::shared_ptr<Chess::Player> current_player, bool is_checkmate, bool is_draw, bool is_check)
+void Controller::display(Player *current_player, bool is_checkmate, bool is_draw, bool is_check)
 {
 	const char *checkmate = is_checkmate ? "true" : "false";
 	const char *draw = is_draw ? "true" : "false";
-	const char *name = current_player.get()->get_name().c_str();
-	const char *color = current_player.get()->get_color() == Chess::utilities::Color::white ? "█" : "░";
+	const char *name = current_player->get_name().c_str();
+	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
 	printf("%sNow playing:%s %s %s	", BRIGHT, RESET, name, color);
 	printf("%sCheckmate:%s %s	", BRIGHT, RESET, checkmate);
 	printf("%sDraw:%s %s\n\n", BRIGHT, RESET, draw);
 
-	std::cout << *board.get() << "\n\n";
+	std::cout << *board << "\n\n";
 }
 
 /// @brief Exports the game's movements history
