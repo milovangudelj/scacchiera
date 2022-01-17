@@ -71,23 +71,53 @@ Chess::Movement Controller::get_move(Player *current_player)
 {
 	if (current_player->get_type() == PlayerType::computer)
 	{
+		Movement mvmt = {{9, 9}, {9, 9}};
 		std::list<Chess::Piece *> available_pieces = current_player->get_available_pieces();
 
-		int random_piece_index = rand() % available_pieces.size();
-		std::list<Chess::Piece *>::iterator piece_it = available_pieces.begin();
-		std::advance(piece_it, random_piece_index);
+		if (available_pieces.size() == 0)
+		{
+			std::cout << "Player has no more available pieces.\n\n";
+			exit(0);
+		}
 
-		Chess::Piece *piece = *piece_it;
+		std::list<Piece *> checked_pieces;
+		bool found = false;
 
-		std::list<Movement> available_movements = piece->get_pseudo_valid_movements(*board);
+		while (checked_pieces.size() < current_player->get_available_pieces().size() && found == false)
+		{
+			srand(time(NULL)); // Seed random number generator
+			int random_piece_index = rand() % available_pieces.size();
+			std::list<Piece *>::iterator piece_it = available_pieces.begin();
+			std::advance(piece_it, random_piece_index);
 
-		int random_mvmt_index = rand() % available_movements.size();
-		std::list<Movement>::iterator mvmt_it = available_movements.begin();
-		std::advance(mvmt_it, random_piece_index);
+			Piece *piece = *piece_it;
+			checked_pieces.push_back(piece);
 
-		std::cout << "\033[13A\033[J";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		return *mvmt_it;
+			std::list<Movement> available_movements = piece->get_pseudo_valid_movements(*board);
+			if (available_movements.size() == 0)
+			{
+				available_pieces.remove(piece);
+				continue;
+			}
+
+			int random_mvmt_index = rand() % available_movements.size();
+			std::list<Movement>::iterator mvmt_it = available_movements.begin();
+			std::advance(mvmt_it, random_piece_index);
+
+			std::cout << "\033[13A\033[J";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+			found = true;
+			mvmt = *mvmt_it;
+		}
+
+		if (found == false && checked_pieces.size() == current_player->get_available_pieces().size())
+		{
+			std::cout << "Player has no more available movements.\n\n";
+			exit(0);
+		}
+
+		return mvmt;
 	}
 
 	std::string from = "";
