@@ -218,7 +218,7 @@ std::list<std::string> Controller::replay(char out)
 
 	// Create string stream and print initial board layout
 	std::stringstream ss;
-	ss << *board.get();
+	ss << *board;
 	to_print.push_back(ss.str());
 
 	// Loop through the movements and add them to 'to_print'
@@ -228,21 +228,21 @@ std::list<std::string> Controller::replay(char out)
 		ss.str(std::string());
 
 		// Make teh movement
-		board.get()->move(*current_player.get(), *other_player.get(), movement);
+		board->move(*current_player, *other_player, movement);
 
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
 		{
-			ss << board.get()->pretty_print();
+			ss << board->pretty_print();
 		}
 		else
 		{
-			ss << *board.get();
+			ss << *board;
 		}
 		to_print.push_back(ss.str());
 
 		// Swap players
-		std::shared_ptr<Chess::Player> temp = current_player;
+		Player *temp = current_player;
 		current_player = other_player;
 		other_player = temp;
 	}
