@@ -23,19 +23,19 @@ Player::Player(const Color &_color, const PlayerType &_type, const std::string &
 
 // Management methods
 
-void Player::add_to_lost_pieces(std::shared_ptr<Piece> &piece)
+void Player::add_to_lost_pieces(Piece *piece)
 {
 	// Add piece to the back of the list
 	lost_pieces.push_back(piece);
 };
 
-void Player::add_to_available_pieces(std::shared_ptr<Piece> &piece)
+void Player::add_to_available_pieces(Piece *piece)
 {
 	// Add piece to the back of the list
 	available_pieces.push_back(piece);
 };
 
-std::shared_ptr<Piece> &Player::remove_from_lost_pieces(std::shared_ptr<Piece> &piece)
+Piece *Player::remove_from_lost_pieces(Piece *piece)
 {
 	// Removing the given piece from the list
 	lost_pieces.remove(piece);
@@ -43,7 +43,7 @@ std::shared_ptr<Piece> &Player::remove_from_lost_pieces(std::shared_ptr<Piece> &
 	return piece;
 };
 
-std::shared_ptr<Piece> &Player::remove_from_available_pieces(std::shared_ptr<Piece> &piece)
+Piece *Player::remove_from_available_pieces(Piece *piece)
 {
 	// Removing the given piece from the list
 	available_pieces.remove(piece);

@@ -28,11 +28,11 @@ namespace Chess {
 
     class Board {
     protected:
-        std::shared_ptr<Chess::Player> player1;
-        std::shared_ptr<Chess::Player> player2;
+        Chess::Player *player1;
+        Chess::Player *player2;
 
     private:
-        Matrix<std::shared_ptr<Piece>, SIZE> cells;
+        Matrix<Piece *, SIZE> cells;
         void initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player &player1, Player &player2);
         void from_fen(std::string fen);
 
@@ -41,9 +41,9 @@ namespace Chess {
         Coordinate b_king_coordinate;
 
         //needed for undoing invalid moves
-        std::shared_ptr<Piece> last_eaten;
+        Piece *last_eaten;
         Movement last_movement;
-        void undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten);
+        void undo(Movement previous_movement, Piece *previous_eaten);
 
         //side effect: modifies last_eaten and last_movement
         void temporary_move(Movement movement);
@@ -58,7 +58,8 @@ namespace Chess {
         bool can_draw_flag;
 
     public:
-        Board(std::string fen, std::shared_ptr<Player> p1, std::shared_ptr<Player> p2);
+        Board(std::string fen, Player *p1, Player *p2);
+        ~Board();
         Chess::utilities::MoveResult move(Player &current_player, Player &other_player, Movement movement);
         bool promote(Player &player, char piece_symbol);
 
@@ -69,7 +70,7 @@ namespace Chess {
         //used by Pawn for checking for en passant conditions
         Movement get_last_movement() const { return last_movement; }
 
-        std::shared_ptr<Piece> get_piece_at(Coordinate coordinate) const;
+        Piece *get_piece_at(Coordinate coordinate) const;
         friend std::ostream &operator<<(std::ostream &os, const Board &board);
     };
 

@@ -39,31 +39,44 @@ std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'r', Chess::utilities::PieceType::rook},
 	 {'p', Chess::utilities::PieceType::pawn}};
 
-std::shared_ptr<Piece> make_piece(Coordinate coordinate, Color color, PieceType type)
+Piece *make_piece(Coordinate coordinate, Color color, PieceType type)
 {
 	switch (type)
 	{
 	case PieceType::king:
-		return std::make_shared<King>(coordinate, color, type);
+		return new King(coordinate, color, type);
 	case PieceType::queen:
-		return std::make_shared<Queen>(coordinate, color, type);
+		return new Queen(coordinate, color, type);
 	case PieceType::bishop:
-		return std::make_shared<Bishop>(coordinate, color, type);
+		return new Bishop(coordinate, color, type);
 	case PieceType::knight:
-		return std::make_shared<Knight>(coordinate, color, type);
+		return new Knight(coordinate, color, type);
 	case PieceType::rook:
-		return std::make_shared<Rook>(coordinate, color, type);
+		return new Rook(coordinate, color, type);
 	case PieceType::pawn:
-		return std::make_shared<Pawn>(coordinate, color, type);
+		return new Pawn(coordinate, color, type);
 	}
 	return nullptr;
 }
 //end helper
 
-Board::Board(std::string fen, std::shared_ptr<Player> p1, std::shared_ptr<Player> p2) : player1{p1}, player2{p2}, last_eaten{nullptr}, can_draw_flag{false}
+Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, last_eaten{nullptr}, can_draw_flag{false}
 {
 	// initialize_with_fen(fen, had_moved_flags, player1, player2);
 	from_fen(fen);
+}
+
+Board::~Board()
+{
+	delete player1;
+	delete player2;
+	for (size_t i = 0; i < cells.size(); i++)
+	{
+		for (size_t j = 0; j < cells[i].size(); j++)
+		{
+			delete cells[i][j];
+		}
+	}
 }
 
 std::vector<std::string> split(std::string target, char delimiter)
@@ -136,17 +149,17 @@ void Board::from_fen(std::string fen)
 			p_type = char_to_piece.at(std::tolower(c));
 			p_pos = {i, file};
 
-			std::shared_ptr<Piece> piece = make_piece({i, file}, p_color, p_type);
+			Piece *piece = make_piece({i, file}, p_color, p_type);
 			cells[i][file] = piece;
 
 			// Add piece to its player
-			if (player1.get()->get_color() == p_color)
+			if (player1->get_color() == p_color)
 			{
-				player1.get()->add_to_available_pieces(piece);
+				player1->add_to_available_pieces(piece);
 			}
 			else
 			{
-				player2.get()->add_to_available_pieces(piece);
+				player2->add_to_available_pieces(piece);
 			}
 
 			// Set kings' coordinates
@@ -167,7 +180,7 @@ void Board::from_fen(std::string fen)
 			{
 				if ((p_color == Color::white && (i != 6)) || (p_color == Color::black && (i != 1)))
 				{
-					piece.get()->set_had_moved();
+					piece->set_had_moved();
 				}
 			}
 			else
@@ -183,7 +196,7 @@ void Board::from_fen(std::string fen)
 				Coordinate test_pos2 = {test_rank, test_file};
 
 				if (p_pos != test_pos1 && p_pos != test_pos2)
-					piece.get()->set_had_moved();
+					piece->set_had_moved();
 			}
 
 			// Castling & had moved for rooks
@@ -199,7 +212,7 @@ void Board::from_fen(std::string fen)
 				bool is_king_side = file == 7;
 
 				if ((king_side_missing && is_king_side) || (queen_side_missing && is_queen_side))
-					piece.get()->set_had_moved();
+					piece->set_had_moved();
 			}
 
 			file++;
@@ -226,7 +239,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 		}
 		Color color = std::islower(character) ? Color::black : Color::white;
 		PieceType type = char_to_piece.at(std::tolower(character));
-		std::shared_ptr<Piece> piece = make_piece({rank, file}, color, type);
+		Piece *piece = make_piece({rank, file}, color, type);
 		cells[rank][file] = piece;
 		if (player1.get_color() == color)
 		{
@@ -252,7 +265,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 		// No need to do it here. It's already in the constructor.
 		// if (type == PieceType::bishop)
 		// {
-		//     std::static_pointer_cast<Bishop>(piece)->update_cell_color();
+		//     static_cast<Bishop*>(piece)->update_cell_color();
 		// }
 
 		if (type == PieceType::king || type == PieceType::rook)
@@ -268,7 +281,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 	}
 }
 
-std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) const
+Piece *Board::get_piece_at(Coordinate coordinate) const
 {
 	return cells[coordinate.rank][coordinate.file];
 }
@@ -276,7 +289,7 @@ std::shared_ptr<Piece> Board::get_piece_at(Coordinate coordinate) const
 bool Board::is_check(Player &current, Player &other)
 {
 	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king_coordinate : w_king_coordinate;
-	for (std::shared_ptr<Piece> piece : other.get_available_pieces())
+	for (Piece *piece : other.get_available_pieces())
 	{
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
 		auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(),
@@ -299,9 +312,9 @@ bool Board::is_checkmate(Player &current, Player &other)
 	}
 	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
 	Coordinate king_coordinate_copy = king_coordinate;
-	std::shared_ptr<Piece> king = cells[king_coordinate.rank][king_coordinate.file];
+	Piece *king = cells[king_coordinate.rank][king_coordinate.file];
 	Movement previous_movement = last_movement;
-	std::shared_ptr<Piece> previous_eaten = last_eaten;
+	Piece *previous_eaten = last_eaten;
 	for (Movement movement : king->get_pseudo_valid_movements(*this))
 	{
 		temporary_move(movement);
@@ -319,7 +332,7 @@ bool Board::is_checkmate(Player &current, Player &other)
 		return true;
 	}
 
-	for (std::shared_ptr<Piece> piece : current.get_available_pieces())
+	for (Piece *piece : current.get_available_pieces())
 	{
 		if(piece->get_type() == PieceType::king) continue;
 		for (Movement movement : piece->get_pseudo_valid_movements(*this))
@@ -340,7 +353,7 @@ bool Board::is_checkmate(Player &current, Player &other)
 bool Board::is_draw(Player &current, Player &other)
 {
 	Movement previous_movement = last_movement;
-	std::shared_ptr<Piece> previous_eaten = last_eaten;
+	Piece *previous_eaten = last_eaten;
 
 	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
 	Coordinate king_coordinate_copy = king_coordinate;
@@ -348,7 +361,7 @@ bool Board::is_draw(Player &current, Player &other)
 	//stalemate
 	if (!is_check(current, other))
 	{
-		for (std::shared_ptr<Piece> piece : current.get_available_pieces())
+		for (Piece *piece : current.get_available_pieces())
 		{
 			for (Movement movement : piece->get_pseudo_valid_movements(*this))
 			{
@@ -369,8 +382,8 @@ bool Board::is_draw(Player &current, Player &other)
 	return true;
 
 	//dead position
-	std::list<std::shared_ptr<Piece>> current_pieces = current.get_available_pieces();
-	std::list<std::shared_ptr<Piece>> other_pieces = other.get_available_pieces();
+	std::list<Piece *> current_pieces = current.get_available_pieces();
+	std::list<Piece *> other_pieces = other.get_available_pieces();
 
 	if (current_pieces.size() == other_pieces.size() == 1)
 	{
@@ -381,7 +394,7 @@ bool Board::is_draw(Player &current, Player &other)
 	if (current_pieces.size() == 2 && other_pieces.size() == 1)
 	{
 		//king + (bishop/knight) vs king
-		std::shared_ptr<Piece> not_king = current_pieces.front()->get_type() == PieceType::king ? current_pieces.back() : current_pieces.front();
+		Piece *not_king = current_pieces.front()->get_type() == PieceType::king ? current_pieces.back() : current_pieces.front();
 		if (not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight)
 		{
 			return true;
@@ -391,7 +404,7 @@ bool Board::is_draw(Player &current, Player &other)
 	if (current_pieces.size() == 1 && other_pieces.size() == 2)
 	{
 		//king vs king + (bishop/knight)
-		std::shared_ptr<Piece> not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
+		Piece *not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
 		if (not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight)
 		{
 			return true;
@@ -401,9 +414,9 @@ bool Board::is_draw(Player &current, Player &other)
 	if (current_pieces.size() <= 3 && other_pieces.size() <= 3)
 	{
 		//king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
-		std::list<std::shared_ptr<Piece>> bishops;
+		std::list<Piece *> bishops;
 		current_pieces.splice(current_pieces.end(), other_pieces); //move other_pieces elements at the end of current_pieces
-		for (std::shared_ptr<Piece> piece : current_pieces)
+		for (Piece *piece : current_pieces)
 		{
 			if (piece->get_type() != PieceType::king)
 			{
@@ -421,10 +434,10 @@ bool Board::is_draw(Player &current, Player &other)
 		{
 			return false;
 		}
-		Color cell_color = std::static_pointer_cast<Bishop>(bishops.front())->get_cell_color();
-		for (std::shared_ptr<Piece> bishop : bishops)
+		Color cell_color = static_cast<Bishop *>(bishops.front())->get_cell_color();
+		for (Piece *bishop : bishops)
 		{
-			if (std::static_pointer_cast<Bishop>(bishop)->get_cell_color() != cell_color)
+			if (static_cast<Bishop *>(bishop)->get_cell_color() != cell_color)
 			{
 				return false;
 			}
@@ -444,7 +457,7 @@ bool Board::is_draw(Player &current, Player &other)
 MoveResult Board::move(Player &current_player, Player &other_player, Movement movement)
 {
 	//check if piece is owned by the player
-	std::shared_ptr<Piece> start_piece = cells[movement.start.rank][movement.start.file];
+	Piece *start_piece = cells[movement.start.rank][movement.start.file];
 	if (start_piece == nullptr)
 	{
 		return MoveResult::invalid;
@@ -487,7 +500,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 
 	//try to move
 	Movement previous_movement = last_movement;
-	std::shared_ptr<Piece> previous_eaten = last_eaten;
+	Piece *previous_eaten = last_eaten;
 	temporary_move(movement);
 	if (is_check(current_player, other_player))
 	{
@@ -536,9 +549,9 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 
 bool Board::promote(Player &player, char piece_symbol)
 {
-	std::list<std::shared_ptr<Piece>> lost_pieces = player.get_lost_pieces();
+	std::list<Piece *> lost_pieces = player.get_lost_pieces();
 	auto p = std::find_if(lost_pieces.begin(), lost_pieces.end(),
-								 [piece_symbol](std::shared_ptr<Piece> piece)
+								 [piece_symbol](Piece *piece)
 								 {
 									 return piece_symbol == piece->get_symbol();
 								 });
@@ -547,15 +560,15 @@ bool Board::promote(Player &player, char piece_symbol)
 		return false;
 	}
 
-	std::shared_ptr<Piece> resurrected = player.remove_from_lost_pieces(*p);
+	Piece *resurrected = player.remove_from_lost_pieces(*p);
 	if (resurrected->get_type() == PieceType::bishop)
 	{
-		std::static_pointer_cast<Bishop>(resurrected)->update_cell_color();
+		static_cast<Bishop *>(resurrected)->update_cell_color();
 	}
 	player.add_to_available_pieces(resurrected);
 
 	unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
-	for (std::shared_ptr<Piece> piece : cells.at(promotion_rank))
+	for (Piece *piece : cells.at(promotion_rank))
 	{
 		if (piece->get_type() == PieceType::pawn)
 		{
@@ -578,7 +591,7 @@ void Board::temporary_move(Movement movement)
 	cells[start_coordinate.rank][start_coordinate.file] = nullptr;
 }
 
-void Board::undo(Movement previous_movement, std::shared_ptr<Piece> previous_eaten)
+void Board::undo(Movement previous_movement, Piece *previous_eaten)
 {
 	Coordinate start = last_movement.start;
 	Coordinate end = last_movement.end;
@@ -614,7 +627,7 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 		final_king_coordinate = initial_king_coordinate + DirectionOffset.at(Direction::left) + DirectionOffset.at(Direction::left);
 	}
 	//check that cells in between king and rook aren't under attack
-	for (std::shared_ptr<Piece> piece : other_player.get_available_pieces())
+	for (Piece *piece : other_player.get_available_pieces())
 	{
 		for (Movement pseudo_movement : piece->get_pseudo_valid_movements(*this))
 		{
@@ -627,8 +640,8 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 
 	Coordinate initial_king_coordinate_copy = initial_king_coordinate;
 
-	std::shared_ptr<Piece> king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
-	std::shared_ptr<Piece> rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
+	Piece *king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
+	Piece *rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
 
 	temporary_move({initial_king_coordinate, final_king_coordinate});
 	initial_king_coordinate = final_king_coordinate;
@@ -655,10 +668,10 @@ void Board::handle_en_passant(Player &current_player, Player &other_player, Move
 	}
 	temporary_move(movement);
 	Coordinate capture_coordinate = movement.start + DirectionOffset.at(capture_direction);
-	std::shared_ptr<Piece> captured_piece = get_piece_at(capture_coordinate);
+	Piece *captured_piece = get_piece_at(capture_coordinate);
 	cells[capture_coordinate.rank][capture_coordinate.file] = nullptr;
 	last_eaten = captured_piece;
-	std::shared_ptr<Piece> pawn = cells[movement.end.rank][movement.end.file];
+	Piece *pawn = cells[movement.end.rank][movement.end.file];
 	pawn->get_had_moved();
 	pawn->set_coordinate(movement.end);
 	other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(captured_piece));
@@ -670,8 +683,10 @@ std::string Board::to_fen(Color current_color) {
 
 	//pieces positions
 	int empty_count = 0;
-	for(std::array<std::shared_ptr<Piece>, 8> rank : cells) {
-		for(std::shared_ptr<Piece> piece : rank) {
+	for (std::array<Piece *, 8> rank : cells)
+	{
+		for (Piece *piece : rank)
+		{
 			if(piece == nullptr) {
 				empty_count++;
 			} else {
@@ -696,7 +711,7 @@ std::string Board::to_fen(Color current_color) {
 
 	//castling rights
 	bool w_kingside_c = false, w_queenside_c = false;
-	std::shared_ptr<Piece> w_king = cells[w_king_coordinate.rank][w_king_coordinate.file];
+	Piece *w_king = cells[w_king_coordinate.rank][w_king_coordinate.file];
 	for(Movement movement : w_king->get_pseudo_valid_movements(*this)) {
 		if(movement.is_long_castling) {
 			w_queenside_c = true;
@@ -706,7 +721,7 @@ std::string Board::to_fen(Color current_color) {
 		}
 	}
 	bool b_kingside_c = false, b_queenside_c = false;
-	std::shared_ptr<Piece> b_king = cells[b_king_coordinate.rank][b_king_coordinate.file];
+	Piece *b_king = cells[b_king_coordinate.rank][b_king_coordinate.file];
 	for(Movement movement : b_king->get_pseudo_valid_movements(*this)) {
 		if(movement.is_long_castling) {
 			b_queenside_c = true;
@@ -722,7 +737,7 @@ std::string Board::to_fen(Color current_color) {
 	if(!w_kingside_c && !w_queenside_c && !b_kingside_c && !b_queenside_c) fen += "-";
 
 	//en passant position
-	std::shared_ptr<Piece> last_moved = cells[last_movement.end.rank][last_movement.end.file];
+	Piece *last_moved = cells[last_movement.end.rank][last_movement.end.file];
 	if(last_moved != nullptr && last_moved->get_type() == PieceType::pawn) {
 		if(last_movement.end == last_movement.start + std::pair<int, int>(2, 0) || last_movement.end == last_movement.start + std::pair<int, int>(-2, 0)) {
 			char file = last_movement.end.file + 'a';
@@ -772,7 +787,7 @@ namespace Chess
 {
 	std::ostream &operator<<(std::ostream &os, const Board &board)
 	{
-		std::shared_ptr<Piece> piece;
+		Piece *piece;
 		for (int rank = 0; rank < SIZE; rank++)
 		{
 			//algebric notation is reversed from internal matrix representation

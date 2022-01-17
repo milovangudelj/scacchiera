@@ -21,7 +21,7 @@ std::list<Movement> Bishop::get_pseudo_valid_movements(Board &board)
 
 	for (int i = 4; i < 8; i++) // Loop starts from 4 since the bishop can't move perpendicular to the board
 	{
-		std::shared_ptr<Piece> test_piece;
+		Piece *test_piece;
 		Direction direction = static_cast<Direction>(i);
 		std::pair<int, int> offset = DirectionOffset.at(direction);
 		Coordinate test_coordinate = coordinate + offset;

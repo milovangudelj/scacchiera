@@ -92,7 +92,7 @@ std::list<Movement> Pawn::get_pseudo_valid_movements(Board& board)
 /************************** one step *****************************/
 Chess::Coordinate Pawn::one_step(Board& board,Coordinate test_coordinate, Color color)
 {
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     Direction direction = (color == Color::white ? Direction::up : Direction::down);
     test_coordinate = test_coordinate + DirectionOffset.at(direction);
     if(test_coordinate.is_valid())
@@ -110,7 +110,7 @@ Chess::Coordinate Pawn::one_step(Board& board,Coordinate test_coordinate, Color 
 Chess::Coordinate Pawn::double_step(Board& board,Color color)
 {
     Coordinate test_coordinate = this->coordinate;
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     if(!get_had_moved())
     {
         test_coordinate = one_step(board,one_step(board,test_coordinate,color),color);
@@ -123,7 +123,7 @@ Chess::Coordinate Pawn::double_step(Board& board,Color color)
 std::pair<Chess::Coordinate,Chess::Coordinate> Pawn::diag_cap(Board& board, Color color)
 {
     Coordinate test_coordinate;
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     std::pair<Coordinate,Coordinate> valid_coordinate {{9,9},{9,9}};
     Direction direction1 = (color == Color::white ? Direction::left_up : Direction::left_down);
     Direction direction2 = (color == Color::white ? Direction::right_up : Direction::right_down);
@@ -152,7 +152,7 @@ std::pair<Chess::Coordinate,Chess::Coordinate> Pawn::diag_cap(Board& board, Colo
 Chess::Coordinate Pawn::en_passant(Board& board,Color color)
 {
     Coordinate end_p, start_p;
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     Direction direction = (color == Color::white ? Direction::up : Direction::down);
     Direction direction_l = (color == Color::white ? Direction::left_up : Direction::left_down);
     Direction direction_r = (color == Color::white ? Direction::right_up : Direction::right_down);
