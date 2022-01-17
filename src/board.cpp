@@ -68,8 +68,6 @@ Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}
 
 Board::~Board()
 {
-	delete player1;
-	delete player2;
 	for (size_t i = 0; i < cells.size(); i++)
 	{
 		for (size_t j = 0; j < cells[i].size(); j++)
@@ -787,7 +785,7 @@ std::string Board::pretty_print()
 {
 	std::stringstream ss;
 
-	std::shared_ptr<Piece> piece;
+	Piece *piece;
 	for (int rank = 0; rank < SIZE; rank++)
 	{
 		//algebric notation is reversed from internal matrix representation
