@@ -1,15 +1,30 @@
 #include <list>
 #include <memory>
 #include <ostream>
+#include <algorithm>
 
 #include "Player.h"
 #include "Utilities.h"
 #include "Piece.h"
+#include "pieces/King.h"
+#include "pieces/Queen.h"
+#include "pieces/Bishop.h"
+#include "pieces/Knight.h"
+#include "pieces/Rook.h"
+#include "pieces/Pawn.h"
 
 using Chess::Piece;
+using Chess::King;
+using Chess::Queen;
+using Chess::Bishop;
+using Chess::Knight;
+using Chess::Rook;
+using Chess::Pawn;
 using Chess::Player;
+using Chess::Coordinate;
 using Chess::utilities::Color;
 using Chess::utilities::PlayerType;
+using Chess::utilities::PieceType;
 
 // Constructors
 
@@ -23,33 +38,50 @@ Player::Player(const Color &_color, const PlayerType &_type, const std::string &
 
 // Management methods
 
-void Player::add_to_lost_pieces(Piece *piece)
+void Player::move_to_lost_pieces(Piece *piece)
 {
-	// Add piece to the back of the list
-	lost_pieces.push_back(piece);
+	auto piece_it = std::find_if(available_pieces.begin(), available_pieces.end(), 
+		[piece] (auto& lost_piece) {
+			return lost_piece.get() == piece;
+	});
+	lost_pieces.push_back(std::move(*piece_it));
+	available_pieces.erase(piece_it);
+	available_pieces_copy.remove(lost_pieces.back().get());
+	lost_pieces_copy.push_back(lost_pieces.back().get());
 };
 
-void Player::add_to_available_pieces(Piece *piece)
+void Player::move_to_available_pieces(Piece *piece)
 {
-	// Add piece to the back of the list
-	available_pieces.push_back(piece);
+	auto piece_it = std::find_if(available_pieces.begin(), available_pieces.end(), 
+		[piece] (auto& available_piece) {
+			return available_piece.get() == piece;
+	});
+	available_pieces.push_back(std::move(*piece_it));
+	lost_pieces.erase(piece_it);
+	lost_pieces_copy.remove(available_pieces.back().get());
+	available_pieces_copy.push_back(available_pieces.back().get());
 };
 
-Piece *Player::remove_from_lost_pieces(Piece *piece)
-{
-	// Removing the given piece from the list
-	lost_pieces.remove(piece);
-
+Piece *Player::add_to_available_pieces(Coordinate coordinate, Color color, PieceType type) {
+	switch (type)
+	{
+	case PieceType::king:
+		available_pieces.push_back(std::make_unique<King>(coordinate, color, type));
+	case PieceType::queen:
+		available_pieces.push_back(std::make_unique<Queen>(coordinate, color, type));
+	case PieceType::bishop:
+		available_pieces.push_back(std::make_unique<Bishop>(coordinate, color, type));
+	case PieceType::knight:
+		available_pieces.push_back(std::make_unique<Knight>(coordinate, color, type));
+	case PieceType::rook:
+		available_pieces.push_back(std::make_unique<Rook>(coordinate, color, type));
+	case PieceType::pawn:
+		available_pieces.push_back(std::make_unique<Pawn>(coordinate, color, type));
+	}
+	Piece *piece = available_pieces.back().get();
+	available_pieces_copy.push_back(piece);
 	return piece;
-};
-
-Piece *Player::remove_from_available_pieces(Piece *piece)
-{
-	// Removing the given piece from the list
-	available_pieces.remove(piece);
-
-	return piece;
-};
+}
 
 // Overloaded operators
 

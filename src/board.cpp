@@ -9,17 +9,12 @@
 #include <stdexcept>
 #include <algorithm>
 
-using Chess::Bishop;
 using Chess::Board;
 using Chess::Coordinate;
-using Chess::King;
-using Chess::Knight;
 using Chess::Movement;
-using Chess::Pawn;
 using Chess::Piece;
+using Chess::Bishop;
 using Chess::Player;
-using Chess::Queen;
-using Chess::Rook;
 using Chess::utilities::Color;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
@@ -30,7 +25,6 @@ static const std::string BRIGHT = "\033[1m"; // Enphasises the text
 static const std::string RESET = "\033[0m";	// Reset to terminal default colors
 static const std::string INVERT = "\033[7m"; // Invert terminal colors
 
-//helper data or functions
 std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'k', Chess::utilities::PieceType::king},
 	 {'q', Chess::utilities::PieceType::queen},
@@ -39,44 +33,10 @@ std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'r', Chess::utilities::PieceType::rook},
 	 {'p', Chess::utilities::PieceType::pawn}};
 
-Piece *make_piece(Coordinate coordinate, Color color, PieceType type)
-{
-	switch (type)
-	{
-	case PieceType::king:
-		return new King(coordinate, color, type);
-	case PieceType::queen:
-		return new Queen(coordinate, color, type);
-	case PieceType::bishop:
-		return new Bishop(coordinate, color, type);
-	case PieceType::knight:
-		return new Knight(coordinate, color, type);
-	case PieceType::rook:
-		return new Rook(coordinate, color, type);
-	case PieceType::pawn:
-		return new Pawn(coordinate, color, type);
-	}
-	return nullptr;
-}
-//end helper
-
 Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, last_eaten{nullptr}, can_draw_flag{false}
 {
 	// initialize_with_fen(fen, had_moved_flags, player1, player2);
 	from_fen(fen);
-}
-
-Board::~Board()
-{
-	for (size_t i = 0; i < cells.size(); i++)
-	{
-		for (size_t j = 0; j < cells[i].size(); j++)
-		{
-			delete cells[i][j];
-		}
-	}
-
-	delete last_eaten;
 }
 
 std::vector<std::string> split(std::string target, char delimiter)
@@ -149,18 +109,17 @@ void Board::from_fen(std::string fen)
 			p_type = char_to_piece.at(std::tolower(c));
 			p_pos = {i, file};
 
-			Piece *piece = make_piece({i, file}, p_color, p_type);
-			cells[i][file] = piece;
-
 			// Add piece to its player
+			Piece *piece;
 			if (player1->get_color() == p_color)
 			{
-				player1->add_to_available_pieces(piece);
+				piece = player1->add_to_available_pieces({i, file}, p_color, p_type);
 			}
 			else
 			{
-				player2->add_to_available_pieces(piece);
+				piece = player2->add_to_available_pieces({i, file}, p_color, p_type);
 			}
+			cells[i][file] = piece;
 
 			// Set kings' coordinates
 			if (p_type == PieceType::king)
@@ -220,6 +179,7 @@ void Board::from_fen(std::string fen)
 	}
 }
 
+/*
 void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player &player1, Player &player2)
 {
 	unsigned int file = 0, rank = 0;
@@ -280,7 +240,7 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 		file++;
 	}
 }
-
+*/
 Piece *Board::get_piece_at(Coordinate coordinate) const
 {
 	return cells[coordinate.rank][coordinate.file];
@@ -510,7 +470,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 
 	if (last_eaten != nullptr)
 	{
-		other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(last_eaten));
+		other_player.move_to_lost_pieces(last_eaten);
 	}
 	start_piece->set_had_moved();
 	start_piece->set_coordinate(movement.end);
@@ -560,12 +520,12 @@ bool Board::promote(Player &player, char piece_symbol)
 		return false;
 	}
 
-	Piece *resurrected = player.remove_from_lost_pieces(*p);
+	Piece *resurrected = *p;
 	if (resurrected->get_type() == PieceType::bishop)
 	{
 		static_cast<Bishop *>(resurrected)->update_cell_color();
 	}
-	player.add_to_available_pieces(resurrected);
+	player.move_to_available_pieces(*p);
 
 	unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
 	for (Piece *piece : cells.at(promotion_rank))
@@ -574,7 +534,7 @@ bool Board::promote(Player &player, char piece_symbol)
 		{
 			resurrected->set_coordinate(piece->get_coordinate());
 			cells[piece->get_coordinate().rank][piece->get_coordinate().file] = resurrected;
-			player.add_to_lost_pieces(player.remove_from_available_pieces(piece));
+			player.move_to_lost_pieces(piece);
 			break;
 		}
 	}
@@ -674,7 +634,7 @@ void Board::handle_en_passant(Player &current_player, Player &other_player, Move
 	Piece *pawn = cells[movement.end.rank][movement.end.file];
 	pawn->get_had_moved();
 	pawn->set_coordinate(movement.end);
-	other_player.add_to_lost_pieces(other_player.remove_from_available_pieces(captured_piece));
+	other_player.move_to_lost_pieces(captured_piece);
 	current_player.reset_stale_since();
 }
 
