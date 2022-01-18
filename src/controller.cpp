@@ -251,12 +251,10 @@ std::list<std::string> Controller::replay(char out)
 		throw std::invalid_argument("Cannot replay if not provided a list of movements.");
 
 	if (to_terminal)
-		display(current_player, checkmate, draw);
+		to_print.push_back(display(current_player, checkmate, draw, false, false));
 
 	// Create string stream and print initial board layout
 	std::stringstream ss;
-	ss << *board;
-	to_print.push_back(ss.str());
 
 	// Loop through the movements and add them to 'to_print'
 	for (Movement movement : log_list)
@@ -270,7 +268,7 @@ std::list<std::string> Controller::replay(char out)
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
 		{
-			ss << board->pretty_print();
+			ss << display(current_player, checkmate, draw, false, false);
 		}
 		else
 		{
@@ -287,18 +285,27 @@ std::list<std::string> Controller::replay(char out)
 	return to_print;
 }
 
-void Controller::display(Player *current_player, bool is_checkmate, bool is_draw, bool is_check)
+std::string Controller::display(Player *current_player, bool is_checkmate, bool is_draw, bool is_check, bool print)
 {
+	std::stringstream ss;
+	std::string out;
+
 	const char *checkmate = is_checkmate ? "true" : "false";
 	const char *draw = is_draw ? "true" : "false";
 	const char *name = current_player->get_name().c_str();
 	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
-	printf("%sNow playing:%s %s %s	", BRIGHT, RESET, name, color);
-	printf("%sCheckmate:%s %s	", BRIGHT, RESET, checkmate);
-	printf("%sDraw:%s %s\n\n", BRIGHT, RESET, draw);
+	ss << BRIGHT << "Now playing:" << RESET << " " << name << " " << color << "	";
+	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << "	";
+	ss << BRIGHT << "Draw:" << RESET << " " << draw << "\n\n";
 
-	std::cout << board->pretty_print() << "\n\n";
+	ss << board->pretty_print() << "\n\n";
+
+	out = ss.str();
+
+	if (print)
+		std::cout << out;
+	return out;
 }
 
 /// @brief Exports the game's movements history
