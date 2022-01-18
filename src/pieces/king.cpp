@@ -24,7 +24,7 @@ std::list<Movement> King::get_pseudo_valid_movements(Board &board)
     std::list<Movement> pseudo_movements;
 
     Direction direction;
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     Coordinate test_coordinate;
 
     //looks for all 8 adjacent positions

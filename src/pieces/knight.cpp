@@ -52,7 +52,7 @@ std::list<Movement> Knight::get_pseudo_valid_movements(Board& board) {
                             DirectionOffset.at(Direction::down) + 
                             DirectionOffset.at(Direction::right);   //↓ ↓ →
 
-    std::shared_ptr<Piece> test_piece;
+    Piece *test_piece;
     for(Coordinate possible_move : possible_movements) {
         if(possible_move.is_valid()) {
             test_piece = board.get_piece_at(possible_move);
