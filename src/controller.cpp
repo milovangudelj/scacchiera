@@ -180,11 +180,15 @@ void Controller::play()
 	while (!checkmate && !draw)
 	{
 		display(current_player, checkmate, draw, check);
-		std::cout << ": ";
-		for (std::string e : errors)
+
+		if (current_player->get_type() == PlayerType::human)
 		{
-			std::cout << "\n"
-						 << e << "\033[A\r: ";
+			std::cout << ": ";
+			for (std::string e : errors)
+			{
+				std::cout << "\n"
+							 << e << "\033[A\r: ";
+			}
 		}
 
 		// Ask for input again if move was invalid
