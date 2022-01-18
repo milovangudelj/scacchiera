@@ -33,7 +33,7 @@ namespace Chess
 
 		void play();
 		std::list<std::string> replay(char out);
-		void display(Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check = false);
+		std::string display(Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check = false, bool print = true);
 	};
 } // namespace Chess
 
