@@ -6,7 +6,6 @@
 #include <ostream>
 
 #include "Utilities.h"
-#include "Coordinate.h"
 #include "Piece.h"
 
 namespace Chess
@@ -17,10 +16,8 @@ namespace Chess
         std::string name;
         Chess::utilities::PlayerType type;
         Chess::utilities::Color color;
-        std::list<std::unique_ptr<Piece>> available_pieces;
-        std::list<std::unique_ptr<Piece>> lost_pieces;
-        std::list<Piece *> available_pieces_copy;
-        std::list<Piece *> lost_pieces_copy;
+        std::list<Piece *> available_pieces;
+        std::list<Piece *> lost_pieces;
         int stale_since;
 
     public:
@@ -47,11 +44,11 @@ namespace Chess
 
         const std::list<Piece *> &get_available_pieces()
         {
-            return available_pieces_copy;
+            return available_pieces;
         };
         const std::list<Piece *> &get_lost_pieces()
         {
-            return lost_pieces_copy;
+            return lost_pieces;
         };
         Chess::utilities::PlayerType get_type() const
         {
@@ -69,9 +66,10 @@ namespace Chess
 
         // Management member functions
 
-        void move_to_lost_pieces(Piece *piece);
-        void move_to_available_pieces(Piece *piece);
-        Piece *add_to_available_pieces(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type);
+        void add_to_lost_pieces(Piece *piece);
+        void add_to_available_pieces(Piece *piece);
+        Piece *remove_from_lost_pieces(Piece *piece);
+        Piece *remove_from_available_pieces(Piece *piece);
         void increment_stale_since() { stale_since++; };
         void reset_stale_since() { stale_since = 0; };
 

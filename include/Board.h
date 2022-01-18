@@ -2,13 +2,19 @@
 #define board_h
 
 #include <array>
+#include <memory>
 #include <string>
 #include <ostream>
 #include <map>
 #include <initializer_list>
 
 #include "Piece.h"
-#include "Bishop.h"
+#include "pieces/King.h"
+#include "pieces/Queen.h"
+#include "pieces/Bishop.h"
+#include "pieces/Knight.h"
+#include "pieces/Rook.h"
+#include "pieces/Pawn.h"
 #include "Coordinate.h"
 #include "Player.h"
 #include "Utilities.h"
@@ -53,6 +59,7 @@ namespace Chess {
 
     public:
         Board(std::string fen, Player *p1, Player *p2);
+        ~Board();
         Chess::utilities::MoveResult move(Player &current_player, Player &other_player, Movement movement);
         bool promote(Player &player, char piece_symbol);
 
