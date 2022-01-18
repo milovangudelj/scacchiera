@@ -75,6 +75,8 @@ Board::~Board()
 			delete cells[i][j];
 		}
 	}
+
+	delete last_eaten;
 }
 
 std::vector<std::string> split(std::string target, char delimiter)
