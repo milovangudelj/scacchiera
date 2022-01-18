@@ -15,13 +15,13 @@ namespace Chess
 	{
 	private:
 		std::string fen;
-		std::list<Movement> log_list;
+		std::list<Chess::Movement> log_list;
 		bool is_replay = false;
-		std::shared_ptr<Chess::Player> white;
-		std::shared_ptr<Chess::Player> black;
+		Chess::Player *white;
+		Chess::Player *black;
 		std::list<Chess::Movement> history;
-		std::unique_ptr<Chess::Board> board;
-		Chess::Movement get_move();
+		Chess::Board *board;
+		Chess::Movement get_move(Player *current_player);
 		void export_game();
 		void init(const std::string &type);
 		void init_replay();
@@ -29,10 +29,11 @@ namespace Chess
 	public:
 		Controller(std::string _mode, std::string _fen);
 		Controller(std::list<Chess::Movement> log_list);
+		~Controller();
 
 		void play();
 		std::list<std::string> replay(char out);
-		void display(std::shared_ptr<Chess::Player> current_player, bool is_checkmate, bool is_draw, bool is_check = false);
+		std::string display(Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check = false, bool print = true);
 	};
 } // namespace Chess
 
