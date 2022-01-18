@@ -33,7 +33,7 @@ std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'r', Chess::utilities::PieceType::rook},
 	 {'p', Chess::utilities::PieceType::pawn}};
 
-Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, last_eaten{nullptr}, can_draw_flag{false}
+Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, last_eaten{nullptr}
 {
 	// initialize_with_fen(fen, had_moved_flags, player1, player2);
 	from_fen(fen);
@@ -412,6 +412,16 @@ bool Board::is_draw(Player &current, Player &other)
 	}
 
 	return false;
+
+	//threefold repetition
+	auto p = std::find_if(position_history.begin(), position_history.end(),
+		[](std::pair<std::string, int> position) {
+			return position.second == 3;
+	});
+	if (p != position_history.end())
+	{
+		return true;
+	}
 }
 
 MoveResult Board::move(Player &current_player, Player &other_player, Movement movement)
@@ -721,26 +731,6 @@ std::string Board::to_fen(Color current_color) {
 	//number of moves
 	fen += " " + std::to_string(position_history.size() + 1);
 	return fen;
-}
-
-bool Board::can_draw()
-{
-	if (can_draw_flag)
-	{
-		//if it already can draw there is no need to check again
-		return true;
-	}
-	auto p = std::find_if(position_history.begin(), position_history.end(),
-								 [](std::pair<std::string, int> position)
-								 {
-									 return position.second == 3;
-								 });
-	if (p == position_history.end())
-	{
-		return false;
-	}
-	can_draw_flag = true;
-	return true;
 }
 
 std::string Board::pretty_print()

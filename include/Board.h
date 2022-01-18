@@ -49,7 +49,6 @@ namespace Chess {
         //needed by can_draw for threefold repetition
         std::map<std::string, int> position_history;
         std::string to_fen(Chess::utilities::Color current_color); //takes snapshot of current board position
-        bool can_draw_flag;
 
     public:
         Board(std::string fen, Player *p1, Player *p2);
@@ -58,7 +57,6 @@ namespace Chess {
 
         bool is_checkmate(Player &current, Player &other);
         bool is_draw(Player &current, Player &other); //stalemate, dead position and 50 moves rule
-        bool can_draw();                              //returns true if threefold repetition occured
 
         //used by Pawn for checking for en passant conditions
         Movement get_last_movement() const { return last_movement; }
