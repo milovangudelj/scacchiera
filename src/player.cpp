@@ -67,16 +67,22 @@ Piece *Player::add_to_available_pieces(Coordinate coordinate, Color color, Piece
 	{
 	case PieceType::king:
 		available_pieces.push_back(std::make_unique<King>(coordinate, color, type));
+		break;
 	case PieceType::queen:
 		available_pieces.push_back(std::make_unique<Queen>(coordinate, color, type));
+		break;
 	case PieceType::bishop:
 		available_pieces.push_back(std::make_unique<Bishop>(coordinate, color, type));
+		break;
 	case PieceType::knight:
 		available_pieces.push_back(std::make_unique<Knight>(coordinate, color, type));
+		break;
 	case PieceType::rook:
 		available_pieces.push_back(std::make_unique<Rook>(coordinate, color, type));
+		break;
 	case PieceType::pawn:
 		available_pieces.push_back(std::make_unique<Pawn>(coordinate, color, type));
+		break;
 	}
 	Piece *piece = available_pieces.back().get();
 	available_pieces_copy.push_back(piece);

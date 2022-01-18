@@ -8,7 +8,7 @@
 #include <initializer_list>
 
 #include "Piece.h"
-#include "Bishop.h"
+#include "pieces/Bishop.h"
 #include "Coordinate.h"
 #include "Player.h"
 #include "Utilities.h"
