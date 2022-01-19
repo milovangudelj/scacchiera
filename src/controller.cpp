@@ -122,7 +122,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 		return mvmt;
 	}
@@ -180,11 +180,15 @@ void Controller::play()
 	while (!checkmate && !draw)
 	{
 		display(current_player, checkmate, draw, check);
-		std::cout << ": ";
-		for (std::string e : errors)
+
+		if (current_player->get_type() == PlayerType::human)
 		{
-			std::cout << "\n"
-						 << e << "\033[A\r: ";
+			std::cout << ": ";
+			for (std::string e : errors)
+			{
+				std::cout << "\n"
+							 << e << "\033[A\r: ";
+			}
 		}
 
 		// Ask for input again if move was invalid
@@ -208,6 +212,9 @@ void Controller::play()
 		case Chess::utilities::MoveResult::invalid:
 			set_error(errors, "Invalid move. Try again...");
 			break;
+		case Chess::utilities::MoveResult::check:
+			set_error(errors, "king is in check. Try again...");
+			break;
 		case Chess::utilities::MoveResult::ok:
 			clear_errors(errors);
 			// Swap players
@@ -227,7 +234,6 @@ void Controller::play()
 		}
 	}
 	display(current_player, checkmate, draw, check);
-
 	std::cout << "Game Over...\n\n";
 	export_game(); // Right now it only prints the history to the terminal
 }
