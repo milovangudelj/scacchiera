@@ -122,7 +122,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 		return mvmt;
 	}
@@ -211,6 +211,9 @@ void Controller::play()
 		{
 		case Chess::utilities::MoveResult::invalid:
 			set_error(errors, "Invalid move. Try again...");
+			break;
+		case Chess::utilities::MoveResult::check:
+			set_error(errors, "king is in check. Try again...");
 			break;
 		case Chess::utilities::MoveResult::ok:
 			clear_errors(errors);

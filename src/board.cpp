@@ -472,9 +472,15 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 	temporary_move(movement);
+	Coordinate& king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate_copy = king_coordinate;
+	if(start_piece->get_type() == PieceType::king) {
+		king_coordinate = movement.end;
+	}
 	if (is_check(current_player, other_player))
 	{
 		undo(previous_movement, previous_eaten);
+		king_coordinate = king_coordinate_copy;
 		return MoveResult::check;
 	}
 
@@ -491,18 +497,6 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	else
 	{
 		current_player.increment_stale_since();
-	}
-
-	if (start_piece->get_type() == PieceType::king)
-	{
-		if (current_player.get_color() == Color::black)
-		{
-			b_king_coordinate = movement.end;
-		}
-		else
-		{
-			w_king_coordinate = movement.end;
-		}
 	}
 
 	position_history[to_fen(current_player.get_color())]++;
