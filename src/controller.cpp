@@ -248,6 +248,7 @@ std::list<std::string> Controller::replay(char out)
 
 	Chess::Player *current_player = white;
 	Chess::Player *other_player = black;
+	Chess::utilities::MoveResult result;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
@@ -263,13 +264,19 @@ std::list<std::string> Controller::replay(char out)
 	std::stringstream ss;
 
 	// Loop through the movements and add them to 'to_print'
-	for (Movement movement : log_list)
+	std::list<Chess::Movement>::iterator log_it = log_list.begin();
+	for (size_t i = 0; i < log_list.size(); i++)
 	{
 		// Reset the string stream
 		ss.str(std::string());
 
-		// Make teh movement
-		board->move(*current_player, *other_player, movement);
+		// Make the movement
+		result = board->move(*current_player, *other_player, *log_it);
+
+		// Flags
+		check = result == Chess::utilities::MoveResult::check;
+		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		draw = board->is_draw(*other_player, *current_player);
 
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
@@ -279,6 +286,8 @@ std::list<std::string> Controller::replay(char out)
 		else
 		{
 			ss << *board;
+			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate for ") + other_player->get_color()) : "draw");
+			ss << (i == log_list.size() - 1 ? result : "");
 		}
 		to_print.push_back(ss.str());
 
@@ -286,6 +295,9 @@ std::list<std::string> Controller::replay(char out)
 		Player *temp = current_player;
 		current_player = other_player;
 		other_player = temp;
+
+		// Advance iterator
+		std::advance(log_it, 1);
 	}
 
 	return to_print;
