@@ -95,8 +95,8 @@ std::list<Chess::Movement> get_movements(std::istream& in)
 		pos_whitespace = s.find(' ');
 		start_s = s.substr(0,pos_whitespace);
 		end_s = s.substr(pos_whitespace+1);
-		start_c = {(unsigned int)(8-(start_s.at(1)-'0')),(unsigned int)(start_s.at(0)-'A')};
-		end_c = {(unsigned int)(8-(end_s.at(1)-'0')),(unsigned int)(end_s.at(0)-'A')};
+		start_c = {static_cast<unsigned int>(8-(start_s.at(1)-'0')),static_cast<unsigned int>(start_s.at(0)-'A')};
+		end_c = {static_cast<unsigned int>(8-(end_s.at(1)-'0')),static_cast<unsigned int>(end_s.at(0)-'A')};
 		movements.push_back({start_c,end_c});
 	}
 	return movements;
@@ -111,9 +111,12 @@ void method_v(std::ifstream& in_f, char c )
 	//stampa a video il replay con pausa di 1s
 	Chess::Controller controller {log_list};
 	print_list = controller.replay(c);
+	std::cout<<print_list.front();
+	print_list.pop_front();
 	for(std::string config : print_list)
 	{
-		std::cout<<config<<"\n";
+		std::cout << "\033[13A\033[J";
+		std::cout << config << "\n";
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
