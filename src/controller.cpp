@@ -225,8 +225,8 @@ void Controller::play()
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
 		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board->is_checkmate(*current_player, *other_player); //checks if enemy is losing
-		draw = board->is_draw(*current_player, *other_player);
+		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		draw = board->is_draw(*other_player, *current_player);
 
 		switch (result)
 		{
@@ -302,8 +302,8 @@ std::list<std::string> Controller::replay(char out)
 
 		// Flags
 		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board->is_checkmate(*current_player, *other_player); //checks if enemy is losing
-		draw = board->is_draw(*current_player, *other_player);
+		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		draw = board->is_draw(*other_player, *current_player);
 
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
@@ -341,7 +341,7 @@ std::string Controller::display(Player *current_player, bool is_checkmate, bool 
 	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
 	ss << BRIGHT << "Now playing:" << RESET << " " << name << " " << color << "	";
-	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << "	";
+	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << " 	";
 	ss << BRIGHT << "Draw:" << RESET << " " << draw << "\n\n";
 
 	ss << board->pretty_print() << "\n\n";
