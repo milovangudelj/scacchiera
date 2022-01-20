@@ -25,6 +25,12 @@ namespace Chess::utilities
         return os;
     };
 
+    std::string operator+(std::string s, const Color &color)
+    {
+        std::string out = s + ((color == Color::white) ? "white" : "black");
+        return out;
+    };
+
     std::ostream &operator<<(std::ostream &os, const PlayerType &type)
     {
         os << ((type == PlayerType::human) ? "human" : "computer");

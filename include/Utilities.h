@@ -25,6 +25,7 @@ namespace Chess::utilities {
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
     std::ostream &operator<<(std::ostream &os, const Color &color);
+    std::string operator+(std::string s, const Color &color);
     std::ostream &operator<<(std::ostream &os, const PlayerType &player);
 }
 
