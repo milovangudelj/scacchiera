@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <string>
 #include <list>
 #include <thread>
 #include <chrono>
@@ -108,16 +109,18 @@ void method_v(std::ifstream& in_f, char c )
 {
 	std::list<Chess::Movement> log_list;
 	std::list<std::string> print_list;
+	std::string fen;
+	std::getline(in_f, fen);
 	log_list = get_movements(in_f);
 	//stampa a video il replay con pausa di 1s
-	Chess::Controller controller {log_list};
+	Chess::Controller controller{log_list, fen};
 	print_list = controller.replay(c);
 	std::cout<<print_list.front();
 	print_list.pop_front();
 	for(std::string config : print_list)
 	{
-		std::cout << "\033[14A\033[J";
-		std::cout << config << "\n";
+		std::cout << "\033[13A\033[J";
+		std::cout << config;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
@@ -127,9 +130,11 @@ void method_f(std::ifstream& in_f,std::ofstream& out_f,char c)
 {
 	std::list<Chess::Movement> log_list;
 	std::list<std::string> print_list;
+	std::string fen;
+	std::getline(in_f, fen);
 	log_list = get_movements(in_f);
 	//stampa su file il replay senza pausa
-	Chess::Controller controller {log_list};
+	Chess::Controller controller{log_list, fen};
 	print_list = controller.replay(c);
 	std::list<std::string>::iterator print_it = print_list.begin();
 	std::list<Chess::Movement>::iterator log_it = log_list.begin();

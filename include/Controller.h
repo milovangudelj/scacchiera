@@ -28,7 +28,7 @@ namespace Chess
 
 	public:
 		Controller(std::string _mode, std::string _fen);
-		Controller(std::list<Chess::Movement> log_list);
+		Controller(std::list<Chess::Movement> _log_list, std::string _fen);
 		~Controller();
 
 		void play();
