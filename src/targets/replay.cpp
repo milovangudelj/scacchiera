@@ -115,7 +115,7 @@ void method_v(std::ifstream& in_f, char c )
 	print_list.pop_front();
 	for(std::string config : print_list)
 	{
-		std::cout << "\033[13A\033[J";
+		std::cout << "\033[14A\033[J";
 		std::cout << config << "\n";
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
@@ -130,8 +130,13 @@ void method_f(std::ifstream& in_f,std::ofstream& out_f,char c)
 	//stampa su file il replay senza pausa
 	Chess::Controller controller {log_list};
 	print_list = controller.replay(c);
-	for(std::string config : print_list)
+	std::list<std::string>::iterator print_it = print_list.begin();
+	std::list<Chess::Movement>::iterator log_it = log_list.begin();
+	for (size_t i = 0; i < print_list.size(); i++)
 	{
-		out_f<<config<<"\n";
+		out_f << "- Movement: " << *log_it << "\n\n";
+		out_f << *print_it << (i == print_list.size() - 1 ? "" : "\n\n");
+		std::advance(print_it, 1);
+		std::advance(log_it, 1);
 	}
 }
