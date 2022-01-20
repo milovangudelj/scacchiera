@@ -25,6 +25,7 @@ namespace Chess
 		void export_game();
 		void init(const std::string &type);
 		void init_replay();
+		void promote(Player *player);
 
 	public:
 		Controller(std::string _mode, std::string _fen);

@@ -5,6 +5,7 @@
 #include <set>
 #include <random>
 #include <thread>
+#include <algorithm>
 
 #include "Controller.h"
 #include "Board.h"
@@ -13,6 +14,7 @@ using Chess::Board;
 using Chess::Controller;
 using Chess::utilities::Color;
 using Chess::utilities::PlayerType;
+using Chess::utilities::PieceType;
 
 static const char *BRIGHT = "\033[1m";
 static const char *RESET = "\033[0m";
@@ -164,6 +166,46 @@ void clear_errors(std::set<std::string> &errors)
 	errors.clear();
 };
 
+bool can_promote(std::list<Chess::Piece *>& lost_pieces) {
+	auto it = std::find_if(lost_pieces.begin(), lost_pieces.end(),
+		[] (Chess::Piece *piece) {
+			return piece->get_type() != PieceType::pawn;
+	});
+	return !(it == lost_pieces.end());
+}
+
+char get_piece_symbol() {
+	char symbol;
+	std::cout << "Choose the piece: " << "\n";
+	std::cin >> symbol;
+	return symbol;
+}
+
+void display_lost_pieces(std::list<Chess::Piece *>& lost_pieces) {
+	std::string lost_pieces_symbols;
+	for(Chess::Piece *piece : lost_pieces) {
+		lost_pieces_symbols += std::string(1, piece->get_symbol()) + " ";
+	}
+	std::cout << "Piece you can promote to: " << lost_pieces_symbols << "\n";
+}
+
+void Controller::promote(Player *player) {
+	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
+	if(!can_promote(lost_pieces)) {
+		return;
+	}
+	std::string possible_symbols = "rdcapt";
+	char symbol;
+	do {
+		display_lost_pieces(lost_pieces);
+		symbol = get_piece_symbol();
+		if(possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos) {
+			std::cout << "Invalid choice" << "\n";
+			continue;
+		}
+	} while(!board->promote(*player, symbol));
+}
+
 /// @brief Starts the game and goes on until either checkmate or draw occurs
 void Controller::play()
 {
@@ -221,6 +263,13 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
+			history.push_back(mvmt);
+			break;
+		case Chess::utilities::MoveResult::promotion:
+			clear_errors(errors);
+			promote(current_player);
+			current_player = current_player == white ? black : white;
+			other_player = other_player == white ? black : white;
 			history.push_back(mvmt);
 			break;
 

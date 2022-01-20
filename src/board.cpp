@@ -531,10 +531,10 @@ bool Board::promote(Player &player, char piece_symbol)
 	}
 	player.move_to_available_pieces(*p);
 
-	unsigned int promotion_rank = player.get_color() == Color::black ? 0 : 7;
+	unsigned int promotion_rank = player.get_color() == Color::black ? 7 : 0;
 	for (Piece *piece : cells.at(promotion_rank))
 	{
-		if (piece->get_type() == PieceType::pawn)
+		if (piece != nullptr && piece->get_type() == PieceType::pawn)
 		{
 			resurrected->set_coordinate(piece->get_coordinate());
 			cells[piece->get_coordinate().rank][piece->get_coordinate().file] = resurrected;
