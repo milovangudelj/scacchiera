@@ -90,11 +90,12 @@ std::list<Chess::Movement> get_movements(std::istream& in)
 	std::string start_s, end_s;
 	Chess::Coordinate start_c, end_c;
 	int pos_whitespace;
-	while(std::getline(in,s))
+	//while(std::getline(in,s))
+	while(in>>start_s>>end_s)
 	{
-		pos_whitespace = s.find(' ');
-		start_s = s.substr(0,pos_whitespace);
-		end_s = s.substr(pos_whitespace+1);
+		//pos_whitespace = s.find(' ');
+		//start_s = s.substr(0,pos_whitespace);
+		//end_s = s.substr(pos_whitespace+1);
 		start_c = {static_cast<unsigned int>(8-(start_s.at(1)-'0')),static_cast<unsigned int>(start_s.at(0)-'A')};
 		end_c = {static_cast<unsigned int>(8-(end_s.at(1)-'0')),static_cast<unsigned int>(end_s.at(0)-'A')};
 		movements.push_back({start_c,end_c});
