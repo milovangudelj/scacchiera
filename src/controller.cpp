@@ -2,9 +2,12 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <string>
 #include <set>
 #include <random>
 #include <thread>
+#include <regex>
+#include <algorithm>
 
 #include "Controller.h"
 #include "Board.h"
@@ -131,11 +134,21 @@ Chess::Movement Controller::get_move(Player *current_player)
 	std::string to = "";
 
 	std::cin >> from >> to;
-	std::cout << "\033[14A\033[J";
+	std::transform(from.begin(), from.end(), from.begin(), ::toupper);
+	std::transform(to.begin(), to.end(), to.begin(), ::toupper);
 
 	if (from.compare("XX") == 0 && to.compare("XX") == 0)
 	{
 		return {{9, 9}, {9, 9}};
+	}
+
+	std::cout << "\033[14A\033[J";
+
+	std::string input_pattern = "^([A-H][1-8]|XX)$";
+	std::basic_regex input_regex = std::regex(input_pattern, std::regex::ECMAScript);
+	if (!std::regex_match(from, input_regex) || !std::regex_match(to, input_regex))
+	{
+		return {{10, 10}, {10, 10}};
 	}
 
 	Chess::Coordinate start = {(unsigned int)(8 - (from.at(1) - '0')), (unsigned int)(from.at(0) - 'A')};
@@ -196,7 +209,16 @@ void Controller::play()
 
 		if (!mvmt.start.is_valid() || !mvmt.end.is_valid())
 		{
-			clear_errors(errors);
+			if (mvmt.start == Chess::Coordinate{9, 9} && mvmt.end == Chess::Coordinate{9, 9})
+			{
+				clear_errors(errors);
+				std::cout << '\n';
+			}
+			else
+			{
+				set_error(errors, "Invalid move. Try again...");
+			}
+
 			continue;
 		}
 
