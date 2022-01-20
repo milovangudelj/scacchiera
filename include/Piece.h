@@ -19,13 +19,14 @@ namespace Chess {
             Chess::utilities::PieceType type;
             char symbol;
             bool had_moved;
+            bool selected;
 
         public:
-            Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type) :
-                coordinate{coordinate}, 
-                color{color}, 
-                type{type}, 
-                had_moved{false} {}
+            Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type) : coordinate{coordinate},
+                                                                                                            color{color},
+                                                                                                            type{type},
+                                                                                                            had_moved{false},
+                                                                                                            selected{false} {}
 
             virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
             
@@ -34,6 +35,8 @@ namespace Chess {
             Chess::utilities::PieceType get_type() const { return type;};
             char get_symbol() const { return symbol;};
             bool get_had_moved() const { return had_moved;};
+            bool is_selected() const { return selected; };
+            void set_selected(bool val = true) { selected = val; };
             void set_had_moved(bool val = true) { had_moved = true; };
             void set_coordinate(Coordinate coordinate) {
                 this->coordinate = coordinate;
