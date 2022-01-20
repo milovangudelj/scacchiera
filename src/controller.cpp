@@ -122,7 +122,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 		return mvmt;
 	}
@@ -194,7 +194,7 @@ void Controller::play()
 		// Ask for input again if move was invalid
 		Chess::Movement mvmt = get_move(current_player);
 
-		if (!mvmt.start.is_valid() && !mvmt.end.is_valid())
+		if (!mvmt.start.is_valid() || !mvmt.end.is_valid())
 		{
 			clear_errors(errors);
 			continue;
