@@ -273,6 +273,12 @@ std::list<std::string> Controller::replay(char out)
 		// Make the movement
 		result = board->move(*current_player, *other_player, *log_it);
 
+		if (result == Chess::utilities::MoveResult::invalid)
+		{
+			std::cout << "There's an invalid movement at line " << BRIGHT << (i + 1) << RESET << " in the history input file. Please fix the mistake and try again.\n\n";
+			exit(0);
+		}
+
 		// Flags
 		check = result == Chess::utilities::MoveResult::check;
 		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
