@@ -194,9 +194,6 @@ void Controller::play()
 	{
 		display(current_player, checkmate, draw, check);
 
-		checkmate = board->is_checkmate(*current_player, *other_player); 
-		draw = board->is_draw(*current_player, *other_player);
-
 		if (current_player->get_type() == PlayerType::human)
 		{
 			std::cout << ": ";
@@ -227,6 +224,9 @@ void Controller::play()
 
 		result = board->move(*current_player, *other_player, mvmt);
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
+
+		checkmate = board->is_checkmate(*other_player, *current_player); 
+		draw = board->is_draw(*other_player, *current_player);
 
 		check = result == Chess::utilities::MoveResult::check;
 

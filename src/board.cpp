@@ -275,22 +275,22 @@ bool Board::is_checkmate(Player &current, Player &other)
 	{
 		return false;
 	}
-	Coordinate king_coordinate = current.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
-	Coordinate king_coordinate_copy = king_coordinate;
-	Piece *king = cells[king_coordinate.rank][king_coordinate.file];
+	Piece *king = current.get_color() == Color::black ? b_king : w_king;
+	Coordinate king_coordinate = king->get_coordinate();
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 	for (Movement movement : king->get_pseudo_valid_movements(*this))
 	{
 		temporary_move(movement);
-		king_coordinate = movement.end;
+		king->set_coordinate(movement.end);
 		bool can_move = is_check(current, other) ? false : true;
 		undo(previous_movement, previous_eaten);
 		if (can_move)
 		{
+			king->set_coordinate(king_coordinate);
 			return false;
 		}
-		king_coordinate = king_coordinate_copy;
+		king->set_coordinate(king_coordinate);
 	}
 
 	if(current.get_available_pieces().size() == 1) {
