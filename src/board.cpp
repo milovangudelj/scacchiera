@@ -345,8 +345,6 @@ bool Board::is_draw(Player &current, Player &other)
 			}
 		}
 		return true;
-	} else {
-		return false;
 	}
 
 	//dead position
@@ -419,8 +417,6 @@ bool Board::is_draw(Player &current, Player &other)
 		return true;
 	}
 
-	return false;
-
 	//threefold repetition
 	auto p = std::find_if(position_history.begin(), position_history.end(),
 		[](std::pair<std::string, int> position) {
@@ -430,6 +426,8 @@ bool Board::is_draw(Player &current, Player &other)
 	{
 		return true;
 	}
+
+	return false;
 }
 
 MoveResult Board::move(Player &current_player, Player &other_player, Movement movement)

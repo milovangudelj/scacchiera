@@ -111,7 +111,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			std::uniform_int_distribution<std::mt19937::result_type> mvmt_dist(0, available_movements.size() - 1);
 			int random_mvmt_index = mvmt_dist(rng);
 			std::list<Movement>::iterator mvmt_it = available_movements.begin();
-			std::advance(mvmt_it, random_piece_index);
+			std::advance(mvmt_it, random_mvmt_index);
 
 			found = true;
 			mvmt = *mvmt_it;
