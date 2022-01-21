@@ -253,6 +253,9 @@ bool Board::is_check(Player &current, Player &other)
 	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king->get_coordinate() : w_king->get_coordinate();
 	for (Piece *piece : other.get_available_pieces())
 	{
+		if(!(*piece == *cells[piece->get_coordinate().rank][piece->get_coordinate().file])) {
+			continue;
+		}
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
 		auto p = std::find_if(pseudo_movements.begin(), pseudo_movements.end(),
 			[king_coordinate](Movement movement) {
@@ -341,7 +344,7 @@ bool Board::is_draw(Player &current, Player &other)
 			}
 		}
 	}
-	return true;
+	return false;
 
 	//dead position
 	std::list<Piece *> current_pieces = current.get_available_pieces();
@@ -484,14 +487,14 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	Piece *previous_eaten = last_eaten;
 	temporary_move(movement);
 	Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
-	Coordinate king_coordinate_copy = king_coordinate;
+	Piece *king = current_player.get_color() == Color::black ? b_king : w_king;
 	if(start_piece->get_type() == PieceType::king) {
-		king_coordinate = movement.end;
+		king->set_coordinate(movement.end);
 	}
 	if (is_check(current_player, other_player))
 	{
 		undo(previous_movement, previous_eaten);
-		king_coordinate = king_coordinate_copy;
+		king->set_coordinate(king_coordinate);
 		return MoveResult::check;
 	}
 
