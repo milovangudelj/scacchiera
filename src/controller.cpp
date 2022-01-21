@@ -57,6 +57,11 @@ void Controller::init(const std::string &type)
 		white = new Player(Color::white, PlayerType{white_is_human ? PlayerType::human : PlayerType::computer});
 		black = new Player(Color::black, PlayerType{white_is_human ? PlayerType::computer : PlayerType::human});
 	}
+	else if (type.compare("pp") == 0)
+	{
+		white = new Player(Color::white, PlayerType{PlayerType::human});
+		black = new Player(Color::black, PlayerType{PlayerType::human});
+	}
 	else if (type.compare("cc") == 0)
 	{
 		white = new Player(Color::white, PlayerType::computer);
