@@ -241,8 +241,8 @@ void Controller::promote(Player *player)
 		}
 		std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
 
-		symbol = std::tolower(get_piece_symbol());
-		if (possible_symbols.find_first_of(symbol) == std::string::npos)
+		symbol = get_piece_symbol();
+		if (possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos)
 		{
 			set_error("Invalid piece. Chose a different one.");
 			continue;
