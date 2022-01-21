@@ -199,9 +199,11 @@ char get_piece_symbol()
 std::string can_promote_to(std::list<Chess::Piece *> lost_pieces)
 {
 	std::string lost_pieces_symbols;
-	for (Chess::Piece *piece : lost_pieces)
+	std::list<Chess::Piece *>::iterator lostp_it = lost_pieces.begin();
+	for (size_t i = 0; i < lost_pieces.size(); i++)
 	{
-		lost_pieces_symbols += std::string(1, piece->get_symbol()) + ", ";
+		lost_pieces_symbols += BRIGHT + std::string(1, (*lostp_it)->get_symbol()) + RESET + (i == lost_pieces.size() - 1 ? "" : ", ");
+		std::advance(lostp_it, 1);
 	}
 	return lost_pieces_symbols;
 }
@@ -241,13 +243,14 @@ void Controller::promote(Player *player)
 		}
 		std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
 
-		symbol = std::tolower(get_piece_symbol());
-		if (possible_symbols.find_first_of(symbol) == std::string::npos)
+		symbol = get_piece_symbol();
+		if (possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos)
 		{
 			set_error("Invalid piece. Chose a different one.");
 			continue;
 		}
 	} while (!board->promote(*player, symbol));
+	std::cout << "\033[14A\033[J";
 }
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
