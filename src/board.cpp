@@ -324,34 +324,11 @@ bool Board::is_draw(Player &current, Player &other)
 	Piece* king = current.get_color() == Color::black ? b_king : w_king;
 	Coordinate king_coordinate = king->get_coordinate();
 
-	//stalemate
-	if (!is_check(current, other))
-	{
-		for (Piece *piece : current.get_available_pieces())
-		{
-			for (Movement movement : piece->get_pseudo_valid_movements(*this))
-			{
-				if(piece->get_type() == PieceType::king) {
-					king->set_coordinate(movement.end);
-				}
-				temporary_move(movement);
-				bool can_move = is_check(current, other) ? false : true;
-				undo(previous_movement, previous_eaten);
-				king->set_coordinate(king_coordinate);
-				if (can_move)
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	//dead position
 	std::list<Piece *> current_pieces = current.get_available_pieces();
 	std::list<Piece *> other_pieces = other.get_available_pieces();
 
-	if (current_pieces.size() == other_pieces.size() == 1)
+	if ((current_pieces.size() == 1) && (other_pieces.size() == 1))
 	{
 		//only kings left
 		return true;
@@ -414,6 +391,30 @@ bool Board::is_draw(Player &current, Player &other)
 	//50 move rule
 	if (current.get_stale_since() >= 50 && other.get_stale_since() >= 50)
 	{
+		return true;
+	}
+
+	//stalemate
+	if (!is_check(current, other))
+	{
+		for (Piece *piece : current.get_available_pieces())
+		{
+			for (Movement movement : piece->get_pseudo_valid_movements(*this))
+			{
+				if (piece->get_type() == PieceType::king)
+				{
+					king->set_coordinate(movement.end);
+				}
+				temporary_move(movement);
+				bool can_move = is_check(current, other) ? false : true;
+				undo(previous_movement, previous_eaten);
+				king->set_coordinate(king_coordinate);
+				if (can_move)
+				{
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 
