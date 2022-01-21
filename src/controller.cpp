@@ -58,6 +58,11 @@ void Controller::init(const std::string &type)
 		white = new Player(Color::white, PlayerType{white_is_human ? PlayerType::human : PlayerType::computer});
 		black = new Player(Color::black, PlayerType{white_is_human ? PlayerType::computer : PlayerType::human});
 	}
+	else if (type.compare("pp") == 0)
+	{
+		white = new Player(Color::white, PlayerType{PlayerType::human});
+		black = new Player(Color::black, PlayerType{PlayerType::human});
+	}
 	else if (type.compare("cc") == 0)
 	{
 		white = new Player(Color::white, PlayerType::computer);
@@ -112,7 +117,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			std::uniform_int_distribution<std::mt19937::result_type> mvmt_dist(0, available_movements.size() - 1);
 			int random_mvmt_index = mvmt_dist(rng);
 			std::list<Movement>::iterator mvmt_it = available_movements.begin();
-			std::advance(mvmt_it, random_piece_index);
+			std::advance(mvmt_it, random_mvmt_index);
 
 			found = true;
 			mvmt = *mvmt_it;
@@ -300,9 +305,10 @@ void Controller::play()
 		result = board->move(*current_player, *other_player, mvmt);
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
-		check = result == Chess::utilities::MoveResult::check;
-		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		checkmate = board->is_checkmate(*other_player, *current_player); 
 		draw = board->is_draw(*other_player, *current_player);
+
+		check = result == Chess::utilities::MoveResult::check;
 
 		switch (result)
 		{
