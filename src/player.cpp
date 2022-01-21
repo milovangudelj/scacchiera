@@ -52,9 +52,9 @@ void Player::move_to_lost_pieces(Piece *piece)
 
 void Player::move_to_available_pieces(Piece *piece)
 {
-	auto piece_it = std::find_if(available_pieces.begin(), available_pieces.end(), 
-		[piece] (auto& available_piece) {
-			return available_piece.get() == piece;
+	auto piece_it = std::find_if(lost_pieces.begin(), lost_pieces.end(), 
+		[piece] (auto& lost_piece) {
+			return lost_piece.get() == piece;
 	});
 	available_pieces.push_back(std::move(*piece_it));
 	lost_pieces.erase(piece_it);

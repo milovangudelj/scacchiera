@@ -4,6 +4,7 @@
 #include <list>
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "Player.h"
 #include "Movement.h"
@@ -21,10 +22,26 @@ namespace Chess
 		Chess::Player *black;
 		std::list<Chess::Movement> history;
 		Chess::Board *board;
+
+		// Utility variables and methods
+		std::set<std::string> errors;
+		std::set<std::string> tips;
+		void set_error(const std::string &message);
+		void set_tip(const std::string &tip);
+		void clear_errors()
+		{
+			errors.clear();
+		};
+		void clear_tips()
+		{
+			tips.clear();
+		};
+
 		Chess::Movement get_move(Player *current_player);
 		void export_game();
 		void init(const std::string &type);
 		void init_replay();
+		void promote(Player *player);
 
 	public:
 		Controller(std::string _mode, std::string _fen);
