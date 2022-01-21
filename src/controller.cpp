@@ -15,6 +15,7 @@
 using Chess::Board;
 using Chess::Controller;
 using Chess::utilities::Color;
+using Chess::utilities::PieceType;
 using Chess::utilities::PlayerType;
 
 static const char *BRIGHT = "\033[1m";
@@ -149,7 +150,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 	std::cout << "\033[14A\033[J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
-	std::basic_regex input_regex = std::regex(input_pattern, std::regex::ECMAScript);
+	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
 	if (!std::regex_match(from, input_regex) || !std::regex_match(to, input_regex))
 	{
 		return {{10, 10}, {10, 10}};
@@ -162,24 +163,100 @@ Chess::Movement Controller::get_move(Player *current_player)
 }
 
 /// @brief A helper function for setting error messages
-/// @param errors The reference to the errors set
 /// @param message The error message you want to set
 /// @returns void
-void set_error(std::set<std::string> &errors, const std::string &message)
+void Controller::set_error(const std::string &message)
 {
 	std::stringstream msg;
-	msg << RED_FG << BRIGHT << "Error: " << RESET << message;
+	msg << RED_FG << BRIGHT << "Error: " << RESET << message << "\033[0K";
 
 	errors.insert(msg.str());
 }
 
-/// @brief A helper function for clearing error messages
-/// @param errors The reference to the errors set
+/// @brief A helper function for setting error messages
+/// @param tip The tip message you want to set
 /// @returns void
-void clear_errors(std::set<std::string> &errors)
+void Controller::set_tip(const std::string &tip)
 {
-	errors.clear();
-};
+	std::stringstream msg;
+	msg << BLUE_FG << BRIGHT << "Tip: " << RESET << tip;
+
+	tips.insert(msg.str());
+}
+
+bool can_promote(std::list<Chess::Piece *> &lost_pieces)
+{
+	auto it = std::find_if(lost_pieces.begin(), lost_pieces.end(),
+								  [](Chess::Piece *piece)
+								  {
+									  return piece->get_type() != PieceType::pawn;
+								  });
+	return !(it == lost_pieces.end());
+}
+
+char get_piece_symbol()
+{
+	char symbol;
+	std::cin >> symbol;
+	return symbol;
+}
+
+std::string can_promote_to(std::list<Chess::Piece *> lost_pieces)
+{
+	std::string lost_pieces_symbols;
+	std::list<Chess::Piece *>::iterator lostp_it = lost_pieces.begin();
+	for (size_t i = 0; i < lost_pieces.size(); i++)
+	{
+		lost_pieces_symbols += BRIGHT + std::string(1, (*lostp_it)->get_symbol()) + RESET + (i == lost_pieces.size() - 1 ? "" : ", ");
+		std::advance(lostp_it, 1);
+	}
+	return lost_pieces_symbols;
+}
+
+void Controller::promote(Player *player)
+{
+	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
+
+	// Can it promote?
+	if (!can_promote(lost_pieces))
+	{
+		clear_tips();
+		return;
+	}
+
+	std::string possible_symbols = "rdcapt";
+	char symbol;
+
+	do
+	{
+		std::set<std::string> messages;
+		for (std::string e : errors)
+		{
+			messages.insert(e);
+		}
+		for (std::string t : tips)
+		{
+			messages.insert(t);
+		}
+
+		int up = 1; // How many lines to go up by
+		for (std::string m : messages)
+		{
+			up++;
+			std::cout << "\n"
+						 << m;
+		}
+		std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
+
+		symbol = get_piece_symbol();
+		if (possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos)
+		{
+			set_error("Invalid piece. Chose a different one.");
+			continue;
+		}
+	} while (!board->promote(*player, symbol));
+	std::cout << "\033[14A\033[J";
+}
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
 void Controller::play()
@@ -190,7 +267,6 @@ void Controller::play()
 	bool checkmate = false;
 	bool draw = false;
 	bool invalid_move = false;
-	std::set<std::string> errors;
 
 	Chess::utilities::MoveResult result;
 
@@ -215,12 +291,12 @@ void Controller::play()
 		{
 			if (mvmt.start == Chess::Coordinate{9, 9} && mvmt.end == Chess::Coordinate{9, 9})
 			{
-				clear_errors(errors);
+				clear_errors();
 				std::cout << '\n';
 			}
 			else
 			{
-				set_error(errors, "Invalid move. Try again...");
+				set_error("Invalid move. Try again...");
 			}
 
 			continue;
@@ -237,13 +313,28 @@ void Controller::play()
 		switch (result)
 		{
 		case Chess::utilities::MoveResult::invalid:
-			set_error(errors, "Invalid move. Try again...");
+			set_error("Invalid move. Try again...");
 			break;
 		case Chess::utilities::MoveResult::check:
-			set_error(errors, "king is in check. Try again...");
+			set_error("King is under check. Try again...");
 			break;
 		case Chess::utilities::MoveResult::ok:
-			clear_errors(errors);
+			clear_errors();
+			// Swap players
+			current_player = current_player == white ? black : white;
+			other_player = other_player == white ? black : white;
+			// Add movement to history
+			history.push_back(mvmt);
+			break;
+		case Chess::utilities::MoveResult::promotion:
+			clear_errors();
+
+			display(current_player, checkmate, draw, check);
+			std::cout << '\n';
+			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player->get_lost_pieces()) + "\033[0K\033[A\r");
+
+			promote(current_player);
+
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
