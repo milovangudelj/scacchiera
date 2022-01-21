@@ -27,7 +27,7 @@ Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(n
 	init(_mode);
 }
 
-Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr)
+Controller::Controller(std::list<Movement> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
 {
 	init_replay();
 }
@@ -43,7 +43,6 @@ void Controller::init_replay()
 {
 	white = new Player(Color::white, PlayerType::computer);
 	black = new Player(Color::black, PlayerType::computer);
-	fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 
 	board = new Board(fen, white, black);
 }
@@ -258,7 +257,7 @@ void Controller::play()
 	}
 	display(current_player, checkmate, draw, check);
 	std::cout << "Game Over...\n\n";
-	export_game(); // Right now it only prints the history to the terminal
+	export_game();
 }
 
 std::list<std::string> Controller::replay(char out)
@@ -315,7 +314,7 @@ std::list<std::string> Controller::replay(char out)
 		else
 		{
 			ss << *board;
-			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate for ") + other_player->get_color()) : "draw");
+			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate for ") + current_player->get_color()) : "draw");
 			ss << (i == log_list.size() - 1 ? result : "");
 		}
 		to_print.push_back(ss.str());
@@ -343,7 +342,7 @@ std::string Controller::display(Player *current_player, bool is_checkmate, bool 
 	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
 	ss << BRIGHT << "Now playing:" << RESET << " " << name << " " << color << "	";
-	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << "	";
+	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << " 	";
 	ss << BRIGHT << "Draw:" << RESET << " " << draw << "\n\n";
 
 	ss << board->pretty_print() << "\n\n";
@@ -361,14 +360,15 @@ void Controller::export_game()
 {
 	std::ofstream history_file;
 
-	// printf("%s%sHistory:%s\n", BLUE_FG, BRIGHT, RESET);
-
 	history_file.open("history.txt");
 
-	for (Chess::Movement m : history)
+	history_file << fen << '\n';
+
+	std::list<Movement>::iterator history_it = history.begin();
+	for (size_t i = 0; i < history.size(); i++)
 	{
-		// std::cout << m << '\n';
-		history_file << m << '\n';
+		history_file << *history_it << (i == history.size() - 1 ? "" : "\n");
+		std::advance(history_it, 1);
 	}
 
 	history_file.close();
