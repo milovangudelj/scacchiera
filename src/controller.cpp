@@ -196,9 +196,10 @@ char get_piece_symbol()
 	return symbol;
 }
 
-std::string can_promote_to(std::list<Chess::Piece *> lost_pieces)
+std::string can_promote_to(Chess::Player *player)
 {
 	std::string lost_pieces_symbols;
+	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
 	std::list<Chess::Piece *>::iterator lostp_it = lost_pieces.begin();
 	for (size_t i = 0; i < lost_pieces.size(); i++)
 	{
@@ -219,8 +220,12 @@ void Controller::promote(Player *player)
 		return;
 	}
 
-	std::string possible_symbols = "rdcapt";
+	std::string possible_symbols = "rdcat";
 	char symbol;
+
+	// Random numbers
+	std::random_device dev;
+	std::mt19937 rng(dev()); // Random number generator
 
 	do
 	{
@@ -243,7 +248,20 @@ void Controller::promote(Player *player)
 		}
 		std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
 
-		symbol = get_piece_symbol();
+		if (player->get_type() == PlayerType::computer)
+		{
+			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, lost_pieces.size() - 1);
+
+			int random_piece_index = piece_dist(rng);
+			std::list<Piece *>::iterator lost_piece_it = lost_pieces.begin();
+			std::advance(lost_piece_it, random_piece_index);
+
+			symbol = (*lost_piece_it)->get_symbol();
+		}
+		else
+		{
+			symbol = get_piece_symbol();
+		}
 		if (possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos)
 		{
 			set_error("Invalid piece. Chose a different one.");
@@ -325,7 +343,7 @@ void Controller::play()
 
 			display(current_player, checkmate, draw, check);
 			std::cout << '\n';
-			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player->get_lost_pieces()) + "\033[0K\033[A\r");
+			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
 
 			promote(current_player);
 
