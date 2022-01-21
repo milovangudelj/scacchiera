@@ -145,7 +145,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 	std::cout << "\033[14A\033[J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
-	std::basic_regex input_regex = std::regex(input_pattern, std::regex::ECMAScript);
+	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
 	if (!std::regex_match(from, input_regex) || !std::regex_match(to, input_regex))
 	{
 		return {{10, 10}, {10, 10}};
