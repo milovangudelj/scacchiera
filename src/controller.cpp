@@ -232,7 +232,8 @@ void Controller::promote(Player *player)
 	std::random_device dev;
 	std::mt19937 rng(dev()); // Random number generator
 
-	do
+	bool promotion_result = false;
+	while (!promotion_result)
 	{
 		std::set<std::string> messages;
 		for (std::string e : errors)
@@ -272,7 +273,10 @@ void Controller::promote(Player *player)
 			set_error("Invalid piece. Chose a different one.");
 			continue;
 		}
-	} while (!board->promote(*player, symbol));
+		promotion_result = board->promote(*player, symbol);
+	}
+	clear_tips();
+	clear_errors();
 	std::cout << "\033[14A\033[J";
 }
 
@@ -323,7 +327,7 @@ void Controller::play()
 		result = board->move(*current_player, *other_player, mvmt);
 		invalid_move = result == Chess::utilities::MoveResult::invalid;
 
-		checkmate = board->is_checkmate(*other_player, *current_player); 
+		checkmate = board->is_checkmate(*other_player, *current_player);
 		draw = board->is_draw(*other_player, *current_player);
 
 		check = result == Chess::utilities::MoveResult::check;
