@@ -24,6 +24,7 @@ namespace Chess {
     protected:
         Chess::Player *player1;
         Chess::Player *player2;
+        Chess::Piece *selected_piece;
 
     private:
         Matrix<Piece *, SIZE> cells;
@@ -31,8 +32,8 @@ namespace Chess {
         void from_fen(std::string fen);
 
         //makes checking for check condition easier and faster
-        Coordinate w_king_coordinate;
-        Coordinate b_king_coordinate;
+        Piece *w_king;
+        Piece *b_king;
 
         //needed for undoing invalid moves
         Piece *last_eaten;

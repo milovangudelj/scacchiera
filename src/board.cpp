@@ -24,6 +24,8 @@ using Chess::utilities::PieceType;
 static const std::string BRIGHT = "\033[1m"; // Enphasises the text
 static const std::string RESET = "\033[0m";	// Reset to terminal default colors
 static const std::string INVERT = "\033[7m"; // Invert terminal colors
+static const std::string GREEN_BG = "\033[42m"; // Yellow fg for selected piece
+static const std::string GREEN_FG = "\033[32m"; // Yellow fg for selected piece
 
 std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'k', Chess::utilities::PieceType::king},
@@ -33,7 +35,7 @@ std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'r', Chess::utilities::PieceType::rook},
 	 {'p', Chess::utilities::PieceType::pawn}};
 
-Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, last_eaten{nullptr}
+Board::Board(std::string fen, Player *p1, Player *p2) : player1{p1}, player2{p2}, selected_piece{nullptr}, last_eaten{nullptr}
 {
 	// initialize_with_fen(fen, had_moved_flags, player1, player2);
 	from_fen(fen);
@@ -126,11 +128,11 @@ void Board::from_fen(std::string fen)
 			{
 				if (p_color == Color::white)
 				{
-					w_king_coordinate = {i, file};
+					w_king = piece;
 				}
 				else
 				{
-					b_king_coordinate = {i, file};
+					b_king = piece;
 				}
 			}
 
@@ -214,11 +216,11 @@ void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had
 		{
 			if (color == Color::white)
 			{
-				w_king_coordinate = {rank, file};
+				w_king->get_coordinate() = {rank, file};
 			}
 			else
 			{
-				b_king_coordinate = {rank, file};
+				b_king->get_coordinate() = {rank, file};
 			}
 		}
 
@@ -248,7 +250,7 @@ Piece *Board::get_piece_at(Coordinate coordinate) const
 
 bool Board::is_check(Player &current, Player &other)
 {
-	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king->get_coordinate() : w_king->get_coordinate();
 	for (Piece *piece : other.get_available_pieces())
 	{
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
@@ -270,7 +272,7 @@ bool Board::is_checkmate(Player &current, Player &other)
 	{
 		return false;
 	}
-	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate = current.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
 	Coordinate king_coordinate_copy = king_coordinate;
 	Piece *king = cells[king_coordinate.rank][king_coordinate.file];
 	Movement previous_movement = last_movement;
@@ -315,7 +317,7 @@ bool Board::is_draw(Player &current, Player &other)
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 
-	Coordinate& king_coordinate = current.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate = current.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
 	Coordinate king_coordinate_copy = king_coordinate;
 
 	//stalemate
@@ -428,6 +430,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 {
 	//check if piece is owned by the player
 	Piece *start_piece = cells[movement.start.rank][movement.start.file];
+
 	if (start_piece == nullptr)
 	{
 		return MoveResult::invalid;
@@ -436,6 +439,14 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	{
 		return MoveResult::invalid;
 	}
+
+	// selected piece update
+	if (selected_piece != nullptr)
+	{
+		selected_piece->set_selected(false);
+	}
+	start_piece->set_selected();
+	selected_piece = start_piece;
 
 	//check if ending position is contained in pseudo_valid_movements of piece
 	std::list<Movement> pseudo_valid_movements = start_piece->get_pseudo_valid_movements(*this);
@@ -472,7 +483,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 	temporary_move(movement);
-	Coordinate& king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
 	Coordinate king_coordinate_copy = king_coordinate;
 	if(start_piece->get_type() == PieceType::king) {
 		king_coordinate = movement.end;
@@ -567,7 +578,7 @@ void Board::undo(Movement previous_movement, Piece *previous_eaten)
 
 MoveResult Board::handle_castling(Player &current_player, Player &other_player, Movement movement)
 {
-	Coordinate &initial_king_coordinate = current_player.get_color() == Color::black ? b_king_coordinate : w_king_coordinate;
+	Coordinate initial_king_coordinate = current_player.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
 	Coordinate final_king_coordinate;
 	Coordinate initial_rook_coordinate;
 	Coordinate final_rook_coordinate;
@@ -675,7 +686,7 @@ std::string Board::to_fen(Color current_color) {
 
 	//castling rights
 	bool w_kingside_c = false, w_queenside_c = false;
-	Piece *w_king = cells[w_king_coordinate.rank][w_king_coordinate.file];
+	// Piece *w_king = cells[w_king->get_coordinate().rank][w_king->get_coordinate().file];
 	for(Movement movement : w_king->get_pseudo_valid_movements(*this)) {
 		if(movement.is_long_castling) {
 			w_queenside_c = true;
@@ -685,7 +696,7 @@ std::string Board::to_fen(Color current_color) {
 		}
 	}
 	bool b_kingside_c = false, b_queenside_c = false;
-	Piece *b_king = cells[b_king_coordinate.rank][b_king_coordinate.file];
+	// Piece *b_king = cells[b_king->get_coordinate().rank][b_king->get_coordinate().file];
 	for(Movement movement : b_king->get_pseudo_valid_movements(*this)) {
 		if(movement.is_long_castling) {
 			b_queenside_c = true;
@@ -747,7 +758,9 @@ std::string Board::pretty_print()
 			}
 			else
 			{
+				ss << (piece->is_selected() ? BRIGHT + ((rank + file) % 2 == 0 ? GREEN_BG : GREEN_FG) : ""); // Cell color
 				ss << " " << piece->get_symbol() << " ";
+				ss << RESET;
 			}
 		}
 		ss << "\033[0m"; // Color reset

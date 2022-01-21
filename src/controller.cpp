@@ -2,9 +2,11 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <string>
 #include <set>
 #include <random>
 #include <thread>
+#include <regex>
 #include <algorithm>
 
 #include "Controller.h"
@@ -26,7 +28,7 @@ Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(n
 	init(_mode);
 }
 
-Controller::Controller(std::list<Movement> _log_list) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr)
+Controller::Controller(std::list<Movement> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
 {
 	init_replay();
 }
@@ -42,7 +44,6 @@ void Controller::init_replay()
 {
 	white = new Player(Color::white, PlayerType::computer);
 	black = new Player(Color::black, PlayerType::computer);
-	fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
 
 	board = new Board(fen, white, black);
 }
@@ -124,7 +125,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 		return mvmt;
 	}
@@ -133,11 +134,21 @@ Chess::Movement Controller::get_move(Player *current_player)
 	std::string to = "";
 
 	std::cin >> from >> to;
-	std::cout << "\033[14A\033[J";
+	std::transform(from.begin(), from.end(), from.begin(), ::toupper);
+	std::transform(to.begin(), to.end(), to.begin(), ::toupper);
 
 	if (from.compare("XX") == 0 && to.compare("XX") == 0)
 	{
 		return {{9, 9}, {9, 9}};
+	}
+
+	std::cout << "\033[14A\033[J";
+
+	std::string input_pattern = "^([A-H][1-8]|XX)$";
+	std::basic_regex input_regex = std::regex(input_pattern, std::regex::ECMAScript);
+	if (!std::regex_match(from, input_regex) || !std::regex_match(to, input_regex))
+	{
+		return {{10, 10}, {10, 10}};
 	}
 
 	Chess::Coordinate start = {(unsigned int)(8 - (from.at(1) - '0')), (unsigned int)(from.at(0) - 'A')};
@@ -236,9 +247,18 @@ void Controller::play()
 		// Ask for input again if move was invalid
 		Chess::Movement mvmt = get_move(current_player);
 
-		if (!mvmt.start.is_valid() && !mvmt.end.is_valid())
+		if (!mvmt.start.is_valid() || !mvmt.end.is_valid())
 		{
-			clear_errors(errors);
+			if (mvmt.start == Chess::Coordinate{9, 9} && mvmt.end == Chess::Coordinate{9, 9})
+			{
+				clear_errors(errors);
+				std::cout << '\n';
+			}
+			else
+			{
+				set_error(errors, "Invalid move. Try again...");
+			}
+
 			continue;
 		}
 
@@ -247,7 +267,7 @@ void Controller::play()
 
 		check = result == Chess::utilities::MoveResult::check;
 		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
-		draw = board->is_draw(*current_player, *other_player);
+		draw = board->is_draw(*other_player, *current_player);
 
 		switch (result)
 		{
@@ -284,7 +304,7 @@ void Controller::play()
 	}
 	display(current_player, checkmate, draw, check);
 	std::cout << "Game Over...\n\n";
-	export_game(); // Right now it only prints the history to the terminal
+	export_game();
 }
 
 std::list<std::string> Controller::replay(char out)
@@ -297,6 +317,7 @@ std::list<std::string> Controller::replay(char out)
 
 	Chess::Player *current_player = white;
 	Chess::Player *other_player = black;
+	Chess::utilities::MoveResult result;
 	bool check = false;
 	bool checkmate = false;
 	bool draw = false;
@@ -312,13 +333,25 @@ std::list<std::string> Controller::replay(char out)
 	std::stringstream ss;
 
 	// Loop through the movements and add them to 'to_print'
-	for (Movement movement : log_list)
+	std::list<Chess::Movement>::iterator log_it = log_list.begin();
+	for (size_t i = 0; i < log_list.size(); i++)
 	{
 		// Reset the string stream
 		ss.str(std::string());
 
-		// Make teh movement
-		board->move(*current_player, *other_player, movement);
+		// Make the movement
+		result = board->move(*current_player, *other_player, *log_it);
+
+		if (result == Chess::utilities::MoveResult::invalid)
+		{
+			std::cout << "There's an invalid movement at line " << BRIGHT << (i + 1) << RESET << " in the history input file. Please fix the mistake and try again.\n\n";
+			exit(0);
+		}
+
+		// Flags
+		check = result == Chess::utilities::MoveResult::check;
+		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
+		draw = board->is_draw(*other_player, *current_player);
 
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
@@ -328,6 +361,8 @@ std::list<std::string> Controller::replay(char out)
 		else
 		{
 			ss << *board;
+			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate for ") + current_player->get_color()) : "draw");
+			ss << (i == log_list.size() - 1 ? result : "");
 		}
 		to_print.push_back(ss.str());
 
@@ -335,6 +370,9 @@ std::list<std::string> Controller::replay(char out)
 		Player *temp = current_player;
 		current_player = other_player;
 		other_player = temp;
+
+		// Advance iterator
+		std::advance(log_it, 1);
 	}
 
 	return to_print;
@@ -351,7 +389,7 @@ std::string Controller::display(Player *current_player, bool is_checkmate, bool 
 	const char *color = current_player->get_color() == Chess::utilities::Color::white ? "█" : "░";
 
 	ss << BRIGHT << "Now playing:" << RESET << " " << name << " " << color << "	";
-	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << "	";
+	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << " 	";
 	ss << BRIGHT << "Draw:" << RESET << " " << draw << "\n\n";
 
 	ss << board->pretty_print() << "\n\n";
@@ -369,14 +407,15 @@ void Controller::export_game()
 {
 	std::ofstream history_file;
 
-	// printf("%s%sHistory:%s\n", BLUE_FG, BRIGHT, RESET);
-
 	history_file.open("history.txt");
 
-	for (Chess::Movement m : history)
+	history_file << fen << '\n';
+
+	std::list<Movement>::iterator history_it = history.begin();
+	for (size_t i = 0; i < history.size(); i++)
 	{
-		// std::cout << m << '\n';
-		history_file << m << '\n';
+		history_file << *history_it << (i == history.size() - 1 ? "" : "\n");
+		std::advance(history_it, 1);
 	}
 
 	history_file.close();
