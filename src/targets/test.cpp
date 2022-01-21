@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <csignal>
 
 #include "Controller.h"
 #include "Board.h"
@@ -18,8 +19,17 @@ const char *RESET = "\033[0m";
 
 std::pair<std::string, std::string> parse_args(int argc, char *argv[]);
 
+void exiting()
+{
+	std::cout << "\n\033[J";
+};
+
 int main(int argc, char *argv[])
 {
+	// Register function to be executed on exit or `ctrl + c`
+	std::atexit(exiting);
+	std::signal(SIGINT, exit);
+
 	std::pair<std::string, std::string> params = parse_args(argc, argv);
 
 	std::string mode = params.first;
