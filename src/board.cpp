@@ -320,8 +320,9 @@ bool Board::is_draw(Player &current, Player &other)
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 
-	Coordinate king_coordinate = current.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
-	Coordinate king_coordinate_copy = king_coordinate;
+
+	Piece* king = current.get_color() == Color::black ? b_king : w_king;
+	Coordinate king_coordinate = king->get_coordinate();
 
 	//stalemate
 	if (!is_check(current, other))
@@ -331,20 +332,22 @@ bool Board::is_draw(Player &current, Player &other)
 			for (Movement movement : piece->get_pseudo_valid_movements(*this))
 			{
 				if(piece->get_type() == PieceType::king) {
-					king_coordinate = movement.end;
+					king->set_coordinate(movement.end);
 				}
 				temporary_move(movement);
 				bool can_move = is_check(current, other) ? false : true;
 				undo(previous_movement, previous_eaten);
-				king_coordinate = king_coordinate_copy;
+				king->set_coordinate(king_coordinate);
 				if (can_move)
 				{
 					return false;
 				}
 			}
 		}
+		return true;
+	} else {
+		return false;
 	}
-	return false;
 
 	//dead position
 	std::list<Piece *> current_pieces = current.get_available_pieces();
