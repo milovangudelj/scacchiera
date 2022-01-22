@@ -375,7 +375,6 @@ void Controller::play()
 	}
 	display(current_player, checkmate, draw, check);
 	std::cout << "Game Over...\n\n";
-	export_game();
 }
 
 std::list<std::string> Controller::replay(char out)
