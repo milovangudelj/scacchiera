@@ -208,7 +208,9 @@ std::string can_promote_to(Chess::Player *player)
 	std::list<Chess::Piece *>::iterator lostp_it = lost_pieces.begin();
 	for (size_t i = 0; i < lost_pieces.size(); i++)
 	{
-		lost_pieces_symbols += BRIGHT + std::string(1, (*lostp_it)->get_symbol()) + RESET + (i == lost_pieces.size() - 1 ? "" : ", ");
+		if((*lostp_it)->get_type() != PieceType::pawn) {
+			lost_pieces_symbols += BRIGHT + std::string(1, (*lostp_it)->get_symbol()) + RESET + (i == lost_pieces.size() - 1 ? "" : ", ");
+		}
 		std::advance(lostp_it, 1);
 	}
 	return lost_pieces_symbols;
