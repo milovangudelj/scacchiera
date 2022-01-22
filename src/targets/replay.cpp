@@ -139,31 +139,47 @@ void method_v(std::ifstream &in_f, std::string &fen, char out)
 	print_list = controller.replay(out);
 
 	//stampa a video il replay con pausa di 1s
-	std::cout << print_list.front();
-	print_list.pop_front();
-	for (std::string config : print_list)
+
+	std::list<std::string>::iterator print_it = print_list.begin();
+
+	for (size_t i = 0; i < print_list.size(); i++)
 	{
-		std::cout << "\033[14A\033[J";
-		std::cout << config << "\n";
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::cout << *print_it;
+
+		if (i != print_list.size() - 1)
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			std::cout << "\033[13A\033[J";
+		}
+
+		std::advance(print_it, 1);
 	}
 }
 
 /********************stampo scacchiera su file*****************/
-void method_f(std::ifstream &in_f, std::ofstream &out_f, std::string &s, char c)
+void method_f(std::ifstream &in_f, std::ofstream &out_f, std::string &fen, char out)
 {
 	std::list<std::pair<Chess::Movement, char>> log_list;
 	std::list<std::string> print_list;
+
 	log_list = get_movements(in_f);
+
 	//stampa su file il replay senza pausa
-	Chess::Controller controller{log_list, s};
-	print_list = controller.replay(c);
+	Chess::Controller controller{log_list, fen};
+	print_list = controller.replay(out);
+
 	std::list<std::string>::iterator print_it = print_list.begin();
 	std::list<std::pair<Chess::Movement, char>>::iterator log_it = log_list.begin();
-	for (size_t i = 0; i < print_list.size(); i++)
+
+	out_f << "Start:\n\n"
+			<< *print_it << "\n\n";
+	std::advance(print_it, 1);
+
+	for (size_t i = 0; i < log_list.size(); i++)
 	{
-		out_f << "- Movement: " << (*log_it).first << "\n\n";
-		out_f << *print_it << (i == print_list.size() - 1 ? "" : "\n\n");
+		out_f << "- Move: " << (*log_it).first << "\n\n";
+		out_f << *print_it << (i == log_list.size() - 1 ? "" : "\n\n");
+
 		std::advance(print_it, 1);
 		std::advance(log_it, 1);
 	}
