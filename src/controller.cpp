@@ -219,25 +219,26 @@ std::string Controller::promote(Player *player)
 	int pos;
 	while (!selected)
 	{
-		std::set<std::string> messages;
-		for (std::string e : errors)
-		{
-			messages.insert(e);
-		}
-		for (std::string t : tips)
-		{
-			messages.insert(t);
-		}
+		if(player->get_type() == PlayerType::human) {
+			std::set<std::string> messages;
+			for (std::string e : errors)
+			{
+				messages.insert(e);
+			}
+			for (std::string t : tips)
+			{
+				messages.insert(t);
+			}
 
-		int up = 1; // How many lines to go up by
-		for (std::string m : messages)
-		{
-			up++;
-			std::cout << "\n"
-						 << m;
+			int up = 1; // How many lines to go up by
+			for (std::string m : messages)
+			{
+				up++;
+				std::cout << "\n"
+							 << m;
+			}
+			std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
 		}
-		std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
-
 		if (player->get_type() == PlayerType::computer)
 		{
 			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, possible_symbols.size() - 1);
@@ -357,6 +358,8 @@ void Controller::play()
 			if(current_player->get_type() == PlayerType::computer) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
+			checkmate = board->is_checkmate(*other_player, *current_player);
+			draw = board->is_draw(*other_player, *current_player);
 			break;
 
 		default:
