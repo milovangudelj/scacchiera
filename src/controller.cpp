@@ -225,7 +225,7 @@ void Controller::promote(Player *player)
 		return;
 	}
 
-	std::string possible_symbols = "rdcat";
+	std::string possible_symbols = "dcat";
 	char symbol;
 
 	// Random numbers
