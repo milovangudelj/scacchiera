@@ -257,7 +257,7 @@ std::string Controller::promote(Player *player)
 		}
 		selected = true;
 	}
-	std::string english_symbols = "qkbr";
+	std::string english_symbols = "qnbr";
 	symbol = english_symbols.at(pos);
 	board->promote(*player, symbol);
 	clear_tips();
