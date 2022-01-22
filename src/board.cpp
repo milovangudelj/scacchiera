@@ -514,9 +514,6 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	{
 		current_player.increment_stale_since();
 	}
-	if(start_piece->get_type() == PieceType::king) {
-		king->set_had_moved();
-	}
 
 	position_history[to_fen(current_player.get_color())]++;
 
