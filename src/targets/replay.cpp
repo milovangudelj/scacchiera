@@ -143,7 +143,7 @@ void method_v(std::ifstream &in_f, std::string &fen, char out)
 	print_list.pop_front();
 	for (std::string config : print_list)
 	{
-		std::cout << "\033[13A\033[J";
+		std::cout << "\033[14A\033[J";
 		std::cout << config << "\n";
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
