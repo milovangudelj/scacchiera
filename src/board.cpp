@@ -181,68 +181,6 @@ void Board::from_fen(std::string fen)
 	}
 }
 
-/*
-void Board::initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player &player1, Player &player2)
-{
-	unsigned int file = 0, rank = 0;
-	auto flag_iterator = had_moved_flags.begin();
-	for (char character : fen)
-	{
-		if (character == '/')
-		{
-			rank++;
-			file = 0;
-			continue;
-		}
-		if (std::isdigit(character))
-		{
-			file += (character - '0');
-			continue;
-		}
-		Color color = std::islower(character) ? Color::black : Color::white;
-		PieceType type = char_to_piece.at(std::tolower(character));
-		Piece *piece = make_piece({rank, file}, color, type);
-		cells[rank][file] = piece;
-		if (player1.get_color() == color)
-		{
-			player1.add_to_available_pieces(piece);
-		}
-		else
-		{
-			player2.add_to_available_pieces(piece);
-		}
-
-		if (type == PieceType::king)
-		{
-			if (color == Color::white)
-			{
-				w_king->get_coordinate() = {rank, file};
-			}
-			else
-			{
-				b_king->get_coordinate() = {rank, file};
-			}
-		}
-
-		// No need to do it here. It's already in the constructor.
-		// if (type == PieceType::bishop)
-		// {
-		//     static_cast<Bishop*>(piece)->update_cell_color();
-		// }
-
-		if (type == PieceType::king || type == PieceType::rook)
-		{
-			bool had_moved = *flag_iterator;
-			flag_iterator++;
-			if (had_moved)
-			{
-				piece->set_had_moved();
-			}
-		}
-		file++;
-	}
-}
-*/
 Piece *Board::get_piece_at(Coordinate coordinate) const
 {
 	return cells[coordinate.rank][coordinate.file];
@@ -314,7 +252,6 @@ bool Board::is_checkmate(Player &current, Player &other)
 	return true;
 }
 
-//needs to be invoked twice both for current and for other
 bool Board::is_draw(Player &current, Player &other)
 {
 	Movement previous_movement = last_movement;
@@ -527,38 +464,18 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	}
 }
 
-bool Board::promote(Player &player, char piece_symbol)
-{
-	std::list<Piece *> lost_pieces = player.get_lost_pieces();
-	auto p = std::find_if(lost_pieces.begin(), lost_pieces.end(),
-								 [piece_symbol](Piece *piece)
-								 {
-									 return piece_symbol == piece->get_symbol();
-								 });
-	if (p == lost_pieces.end())
-	{
-		return false;
-	}
-
-	Piece *resurrected = *p;
-	if (resurrected->get_type() == PieceType::bishop)
-	{
-		static_cast<Bishop *>(resurrected)->update_cell_color();
-	}
-	player.move_to_available_pieces(*p);
-
+void Board::promote(Player &player, char piece_symbol) {
 	unsigned int promotion_rank = player.get_color() == Color::black ? 7 : 0;
-	for (Piece *piece : cells.at(promotion_rank))
-	{
-		if (piece != nullptr && piece->get_type() == PieceType::pawn)
-		{
-			resurrected->set_coordinate(piece->get_coordinate());
-			cells[piece->get_coordinate().rank][piece->get_coordinate().file] = resurrected;
-			player.move_to_lost_pieces(piece);
+	Piece *pawn;
+	for(Piece *piece : cells.at(promotion_rank)) {
+		if(piece != nullptr && piece->get_type() == PieceType::pawn) {
+			pawn = piece;
 			break;
 		}
 	}
-	return true;
+	Piece* promoted = player.add_to_available_pieces(pawn->get_coordinate(), player.get_color(), char_to_piece.at(piece_symbol));
+	player.move_to_lost_pieces(pawn);
+	cells[promoted->get_coordinate().rank][promoted->get_coordinate().file] = promoted;
 }
 
 void Board::temporary_move(Movement movement)
@@ -618,9 +535,7 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 		}
 	}
 
-	Coordinate initial_king_coordinate_copy = initial_king_coordinate;
-
-	Piece *king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
+	Piece *king = current_player.get_color() == Color::black ? b_king : w_king;
 	Piece *rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
 
 	temporary_move({initial_king_coordinate, final_king_coordinate});

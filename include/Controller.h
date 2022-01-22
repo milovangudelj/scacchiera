@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <string>
 
 #include "Player.h"
 #include "Movement.h"
@@ -20,7 +21,7 @@ namespace Chess
 		bool is_replay = false;
 		Chess::Player *white;
 		Chess::Player *black;
-		std::list<Chess::Movement> history;
+		std::list<std::string> history;
 		Chess::Board *board;
 
 		// Utility variables and methods
@@ -38,10 +39,10 @@ namespace Chess
 		};
 
 		Chess::Movement get_move(Player *current_player);
-		void export_game();
 		void init(const std::string &type);
+		void export_game();
 		void init_replay();
-		void promote(Player *player);
+		std::string promote(Player *player);
 
 	public:
 		Controller(std::string _mode, std::string _fen);
