@@ -257,9 +257,19 @@ bool Board::is_draw(Player &current, Player &other)
 	Movement previous_movement = last_movement;
 	Piece *previous_eaten = last_eaten;
 
-
 	Piece* king = current.get_color() == Color::black ? b_king : w_king;
 	Coordinate king_coordinate = king->get_coordinate();
+
+	//threefold repetition
+	auto p = std::find_if(position_history.begin(), position_history.end(),
+								 [](std::pair<std::string, int> position)
+								 {
+									 return position.second == 3;
+								 });
+	if (p != position_history.end())
+	{
+		return true;
+	}
 
 	//dead position
 	std::list<Piece *> current_pieces = current.get_available_pieces();
@@ -352,16 +362,6 @@ bool Board::is_draw(Player &current, Player &other)
 				}
 			}
 		}
-		return true;
-	}
-
-	//threefold repetition
-	auto p = std::find_if(position_history.begin(), position_history.end(),
-		[](std::pair<std::string, int> position) {
-			return position.second == 3;
-	});
-	if (p != position_history.end())
-	{
 		return true;
 	}
 
@@ -646,15 +646,15 @@ std::string Board::to_fen(Color current_color) {
 		fen += " -";
 	}
 
-	//number of half moves
-	if(player1->get_color() == current_color) {
-		fen += " " + std::to_string(player1->get_stale_since());
-	} else {
-		fen += " " + std::to_string(player2->get_stale_since());
-	}
+	// //number of half moves
+	// if(player1->get_color() == current_color) {
+	// 	fen += " " + std::to_string(player1->get_stale_since());
+	// } else {
+	// 	fen += " " + std::to_string(player2->get_stale_since());
+	// }
 
-	//number of moves
-	fen += " " + std::to_string(position_history.size() + 1);
+	// //number of moves
+	// fen += " " + std::to_string(position_history.size() + 1);
 	return fen;
 }
 

@@ -6,7 +6,9 @@
 #include <set>
 #include <random>
 #include <thread>
+#include <utility>
 #include <regex>
+#include <utility>
 #include <algorithm>
 
 #include "Controller.h"
@@ -28,7 +30,7 @@ Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(n
 	init(_mode);
 }
 
-Controller::Controller(std::list<Movement> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
+Controller::Controller(std::list<std::pair<Movement, char>> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
 {
 	init_replay();
 }
@@ -129,7 +131,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			exit(0);
 		}
 
-		std::cout << "\033[13A\033[J";
+		std::cout << "\033[2J";
 
 		return mvmt;
 	}
@@ -146,7 +148,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		return {{9, 9}, {9, 9}};
 	}
 
-	std::cout << "\033[14A\033[J";
+	std::cout << "\033[2J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
 	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
@@ -190,23 +192,26 @@ char get_piece_symbol()
 	return symbol;
 }
 
-std::string can_promote_to(Chess::Player *player) {
+std::string can_promote_to(Chess::Player *player)
+{
 	std::string possible_promotions = "dact";
 	std::string output;
-	if(player->get_color() == Color::black) {
-		std::for_each(possible_promotions.begin(), possible_promotions.end(), 
-			[](char &c) {
-				c = std::toupper(c);
-			}
-		);
+	if (player->get_color() == Color::black)
+	{
+		std::for_each(possible_promotions.begin(), possible_promotions.end(),
+						  [](char &c)
+						  {
+							  c = std::toupper(c);
+						  });
 	}
-	for(size_t i = 0; i < possible_promotions.size(); i++) {
+	for (size_t i = 0; i < possible_promotions.size(); i++)
+	{
 		output += BRIGHT + std::string(1, possible_promotions.at(i)) + RESET + (i == possible_promotions.size() - 1 ? "" : ", ");
 	}
 	return output;
 }
 
-std::string Controller::promote(Player *player)
+char Controller::promote(Player *player, char promote_to)
 {
 	std::string possible_symbols = "dcat";
 	char symbol;
@@ -219,7 +224,15 @@ std::string Controller::promote(Player *player)
 	int pos;
 	while (!selected)
 	{
-		if(player->get_type() == PlayerType::human) {
+		if (promote_to != ' ')
+		{
+			symbol = promote_to;
+			selected = true;
+			continue;
+		}
+
+		if (player->get_type() == PlayerType::human)
+		{
 			std::set<std::string> messages;
 			for (std::string e : errors)
 			{
@@ -237,8 +250,9 @@ std::string Controller::promote(Player *player)
 				std::cout << "\n"
 							 << m;
 			}
-			std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
+			std::cout << std::string("\033[0K\r: ");
 		}
+
 		if (player->get_type() == PlayerType::computer)
 		{
 			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, possible_symbols.size() - 1);
@@ -250,6 +264,7 @@ std::string Controller::promote(Player *player)
 			symbol = get_piece_symbol();
 			symbol = std::tolower(symbol);
 		}
+
 		pos = possible_symbols.find_first_of(symbol);
 		if (pos == std::string::npos)
 		{
@@ -259,12 +274,15 @@ std::string Controller::promote(Player *player)
 		selected = true;
 	}
 	std::string english_symbols = "qnbr";
-	symbol = english_symbols.at(pos);
+	if (promote_to == ' ')
+	{
+		symbol = english_symbols.at(pos);
+	}
 	board->promote(*player, symbol);
 	clear_tips();
 	clear_errors();
-	std::cout << "\033[14A\033[J";
-	return std::string(1, symbol);
+	std::cout << "\033[2J";
+	return symbol;
 }
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
@@ -319,11 +337,6 @@ void Controller::play()
 
 		check = result == Chess::utilities::MoveResult::check;
 
-		std::ostringstream ss;
-		ss << mvmt;
-		std::string mvmt_string = ss.str();
-		std::string promoted_piece;
-
 		switch (result)
 		{
 		case Chess::utilities::MoveResult::invalid:
@@ -338,36 +351,41 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt_string);
-			if(current_player->get_type() == PlayerType::computer) {
-				//std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			history.push_back(std::make_pair(mvmt, ' '));
+
+			if (current_player->get_type() == PlayerType::computer)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
 			break;
 		case Chess::utilities::MoveResult::promotion:
+		{
 			clear_errors();
 
 			display(current_player, checkmate, draw, check);
 			std::cout << '\n';
+
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
-			promoted_piece = promote(current_player);
+
+			char promote_to = promote(current_player);
+
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
+
 			// Add movement to history
-			history.push_back(mvmt_string + ((promoted_piece == "") ? "" : " " + promoted_piece));
-			if(current_player->get_type() == PlayerType::computer) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			}
+			history.push_back(std::make_pair(mvmt, promote_to));
 			checkmate = board->is_checkmate(*other_player, *current_player);
 			draw = board->is_draw(*other_player, *current_player);
-			break;
 
+			break;
+		}
 		default:
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt_string);
+			history.push_back(std::make_pair(mvmt, ' '));
 			break;
 		}
 	}
@@ -402,14 +420,19 @@ std::list<std::string> Controller::replay(char out)
 	std::stringstream ss;
 
 	// Loop through the movements and add them to 'to_print'
-	std::list<Chess::Movement>::iterator log_it = log_list.begin();
+	std::list<std::pair<Movement, char>>::iterator log_it = log_list.begin();
 	for (size_t i = 0; i < log_list.size(); i++)
 	{
 		// Reset the string stream
 		ss.str(std::string());
 
 		// Make the movement
-		result = board->move(*current_player, *other_player, *log_it);
+		result = board->move(*current_player, *other_player, (*log_it).first);
+
+		if ((*log_it).second != ' ' && result == Chess::utilities::MoveResult::promotion)
+		{
+			promote(current_player, (*log_it).second);
+		}
 
 		if (result == Chess::utilities::MoveResult::invalid)
 		{
@@ -480,10 +503,10 @@ void Controller::export_game()
 
 	history_file << fen << '\n';
 
-	std::list<std::string>::iterator history_it = history.begin();
+	std::list<std::pair<Chess::Movement, char>>::iterator history_it = history.begin();
 	for (size_t i = 0; i < history.size(); i++)
 	{
-		history_file << *history_it << (i == history.size() - 1 ? "" : "\n");
+		history_file << (*history_it).first << " " << (*history_it).second << (i == history.size() - 1 ? "" : "\n");
 		std::advance(history_it, 1);
 	}
 
