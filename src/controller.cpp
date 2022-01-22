@@ -131,7 +131,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			exit(0);
 		}
 
-		std::cout << "\033[0K\033[J";
+		std::cout << "\033[2J";
 
 		return mvmt;
 	}
@@ -148,7 +148,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		return {{9, 9}, {9, 9}};
 	}
 
-	std::cout << "\033[0K\033[J";
+	std::cout << "\033[2J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
 	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
@@ -192,17 +192,20 @@ char get_piece_symbol()
 	return symbol;
 }
 
-std::string can_promote_to(Chess::Player *player) {
+std::string can_promote_to(Chess::Player *player)
+{
 	std::string possible_promotions = "dact";
 	std::string output;
-	if(player->get_color() == Color::black) {
-		std::for_each(possible_promotions.begin(), possible_promotions.end(), 
-			[](char &c) {
-				c = std::toupper(c);
-			}
-		);
+	if (player->get_color() == Color::black)
+	{
+		std::for_each(possible_promotions.begin(), possible_promotions.end(),
+						  [](char &c)
+						  {
+							  c = std::toupper(c);
+						  });
 	}
-	for(size_t i = 0; i < possible_promotions.size(); i++) {
+	for (size_t i = 0; i < possible_promotions.size(); i++)
+	{
 		output += BRIGHT + std::string(1, possible_promotions.at(i)) + RESET + (i == possible_promotions.size() - 1 ? "" : ", ");
 	}
 	return output;
@@ -228,7 +231,8 @@ char Controller::promote(Player *player, char promote_to)
 			continue;
 		}
 
-		if(player->get_type() == PlayerType::human) {
+		if (player->get_type() == PlayerType::human)
+		{
 			std::set<std::string> messages;
 			for (std::string e : errors)
 			{
@@ -270,11 +274,14 @@ char Controller::promote(Player *player, char promote_to)
 		selected = true;
 	}
 	std::string english_symbols = "qnbr";
-	symbol = english_symbols.at(pos);
+	if (promote_to == ' ')
+	{
+		symbol = english_symbols.at(pos);
+	}
 	board->promote(*player, symbol);
 	clear_tips();
 	clear_errors();
-	std::cout << "\033[0K\033[J";
+	std::cout << "\033[2J";
 	return symbol;
 }
 
@@ -346,7 +353,8 @@ void Controller::play()
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, ' '));
 
-			if(current_player->get_type() == PlayerType::computer) {
+			if (current_player->get_type() == PlayerType::computer)
+			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
 			break;
