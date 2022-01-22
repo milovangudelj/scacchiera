@@ -88,33 +88,6 @@ int main(int argc, char *argv[])
 }
 
 /********************dal file log, estraggo le mosse e li inserisco nella lista*****************/
-/*
-std::list<std::pair<Chess::Movement,char>> get_movements(std::istream& in)
-{
-	std::string s;
-	std::list<std::pair<Chess::Movement,char>> movements;
-	std::string start_s, end_s;
-	char promoted_to;
-	Chess::Coordinate start_c, end_c;
-	Chess::Movement move;
-	std::pair<Chess::Movement,char> coppia;
-	//int pos_whitespace;
-	//while(std::getline(in,s))
-	while(in>>start_s>>end_s>>promoted_to)
-	{
-		//pos_whitespace = s.find(' ');
-		//start_s = s.substr(0,pos_whitespace);
-		//end_s = s.substr(pos_whitespace+1);
-		start_c = {static_cast<unsigned int>(8-(start_s.at(1)-'0')),static_cast<unsigned int>(start_s.at(0)-'A')};
-		end_c = {static_cast<unsigned int>(8-(end_s.at(1)-'0')),static_cast<unsigned int>(end_s.at(0)-'A')};
-		move = {start_c,end_c};
-		coppia = std::make_pair(move,promoted_to);
-		//movements.push_back({start_c,end_c});
-		movements.push_back(coppia);
-	}
-	return movements;
-}
-*/
 std::list<std::pair<Chess::Movement,char>> get_movements(std::istream& in)
 {
 	std::string s,fen;
@@ -163,7 +136,7 @@ void method_v(std::ifstream& in_f,std::string& s, char c )
 	print_list.pop_front();
 	for(std::string config : print_list)
 	{
-		std::cout << "\033[14A\033[J";
+		std::cout << "\033[0K\033[J";
 		std::cout << config << "\n";
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
