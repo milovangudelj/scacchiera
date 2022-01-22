@@ -222,7 +222,7 @@ char Controller::promote(Player *player, char promote_to)
 	if (!can_promote(lost_pieces))
 	{
 		clear_tips();
-		return;
+		return ' ';
 	}
 
 	std::string possible_symbols = "rdcapt";
@@ -263,6 +263,7 @@ char Controller::promote(Player *player, char promote_to)
 		}
 	} while (!board->promote(*player, symbol));
 	std::cout << "\033[14A\033[J";
+	return symbol;
 }
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
@@ -334,6 +335,7 @@ void Controller::play()
 			history.push_back(std::make_pair(mvmt, ' '));
 			break;
 		case Chess::utilities::MoveResult::promotion:
+		{
 			clear_errors();
 
 			display(current_player, checkmate, draw, check);
@@ -348,7 +350,7 @@ void Controller::play()
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, promoted_to));
 			break;
-
+		}
 		default:
 			// Swap players
 			current_player = current_player == white ? black : white;
