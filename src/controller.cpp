@@ -449,11 +449,13 @@ std::list<std::string> Controller::replay(char out)
 		if (to_terminal)
 		{
 			ss << display(current_player, checkmate, draw, false, false);
+			std::string result = "Match result: " + (checkmate ? (std::string("checkmate! ") + current_player->get_color() + " wins.") : "draw");
+			ss << (i == log_list.size() - 1 ? result : "");
 		}
 		else
 		{
 			ss << *board;
-			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate for ") + current_player->get_color()) : "draw");
+			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate! ") + current_player->get_color() + " wins.") : "draw");
 			ss << (i == log_list.size() - 1 ? result : "");
 		}
 		to_print.push_back(ss.str());
