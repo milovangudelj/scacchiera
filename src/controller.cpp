@@ -131,7 +131,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			exit(0);
 		}
 
-		std::cout << "\033[2J";
+		std::cout << "\033[13A\033[J";
 
 		return mvmt;
 	}
@@ -148,7 +148,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		return {{9, 9}, {9, 9}};
 	}
 
-	std::cout << "\033[2J";
+	std::cout << "\033[14A\033[J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
 	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
@@ -250,7 +250,7 @@ char Controller::promote(Player *player, char promote_to)
 				std::cout << "\n"
 							 << m;
 			}
-			std::cout << std::string("\033[0K\r: ");
+			std::cout << std::string("\033[" + std::to_string(up) + "A\r: \033[0K");
 		}
 
 		if (player->get_type() == PlayerType::computer)
@@ -281,8 +281,27 @@ char Controller::promote(Player *player, char promote_to)
 	board->promote(*player, symbol);
 	clear_tips();
 	clear_errors();
-	std::cout << "\033[2J";
+	std::cout << (promote_to != ' ' ? "" : "\033[14A\033[J");
 	return symbol;
+}
+
+std::string capitalise(std::string s)
+{
+	std::stringstream out("");
+
+	for (size_t i = 0; i < s.length(); i++)
+	{
+		out << (i == 0 ? char(std::toupper(s[i])) : char(s[i]));
+	}
+
+	return out.str();
+}
+
+std::string capitalise(Color c)
+{
+	std::stringstream ss("");
+	ss << c;
+	return capitalise(ss.str());
 }
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
@@ -391,6 +410,9 @@ void Controller::play()
 	}
 	display(current_player, checkmate, draw, check);
 	std::cout << "Game Over...\n\n";
+
+	std::cout << "Match result: " << (checkmate ? (BRIGHT + std::string("checkmate") + RESET + "! " + capitalise(other_player->get_color()) + " wins.") : (BRIGHT + std::string("draw") + RESET + "."));
+
 	export_game();
 }
 
@@ -413,11 +435,18 @@ std::list<std::string> Controller::replay(char out)
 	if (!is_replay)
 		throw std::invalid_argument("Cannot replay if not provided a list of movements.");
 
-	if (to_terminal)
-		to_print.push_back(display(current_player, checkmate, draw, false, false));
-
 	// Create string stream and print initial board layout
 	std::stringstream ss;
+
+	if (to_terminal)
+	{
+		to_print.push_back(display(current_player, checkmate, draw, false, false));
+	}
+	else
+	{
+		ss << *board;
+		to_print.push_back(ss.str());
+	}
 
 	// Loop through the movements and add them to 'to_print'
 	std::list<std::pair<Movement, char>>::iterator log_it = log_list.begin();
@@ -449,14 +478,12 @@ std::list<std::string> Controller::replay(char out)
 		if (to_terminal)
 		{
 			ss << display(current_player, checkmate, draw, false, false);
-			std::string result = "Match result: " + (checkmate ? (std::string("checkmate! ") + current_player->get_color() + " wins.") : "draw");
-			ss << (i == log_list.size() - 1 ? result : "");
+			ss << (i == log_list.size() - 1 ? ("Match result: " + (checkmate ? (BRIGHT + std::string("checkmate") + RESET + "! " + capitalise(current_player->get_color()) + " wins.\n") : (BRIGHT + std::string("draw") + RESET + ".\n"))) : "");
 		}
 		else
 		{
 			ss << *board;
-			std::string result = "\n\nMatch result: " + (checkmate ? (std::string("checkmate! ") + current_player->get_color() + " wins.") : "draw");
-			ss << (i == log_list.size() - 1 ? result : "");
+			ss << (i == log_list.size() - 1 ? ("\n\nMatch result: " + (checkmate ? ("checkmate! " + capitalise(current_player->get_color()) + " wins.") : ("draw."))) : "");
 		}
 		to_print.push_back(ss.str());
 
