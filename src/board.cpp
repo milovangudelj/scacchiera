@@ -254,12 +254,6 @@ bool Board::is_checkmate(Player &current, Player &other)
 
 bool Board::is_draw(Player &current, Player &other)
 {
-	Movement previous_movement = last_movement;
-	Piece *previous_eaten = last_eaten;
-
-	Piece* king = current.get_color() == Color::black ? b_king : w_king;
-	Coordinate king_coordinate = king->get_coordinate();
-
 	//threefold repetition
 	auto p = std::find_if(position_history.begin(), position_history.end(),
 								 [](std::pair<std::string, int> position)
@@ -267,6 +261,12 @@ bool Board::is_draw(Player &current, Player &other)
 									 return position.second == 3;
 								 });
 	if (p != position_history.end())
+	{
+		return true;
+	}
+
+	//50 move rule
+	if (current.get_stale_since() >= 50 && other.get_stale_since() >= 50)
 	{
 		return true;
 	}
@@ -304,6 +304,7 @@ bool Board::is_draw(Player &current, Player &other)
 	if (current_pieces.size() <= 3 && other_pieces.size() <= 3)
 	{
 		//king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color
+		bool all_bishop = true;
 		std::list<Piece *> bishops;
 		current_pieces.splice(current_pieces.end(), other_pieces); //move other_pieces elements at the end of current_pieces
 		for (Piece *piece : current_pieces)
@@ -316,30 +317,34 @@ bool Board::is_draw(Player &current, Player &other)
 				}
 				else
 				{
-					return false;
+					all_bishop = false;
+					break;
 				}
 			}
 		}
-		if (bishops.size() == 0)
+		if (all_bishop)
 		{
-			return false;
-		}
-		Color cell_color = static_cast<Bishop *>(bishops.front())->get_cell_color();
-		for (Piece *bishop : bishops)
-		{
-			if (static_cast<Bishop *>(bishop)->get_cell_color() != cell_color)
+			bool all_same = true;
+			Color cell_color = static_cast<Bishop *>(bishops.front())->get_cell_color();
+			for (Piece *bishop : bishops)
 			{
-				return false;
+				if (static_cast<Bishop *>(bishop)->get_cell_color() != cell_color)
+				{
+					all_same = false;
+					break;
+				}
+			}
+			if(all_same) {
+				return true;
 			}
 		}
-		return true;
 	}
 
-	//50 move rule
-	if (current.get_stale_since() >= 50 && other.get_stale_since() >= 50)
-	{
-		return true;
-	}
+	Movement previous_movement = last_movement;
+	Piece *previous_eaten = last_eaten;
+
+	Piece* king = current.get_color() == Color::black ? b_king : w_king;
+	Coordinate king_coordinate = king->get_coordinate();
 
 	//stalemate
 	if (!is_check(current, other))
