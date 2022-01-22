@@ -216,7 +216,7 @@ std::string can_promote_to(Chess::Player *player)
 	return lost_pieces_symbols;
 }
 
-void Controller::promote(Player *player)
+std::string Controller::promote(Player *player)
 {
 	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
 
@@ -224,7 +224,7 @@ void Controller::promote(Player *player)
 	if (!can_promote(lost_pieces))
 	{
 		clear_tips();
-		return;
+		return "";
 	}
 
 	std::string possible_symbols = "dcat";
@@ -280,6 +280,7 @@ void Controller::promote(Player *player)
 	clear_tips();
 	clear_errors();
 	std::cout << "\033[14A\033[J";
+	return std::string(1, symbol);
 }
 
 /// @brief Starts the game and goes on until either checkmate or draw occurs
@@ -334,6 +335,11 @@ void Controller::play()
 
 		check = result == Chess::utilities::MoveResult::check;
 
+		std::ostringstream ss;
+		ss << mvmt;
+		std::string mvmt_string = ss.str();
+		std::string promoted_piece;
+
 		switch (result)
 		{
 		case Chess::utilities::MoveResult::invalid:
@@ -348,7 +354,7 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(mvmt_string);
 			break;
 		case Chess::utilities::MoveResult::promotion:
 			clear_errors();
@@ -356,14 +362,12 @@ void Controller::play()
 			display(current_player, checkmate, draw, check);
 			std::cout << '\n';
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
-
-			promote(current_player);
-
+			promoted_piece = promote(current_player);
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(mvmt_string + ((promoted_piece == "") ? "" : " " + promoted_piece));
 			break;
 
 		default:
@@ -371,7 +375,7 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(mvmt_string);
 			break;
 		}
 	}
@@ -483,7 +487,7 @@ void Controller::export_game()
 
 	history_file << fen << '\n';
 
-	std::list<Movement>::iterator history_it = history.begin();
+	std::list<std::string>::iterator history_it = history.begin();
 	for (size_t i = 0; i < history.size(); i++)
 	{
 		history_file << *history_it << (i == history.size() - 1 ? "" : "\n");
