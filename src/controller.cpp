@@ -366,8 +366,10 @@ void Controller::play()
 			std::cout << '\n';
 
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
-
 			char promote_to = promote(current_player);
+
+			checkmate = board->is_checkmate(*other_player, *current_player);
+			draw = board->is_draw(*other_player, *current_player);
 
 			// Swap players
 			current_player = current_player == white ? black : white;
@@ -375,8 +377,6 @@ void Controller::play()
 
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, promote_to));
-			checkmate = board->is_checkmate(*other_player, *current_player);
-			draw = board->is_draw(*other_player, *current_player);
 
 			break;
 		}
