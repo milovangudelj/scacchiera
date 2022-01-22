@@ -191,7 +191,7 @@ bool Board::is_check(Player &current, Player &other)
 	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king->get_coordinate() : w_king->get_coordinate();
 	for (Piece *piece : other.get_available_pieces())
 	{
-		if(!(*piece == *cells[piece->get_coordinate().rank][piece->get_coordinate().file])) {
+		if(!(piece == get_piece_at(piece->get_coordinate()))) { //just been eaten by a temporary move
 			continue;
 		}
 		std::list<Movement> pseudo_movements = piece->get_pseudo_valid_movements(*this);
@@ -351,6 +351,9 @@ bool Board::is_draw(Player &current, Player &other)
 	{
 		for (Piece *piece : current.get_available_pieces())
 		{
+			if(!(piece == get_piece_at(piece->get_coordinate()))) {
+				continue;
+			}
 			for (Movement movement : piece->get_pseudo_valid_movements(*this))
 			{
 				if (piece->get_type() == PieceType::king)
@@ -479,6 +482,11 @@ void Board::promote(Player &player, char piece_symbol) {
 		}
 	}
 	Piece* promoted = player.add_to_available_pieces(pawn->get_coordinate(), player.get_color(), char_to_piece.at(piece_symbol));
+	promoted->set_selected();
+	selected_piece = promoted;
+	if(promoted->get_type() == PieceType::bishop) {
+		static_cast<Bishop*>(promoted)->update_cell_color();
+	}
 	player.move_to_lost_pieces(pawn);
 	cells[promoted->get_coordinate().rank][promoted->get_coordinate().file] = promoted;
 }
