@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #include "Coordinate.h"
 #include <string>
 

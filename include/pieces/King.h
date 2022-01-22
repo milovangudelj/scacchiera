@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #ifndef king_h
 #define king_h
 

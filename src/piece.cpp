@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #include "Piece.h"
 
 bool Chess::operator == (Piece& piece1, Piece& piece2) {

@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #ifndef coordinate_h
 #define coordinate_h
 

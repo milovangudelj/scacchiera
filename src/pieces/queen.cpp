@@ -1,4 +1,4 @@
-// Queen implementation
+// Milovan Gudelj
 
 #include "Board.h"
 #include "pieces/Queen.h"

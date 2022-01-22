@@ -1,3 +1,5 @@
+// Milovan Gudelj
+
 #include <list>
 #include <memory>
 #include <ostream>

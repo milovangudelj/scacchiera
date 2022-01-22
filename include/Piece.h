@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #ifndef piece_h
 #define piece_h
 

@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #include "pieces/Knight.h"
 #include "Board.h"
 

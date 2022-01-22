@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #ifndef knight_h
 #define knight_h
 

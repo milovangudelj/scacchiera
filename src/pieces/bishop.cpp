@@ -1,3 +1,5 @@
+// Milovan Gudelj
+
 #include "Board.h"
 #include "pieces/Bishop.h"
 

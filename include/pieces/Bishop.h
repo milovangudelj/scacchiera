@@ -1,3 +1,5 @@
+// Milovan Gudelj
+
 #ifndef BISHOP_H
 #define BISHOP_H
 

@@ -1,3 +1,5 @@
+// Yihui Zhu
+
 #ifndef board_h
 #define board_h
 
