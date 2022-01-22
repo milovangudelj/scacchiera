@@ -16,11 +16,11 @@ namespace Chess
 	{
 	private:
 		std::string fen;
-		std::list<Chess::Movement> log_list;
+		std::list<std::pair<Chess::Movement, char>> log_list;
 		bool is_replay = false;
 		Chess::Player *white;
 		Chess::Player *black;
-		std::list<Chess::Movement> history;
+		std::list<std::pair<Chess::Movement, char>> history;
 		Chess::Board *board;
 
 		// Utility variables and methods
@@ -41,11 +41,11 @@ namespace Chess
 		void export_game();
 		void init(const std::string &type);
 		void init_replay();
-		void promote(Player *player);
+		char promote(Player *player, char promote_to = ' ');
 
 	public:
 		Controller(std::string _mode, std::string _fen);
-		Controller(std::list<Chess::Movement> _log_list, std::string _fen);
+		Controller(std::list<std::pair<Chess::Movement, char>> _log_list, std::string _fen);
 		~Controller();
 
 		void play();

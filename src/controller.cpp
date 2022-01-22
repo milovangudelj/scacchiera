@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 #include <regex>
+#include <utility>
 #include <algorithm>
 
 #include "Controller.h"
@@ -28,7 +29,7 @@ Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(n
 	init(_mode);
 }
 
-Controller::Controller(std::list<Movement> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
+Controller::Controller(std::list<std::pair<Movement, char>> _log_list, std::string _fen) : is_replay(true), log_list(_log_list), white(nullptr), black(nullptr), board(nullptr), fen(_fen)
 {
 	init_replay();
 }
@@ -213,7 +214,7 @@ std::string can_promote_to(std::list<Chess::Piece *> lost_pieces)
 	return lost_pieces_symbols;
 }
 
-void Controller::promote(Player *player)
+char Controller::promote(Player *player, char promote_to)
 {
 	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
 
@@ -229,6 +230,12 @@ void Controller::promote(Player *player)
 
 	do
 	{
+		if (promote_to != ' ')
+		{
+			symbol = promote_to;
+			continue;
+		}
+
 		std::set<std::string> messages;
 		for (std::string e : errors)
 		{
@@ -324,7 +331,7 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(std::make_pair(mvmt, ' '));
 			break;
 		case Chess::utilities::MoveResult::promotion:
 			clear_errors();
@@ -333,13 +340,13 @@ void Controller::play()
 			std::cout << '\n';
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player->get_lost_pieces()) + "\033[0K\033[A\r");
 
-			promote(current_player);
+			char promoted_to = promote(current_player);
 
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(std::make_pair(mvmt, promoted_to));
 			break;
 
 		default:
@@ -347,7 +354,7 @@ void Controller::play()
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
 			// Add movement to history
-			history.push_back(mvmt);
+			history.push_back(std::make_pair(mvmt, ' '));
 			break;
 		}
 	}
@@ -382,14 +389,19 @@ std::list<std::string> Controller::replay(char out)
 	std::stringstream ss;
 
 	// Loop through the movements and add them to 'to_print'
-	std::list<Chess::Movement>::iterator log_it = log_list.begin();
+	std::list<std::pair<Chess::Movement, char>>::iterator log_it = log_list.begin();
 	for (size_t i = 0; i < log_list.size(); i++)
 	{
 		// Reset the string stream
 		ss.str(std::string());
 
 		// Make the movement
-		result = board->move(*current_player, *other_player, *log_it);
+		result = board->move(*current_player, *other_player, (*log_it).first);
+
+		if ((*log_it).second != ' ' && result == Chess::utilities::MoveResult::promotion)
+		{
+			promote(current_player, (*log_it).second);
+		}
 
 		if (result == Chess::utilities::MoveResult::invalid)
 		{
@@ -460,10 +472,10 @@ void Controller::export_game()
 
 	history_file << fen << '\n';
 
-	std::list<Movement>::iterator history_it = history.begin();
+	std::list<std::pair<Chess::Movement, char>>::iterator history_it = history.begin();
 	for (size_t i = 0; i < history.size(); i++)
 	{
-		history_file << *history_it << (i == history.size() - 1 ? "" : "\n");
+		history_file << (*history_it).first << " " << (*history_it).second << (i == history.size() - 1 ? "" : "\n");
 		std::advance(history_it, 1);
 	}
 
