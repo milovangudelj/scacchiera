@@ -19,16 +19,18 @@ const char *RESET = "\033[0m";
 
 std::pair<std::string, std::string> parse_args(int argc, char *argv[]);
 
-Controller *con = nullptr;
-
 void exiting()
 {
-	con->export_game();
 	std::cout << "\n\033[J";
 };
 
 int main(int argc, char *argv[])
 {
+	// Register function to be executed on exit or `ctrl + c`
+	std::atexit(exiting);
+	std::signal(SIGINT, exit);
+	std::signal(SIGSEGV, exit);
+
 	std::pair<std::string, std::string> params = parse_args(argc, argv);
 
 	std::string mode = params.first;
@@ -39,11 +41,6 @@ int main(int argc, char *argv[])
 	std::string fen_is_check = "k7/7R/6R1/8/8/8/8/7K w - - 0 0";
 
 	Controller controller{mode, fen};
-	con = &controller;
-
-	// Register function to be executed on exit or `ctrl + c`
-	std::atexit(exiting);
-	std::signal(SIGINT, exit);
 
 	controller.play();
 

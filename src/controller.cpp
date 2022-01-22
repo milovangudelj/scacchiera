@@ -130,7 +130,6 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 		return mvmt;
 	}
@@ -344,6 +343,12 @@ void Controller::play()
 			break;
 		case Chess::utilities::MoveResult::ok:
 			clear_errors();
+
+			if (current_player->get_type() == PlayerType::computer)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			}
+
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
@@ -377,6 +382,7 @@ void Controller::play()
 	}
 	display(current_player, checkmate, draw, check);
 	std::cout << "Game Over...\n\n";
+	export_game();
 }
 
 std::list<std::string> Controller::replay(char out)

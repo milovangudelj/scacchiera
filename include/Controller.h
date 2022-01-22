@@ -39,6 +39,7 @@ namespace Chess
 
 		Chess::Movement get_move(Player *current_player);
 		void init(const std::string &type);
+		void export_game();
 		void init_replay();
 		void promote(Player *player);
 
@@ -50,7 +51,6 @@ namespace Chess
 		void play();
 		std::list<std::string> replay(char out);
 		std::string display(Chess::Player *current_player, bool is_checkmate, bool is_draw, bool is_check = false, bool print = true);
-		void export_game();
 	};
 } // namespace Chess
 
