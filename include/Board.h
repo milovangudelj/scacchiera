@@ -27,7 +27,7 @@ namespace Chess {
         Chess::Piece *selected_piece;
 
     private:
-        Matrix<Piece *, SIZE> cells;
+        Matrix<Piece *, SIZE> cells{};
         void initialize_with_fen(std::string fen, std::initializer_list<bool> had_moved_flags, Player &player1, Player &player2);
         void from_fen(std::string fen);
 
