@@ -1,5 +1,6 @@
 .vscode
 build
 history.txt
+output.txt
 massif.out.*
 valgrind-out.txt
