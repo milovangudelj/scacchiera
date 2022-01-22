@@ -130,7 +130,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 			exit(0);
 		}
 
-		std::cout << "\033[13A\033[J";
+		std::cout << "\033[0K\033[J";
 
 		return mvmt;
 	}
@@ -147,7 +147,7 @@ Chess::Movement Controller::get_move(Player *current_player)
 		return {{9, 9}, {9, 9}};
 	}
 
-	std::cout << "\033[14A\033[J";
+	std::cout << "\033[0K\033[J";
 
 	std::string input_pattern = "^([A-H][1-8]|XX)$";
 	std::basic_regex<char> input_regex = std::regex(input_pattern, std::regex::ECMAScript);
@@ -245,8 +245,9 @@ char Controller::promote(Player *player, char promote_to)
 				std::cout << "\n"
 							 << m;
 			}
-			std::cout << std::string("\033[" + std::to_string(up) + "A\r: ");
+			std::cout << std::string("\033[0K\r: ");
 		}
+
 		if (player->get_type() == PlayerType::computer)
 		{
 			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, possible_symbols.size() - 1);
@@ -258,6 +259,7 @@ char Controller::promote(Player *player, char promote_to)
 			symbol = get_piece_symbol();
 			symbol = std::tolower(symbol);
 		}
+
 		pos = possible_symbols.find_first_of(symbol);
 		if (pos == std::string::npos)
 		{
@@ -271,7 +273,7 @@ char Controller::promote(Player *player, char promote_to)
 	board->promote(*player, symbol);
 	clear_tips();
 	clear_errors();
-	std::cout << "\033[14A\033[J";
+	std::cout << "\033[0K\033[J";
 	return symbol;
 }
 
@@ -342,8 +344,9 @@ void Controller::play()
 			other_player = other_player == white ? black : white;
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, ' '));
+
 			if(current_player->get_type() == PlayerType::computer) {
-				//std::this_thread::sleep_for(std::chrono::milliseconds(200));
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			}
 			break;
 		case Chess::utilities::MoveResult::promotion:
@@ -352,18 +355,20 @@ void Controller::play()
 
 			display(current_player, checkmate, draw, check);
 			std::cout << '\n';
+
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
+
 			char promote_to = promote(current_player);
+
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
+
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, promote_to));
-			if(current_player->get_type() == PlayerType::computer) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			}
 			checkmate = board->is_checkmate(*other_player, *current_player);
 			draw = board->is_draw(*other_player, *current_player);
+
 			break;
 		}
 		default:
