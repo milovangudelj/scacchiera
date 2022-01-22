@@ -130,7 +130,6 @@ Chess::Movement Controller::get_move(Player *current_player)
 		}
 
 		std::cout << "\033[13A\033[J";
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 		return mvmt;
 	}
@@ -184,16 +183,6 @@ void Controller::set_tip(const std::string &tip)
 	tips.insert(msg.str());
 }
 
-bool can_promote(std::list<Chess::Piece *> &lost_pieces)
-{
-	auto it = std::find_if(lost_pieces.begin(), lost_pieces.end(),
-								  [](Chess::Piece *piece)
-								  {
-									  return piece->get_type() != PieceType::pawn;
-								  });
-	return !(it == lost_pieces.end());
-}
-
 char get_piece_symbol()
 {
 	char symbol;
@@ -201,32 +190,24 @@ char get_piece_symbol()
 	return symbol;
 }
 
-std::string can_promote_to(Chess::Player *player)
-{
-	std::string lost_pieces_symbols;
-	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
-	std::list<Chess::Piece *>::iterator lostp_it = lost_pieces.begin();
-	for (size_t i = 0; i < lost_pieces.size(); i++)
-	{
-		if((*lostp_it)->get_type() != PieceType::pawn) {
-			lost_pieces_symbols += BRIGHT + std::string(1, (*lostp_it)->get_symbol()) + RESET + (i == lost_pieces.size() - 1 ? "" : ", ");
-		}
-		std::advance(lostp_it, 1);
+std::string can_promote_to(Chess::Player *player) {
+	std::string possible_promotions = "dact";
+	std::string output;
+	if(player->get_color() == Color::black) {
+		std::for_each(possible_promotions.begin(), possible_promotions.end(), 
+			[](char &c) {
+				c = std::toupper(c);
+			}
+		);
 	}
-	return lost_pieces_symbols;
+	for(size_t i = 0; i < possible_promotions.size(); i++) {
+		output += BRIGHT + std::string(1, possible_promotions.at(i)) + RESET + (i == possible_promotions.size() - 1 ? "" : ", ");
+	}
+	return output;
 }
 
 std::string Controller::promote(Player *player)
 {
-	std::list<Chess::Piece *> lost_pieces = player->get_lost_pieces();
-
-	// Can it promote?
-	if (!can_promote(lost_pieces))
-	{
-		clear_tips();
-		return "";
-	}
-
 	std::string possible_symbols = "dcat";
 	char symbol;
 
@@ -234,8 +215,9 @@ std::string Controller::promote(Player *player)
 	std::random_device dev;
 	std::mt19937 rng(dev()); // Random number generator
 
-	bool promotion_result = false;
-	while (!promotion_result)
+	bool selected = false;
+	int pos;
+	while (!selected)
 	{
 		std::set<std::string> messages;
 		for (std::string e : errors)
@@ -258,25 +240,26 @@ std::string Controller::promote(Player *player)
 
 		if (player->get_type() == PlayerType::computer)
 		{
-			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, lost_pieces.size() - 1);
-
+			std::uniform_int_distribution<std::mt19937::result_type> piece_dist(0, possible_symbols.size() - 1);
 			int random_piece_index = piece_dist(rng);
-			std::list<Piece *>::iterator lost_piece_it = lost_pieces.begin();
-			std::advance(lost_piece_it, random_piece_index);
-
-			symbol = (*lost_piece_it)->get_symbol();
+			symbol = possible_symbols.at(random_piece_index);
 		}
 		else
 		{
 			symbol = get_piece_symbol();
+			symbol = std::tolower(symbol);
 		}
-		if (possible_symbols.find_first_of(std::tolower(symbol)) == std::string::npos)
+		pos = possible_symbols.find_first_of(symbol);
+		if (pos == std::string::npos)
 		{
 			set_error("Invalid piece. Chose a different one.");
 			continue;
 		}
-		promotion_result = board->promote(*player, symbol);
+		selected = true;
 	}
+	std::string english_symbols = "qkbr";
+	symbol = english_symbols.at(pos);
+	board->promote(*player, symbol);
 	clear_tips();
 	clear_errors();
 	std::cout << "\033[14A\033[J";
@@ -355,6 +338,9 @@ void Controller::play()
 			other_player = other_player == white ? black : white;
 			// Add movement to history
 			history.push_back(mvmt_string);
+			if(current_player->get_type() == PlayerType::computer) {
+				//std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			}
 			break;
 		case Chess::utilities::MoveResult::promotion:
 			clear_errors();
@@ -368,6 +354,9 @@ void Controller::play()
 			other_player = other_player == white ? black : white;
 			// Add movement to history
 			history.push_back(mvmt_string + ((promoted_piece == "") ? "" : " " + promoted_piece));
+			if(current_player->get_type() == PlayerType::computer) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(200));
+			}
 			break;
 
 		default:

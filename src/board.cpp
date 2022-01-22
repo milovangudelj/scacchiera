@@ -514,6 +514,9 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	{
 		current_player.increment_stale_since();
 	}
+	if(start_piece->get_type() == PieceType::king) {
+		king->set_had_moved();
+	}
 
 	position_history[to_fen(current_player.get_color())]++;
 
@@ -527,7 +530,7 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	}
 }
 
-bool Board::promote(Player &player, char piece_symbol)
+/*bool Board::promote(Player &player, char piece_symbol)
 {
 	std::list<Piece *> lost_pieces = player.get_lost_pieces();
 	auto p = std::find_if(lost_pieces.begin(), lost_pieces.end(),
@@ -559,6 +562,20 @@ bool Board::promote(Player &player, char piece_symbol)
 		}
 	}
 	return true;
+}*/
+
+void Board::promote(Player &player, char piece_symbol) {
+	unsigned int promotion_rank = player.get_color() == Color::black ? 7 : 0;
+	Piece *pawn;
+	for(Piece *piece : cells.at(promotion_rank)) {
+		if(piece != nullptr && piece->get_type() == PieceType::pawn) {
+			pawn = piece;
+			break;
+		}
+	}
+	Piece* promoted = player.add_to_available_pieces(pawn->get_coordinate(), player.get_color(), char_to_piece.at(piece_symbol));
+	player.move_to_lost_pieces(pawn);
+	cells[promoted->get_coordinate().rank][promoted->get_coordinate().file] = promoted;
 }
 
 void Board::temporary_move(Movement movement)
@@ -618,9 +635,7 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 		}
 	}
 
-	Coordinate initial_king_coordinate_copy = initial_king_coordinate;
-
-	Piece *king = cells[initial_king_coordinate.rank][initial_king_coordinate.file];
+	Piece *king = current_player.get_color() == Color::black ? b_king : w_king;
 	Piece *rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
 
 	temporary_move({initial_king_coordinate, final_king_coordinate});

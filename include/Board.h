@@ -54,7 +54,7 @@ namespace Chess {
     public:
         Board(std::string fen, Player *p1, Player *p2);
         Chess::utilities::MoveResult move(Player &current_player, Player &other_player, Movement movement);
-        bool promote(Player &player, char piece_symbol);
+        void promote(Player &player, char piece_symbol);
 
         bool is_checkmate(Player &current, Player &other);
         bool is_draw(Player &current, Player &other); //stalemate, dead position and 50 moves rule
