@@ -1,0 +1,8 @@
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0
+E2 E4  
+B8 C6  
+F1 C4  
+G7 G5  
+D1 H5  
+C6 D4  
+H5 F7  
