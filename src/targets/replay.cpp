@@ -11,8 +11,8 @@
 #include "Controller.h"
 
 std::list<std::pair<Chess::Movement, char>> get_movements(std::istream &in);
-void method_v(std::ifstream &in_f, std::string &s, char c);
-void method_f(std::ifstream &in_f, std::ofstream &out_f, std::string &s, char c);
+void method_v(std::ifstream &in_f, std::string &fen, char out);
+void method_f(std::ifstream &in_f, std::ofstream &out_f, std::string &fen, char out);
 std::vector<std::string> split_it(std::string target, char delimiter);
 
 int main(int argc, char *argv[])
