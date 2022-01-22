@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <string>
 
 #include "Player.h"
 #include "Movement.h"
@@ -38,8 +39,8 @@ namespace Chess
 		};
 
 		Chess::Movement get_move(Player *current_player);
-		void export_game();
 		void init(const std::string &type);
+		void export_game();
 		void init_replay();
 		char promote(Player *player, char promote_to = ' ');
 

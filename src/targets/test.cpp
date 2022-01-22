@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 	// Register function to be executed on exit or `ctrl + c`
 	std::atexit(exiting);
 	std::signal(SIGINT, exit);
+	std::signal(SIGSEGV, exit);
 
 	std::pair<std::string, std::string> params = parse_args(argc, argv);
 
