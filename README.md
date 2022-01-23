@@ -28,6 +28,7 @@ Dopo la compilazione verranno generati due eseguibili nella cartella `build`.
 	```sh
 	./build/scacchiera cc "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
 	```
+	L'eseguibile genera un file di output `history.txt` contenente la cronologia delle mosse eseguite dai due giocatori durante la partita.
 - **`replay`**  
 	Accetta tre parametri:
 	- `[destinazione]` - La destinazione dell'output del replay. Deve essere un carattere tra i seguenti: v, f. Rispettivamente per video e file.
