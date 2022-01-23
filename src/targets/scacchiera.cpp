@@ -14,11 +14,7 @@
 #include "Player.h"
 
 using namespace Chess;
-
-/// Makes subsequent terminal text bright/bold
-const char *BRIGHT = "\033[1m";
-/// Resets terminal colors to their default values
-const char *RESET = "\033[0m";
+using namespace Chess::utilities;
 
 std::pair<std::string, std::string> parse_args(int argc, char *argv[]);
 void exiting() { std::cout << "\n\033[J"; };

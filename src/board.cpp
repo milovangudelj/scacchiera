@@ -11,23 +11,22 @@
 #include <stdexcept>
 #include <algorithm>
 
+using Chess::Bishop;
 using Chess::Board;
 using Chess::Coordinate;
 using Chess::Movement;
 using Chess::Piece;
-using Chess::Bishop;
 using Chess::Player;
+using Chess::utilities::BRIGHT;
 using Chess::utilities::Color;
 using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
+using Chess::utilities::GREEN_BG;
+using Chess::utilities::GREEN_FG;
+using Chess::utilities::INVERT;
 using Chess::utilities::MoveResult;
 using Chess::utilities::PieceType;
-
-static const std::string BRIGHT = "\033[1m"; // Enphasises the text
-static const std::string RESET = "\033[0m";	// Reset to terminal default colors
-static const std::string INVERT = "\033[7m"; // Invert terminal colors
-static const std::string GREEN_BG = "\033[42m"; // Yellow fg for selected piece
-static const std::string GREEN_FG = "\033[32m"; // Yellow fg for selected piece
+using Chess::utilities::RESET;
 
 std::map<char, Chess::utilities::PieceType> char_to_piece{
 	 {'k', Chess::utilities::PieceType::king},
@@ -67,7 +66,7 @@ void Board::from_fen(std::string fen)
 
 	// Validate fen string against regex pattern
 	if (!std::regex_match(fen, std::regex(pattern, std::regex::ECMAScript)))
-		throw std::invalid_argument("Invalid fen string. Make sure it matches this pattern: " + BRIGHT + pattern + RESET);
+		throw std::invalid_argument("Invalid fen string. Make sure it matches this pattern: " + std::string(BRIGHT) + pattern + RESET);
 
 	// Splitting fen into its fields
 	std::vector<std::string> fields(split(fen, ' '));
@@ -693,7 +692,7 @@ std::string Board::pretty_print()
 			}
 			else
 			{
-				ss << (piece->is_selected() ? BRIGHT + ((rank + file) % 2 == 0 ? GREEN_BG : GREEN_FG) : ""); // Cell color
+				ss << (piece->is_selected() ? BRIGHT + std::string(((rank + file) % 2 == 0 ? GREEN_BG : GREEN_FG)) : ""); // Cell color
 				ss << " " << piece->get_symbol() << " ";
 				ss << RESET;
 			}

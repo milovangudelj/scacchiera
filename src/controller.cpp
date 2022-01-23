@@ -24,15 +24,6 @@
 using namespace Chess;
 using namespace Chess::utilities;
 
-/// Makes subsequent terminal text bright/bold
-const char *BRIGHT = "\033[1m";
-/// Resets terminal colors to their default values
-const char *RESET = "\033[0m";
-/// Makes subsequent terminal text red
-static const char *RED_FG = "\033[31m";
-/// Makes subsequent terminal text blue
-static const char *BLUE_FG = "\033[34m";
-
 // Constructors
 
 Controller::Controller(std::string _mode, std::string _fen) : fen(_fen), white(nullptr), black(nullptr), board(nullptr)
