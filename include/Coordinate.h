@@ -23,7 +23,7 @@ namespace Chess {
     std::string operator+ (std::string s, Coordinate coordinate);
 
     bool operator== (const Coordinate& coordinate1, const Coordinate& coordinate2);
-    bool operator!=(const Coordinate &coordinate1, const Coordinate &coordinate2);
+    bool operator!=(const Coordinate& coordinate1, const Coordinate& coordinate2);
 
     std::ostream& operator<< (std::ostream& os, Coordinate& coordinate);
 }
