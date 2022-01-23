@@ -45,7 +45,7 @@ std::map<char, Chess::utilities::PieceType> char_to_piece {
 	{'p', Chess::utilities::PieceType::pawn}
 };
 
-Board::Board(std::string fen, Player *player1, Player *player2) : selected_piece{nullptr}, last_eaten{nullptr} {
+Board::Board(std::string fen, Player* player1, Player* player2) : selected_piece{nullptr}, last_eaten{nullptr} {
 	from_fen(fen, player1, player2);
 }
 
@@ -79,13 +79,11 @@ void Board::from_fen(std::string fen, Player* player1, Player* player2)
 	std::vector<std::string> ranks(split(fields[0], '/'));
 
 	Color active_color;
-	switch (fields[1][0])
-	{
-	case 'w':
-		active_color = Chess::utilities::Color::white;
-
-	case 'b':
-		active_color = Chess::utilities::Color::black;
+	switch (fields[1][0]) {
+		case 'w':
+			active_color = Chess::utilities::Color::white;
+		case 'b':
+			active_color = Chess::utilities::Color::black;
 	}
 
 	std::string c_rights = fields[2];
@@ -114,7 +112,7 @@ void Board::from_fen(std::string fen, Player* player1, Player* player2)
 			p_pos = {i, file};
 
 			// Add piece to its player
-			Piece *piece;
+			Piece* piece;
 			if (player1->get_color() == p_color) {
 				piece = player1->add_to_available_pieces({i, file}, p_color, p_type);
 			} else {
@@ -171,14 +169,14 @@ void Board::from_fen(std::string fen, Player* player1, Player* player2)
 	}
 }
 
-Piece *Board::get_piece_at(Coordinate coordinate) const {
+Piece* Board::get_piece_at(Coordinate coordinate) const {
 	return cells[coordinate.rank][coordinate.file];
 }
 
-bool Board::is_check(Player &current, Player &other) {
+bool Board::is_check(Player& current, Player& other) {
 	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king->get_coordinate() : w_king->get_coordinate();
 
-	for (Piece *piece : other.get_available_pieces()) {	
+	for (Piece* piece : other.get_available_pieces()) {	
 
 		if(!(piece == get_piece_at(piece->get_coordinate()))) { //just been eaten by a temporary move of currnet player
 			continue;
@@ -196,15 +194,15 @@ bool Board::is_check(Player &current, Player &other) {
 	return false;
 }
 
-bool Board::is_checkmate(Player &current, Player &other) {
+bool Board::is_checkmate(Player& current, Player& other) {
 	if (!is_check(current, other)) {
 		return false;
 	}
 
-	Piece *king = current.get_color() == Color::black ? b_king : w_king;
+	Piece* king = current.get_color() == Color::black ? b_king : w_king;
 	Coordinate king_coordinate = king->get_coordinate(); //copy of king's coordinates for restoring it later
 	Movement previous_movement = last_movement;
-	Piece *previous_eaten = last_eaten;
+	Piece* previous_eaten = last_eaten;
 
 	for (Movement movement : king->get_pseudo_valid_movements(*this)) { //checks first if king can move
 		temporary_move(movement);
@@ -222,7 +220,7 @@ bool Board::is_checkmate(Player &current, Player &other) {
 		return true;
 	}
 
-	for (Piece *piece : current.get_available_pieces()) {
+	for (Piece* piece : current.get_available_pieces()) {
 		if(piece->get_type() == PieceType::king) continue;
 		for (Movement movement : piece->get_pseudo_valid_movements(*this)) {
 			temporary_move(movement);
@@ -236,7 +234,7 @@ bool Board::is_checkmate(Player &current, Player &other) {
 	return true;
 }
 
-bool Board::is_draw(Player &current, Player &other) {
+bool Board::is_draw(Player& current, Player& other) {
 
 	//threefold repetition
 	auto p = std::find_if(position_history.begin(), position_history.end(),
@@ -253,22 +251,22 @@ bool Board::is_draw(Player &current, Player &other) {
 	}
 
 	//dead position
-	std::list<Piece *> current_pieces = current.get_available_pieces();
-	std::list<Piece *> other_pieces = other.get_available_pieces();
+	std::list<Piece*> current_pieces = current.get_available_pieces();
+	std::list<Piece*> other_pieces = other.get_available_pieces();
 
 	if ((current_pieces.size() == 1) && (other_pieces.size() == 1)) { //only kings left
 		return true;
 	}
 
 	if (current_pieces.size() == 2 && other_pieces.size() == 1) { //king + (bishop/knight) vs king
-		Piece *not_king = current_pieces.front()->get_type() == PieceType::king ? current_pieces.back() : current_pieces.front();
+		Piece* not_king = current_pieces.front()->get_type() == PieceType::king ? current_pieces.back() : current_pieces.front();
 		if (not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight) {
 			return true;
 		}
 	}
 
 	if (current_pieces.size() == 1 && other_pieces.size() == 2) { //king vs king + (bishop/knight)	
-		Piece *not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
+		Piece* not_king = other_pieces.front()->get_type() == PieceType::king ? other_pieces.back() : other_pieces.front();
 		if (not_king->get_type() == PieceType::bishop || not_king->get_type() == PieceType::knight) {
 			return true;
 		}
@@ -276,9 +274,9 @@ bool Board::is_draw(Player &current, Player &other) {
 
 	if (current_pieces.size() <= 3 && other_pieces.size() <= 3) { //king + 0-2 bishops vs king + 0-2 bishops all on cells of the same color		
 		bool all_bishop = true;
-		std::list<Piece *> bishops;
+		std::list<Piece*> bishops;
 		current_pieces.splice(current_pieces.end(), other_pieces); //move other_pieces elements at the end of current_pieces
-		for (Piece *piece : current_pieces) {
+		for (Piece* piece : current_pieces) {
 			if (piece->get_type() != PieceType::king) {
 				if (piece->get_type() == PieceType::bishop) {
 					bishops.push_back(piece);
@@ -290,8 +288,8 @@ bool Board::is_draw(Player &current, Player &other) {
 		}
 		if (all_bishop) {
 			bool all_same = true;
-			Color cell_color = static_cast<Bishop *>(bishops.front())->get_cell_color();
-			for (Piece *bishop : bishops) {
+			Color cell_color = static_cast<Bishop*>(bishops.front())->get_cell_color();
+			for (Piece* bishop : bishops) {
 				if (static_cast<Bishop *>(bishop)->get_cell_color() != cell_color) {
 					all_same = false;
 					break;
@@ -305,13 +303,13 @@ bool Board::is_draw(Player &current, Player &other) {
 
 	//stalemate
 	Movement previous_movement = last_movement;
-	Piece *previous_eaten = last_eaten;
+	Piece* previous_eaten = last_eaten;
 
 	Piece* king = current.get_color() == Color::black ? b_king : w_king;
 	Coordinate king_coordinate = king->get_coordinate();
 
 	if (!is_check(current, other)) {
-		for (Piece *piece : current.get_available_pieces()) {
+		for (Piece* piece : current.get_available_pieces()) {
 			if(!(piece == get_piece_at(piece->get_coordinate()))) { //the pieces exists on the board effectively
 				continue;
 			}
@@ -334,10 +332,10 @@ bool Board::is_draw(Player &current, Player &other) {
 	return false;
 }
 
-MoveResult Board::move(Player &current_player, Player &other_player, Movement movement) {
+MoveResult Board::move(Player& current_player, Player& other_player, Movement movement) {
 
 	//check if piece is owned by the player
-	Piece *start_piece = cells[movement.start.rank][movement.start.file];
+	Piece* start_piece = cells[movement.start.rank][movement.start.file];
 	if (start_piece == nullptr) {
 		return MoveResult::invalid;
 	}
@@ -381,11 +379,11 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 
 	//try to move
 	Movement previous_movement = last_movement;
-	Piece *previous_eaten = last_eaten;
+	Piece* previous_eaten = last_eaten;
 	temporary_move(movement);
 
 	Coordinate king_coordinate = current_player.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
-	Piece *king = current_player.get_color() == Color::black ? b_king : w_king;
+	Piece* king = current_player.get_color() == Color::black ? b_king : w_king;
 
 	if(start_piece->get_type() == PieceType::king) {
 		king->set_coordinate(movement.end);
@@ -420,10 +418,10 @@ MoveResult Board::move(Player &current_player, Player &other_player, Movement mo
 	}
 }
 
-void Board::promote(Player &player, char piece_symbol) {
+void Board::promote(Player& player, char piece_symbol) {
 	unsigned int promotion_rank = player.get_color() == Color::black ? 7 : 0;
-	Piece *pawn;
-	for(Piece *piece : cells.at(promotion_rank)) { //finds pawn who is promoting
+	Piece* pawn;
+	for(Piece* piece : cells.at(promotion_rank)) { //finds pawn who is promoting
 		if(piece != nullptr && piece->get_type() == PieceType::pawn) {
 			pawn = piece;
 			break;
@@ -448,7 +446,7 @@ void Board::temporary_move(Movement movement) {
 	cells[start_coordinate.rank][start_coordinate.file] = nullptr;
 }
 
-void Board::undo(Movement previous_movement, Piece *previous_eaten) {
+void Board::undo(Movement previous_movement, Piece* previous_eaten) {
 	Coordinate start = last_movement.start;
 	Coordinate end = last_movement.end;
 	cells[start.rank][start.file] = cells[end.rank][end.file];
@@ -457,7 +455,7 @@ void Board::undo(Movement previous_movement, Piece *previous_eaten) {
 	last_movement = previous_movement;
 }
 
-MoveResult Board::handle_castling(Player &current_player, Player &other_player, Movement movement) {
+MoveResult Board::handle_castling(Player& current_player, Player& other_player, Movement movement) {
 	Coordinate initial_king_coordinate = current_player.get_color() == Color::black ? b_king->get_coordinate() : w_king->get_coordinate();
 	Coordinate final_king_coordinate;
 	Coordinate initial_rook_coordinate;
@@ -481,7 +479,7 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 	}
 
 	//check that cells in between king and rook aren't under attack
-	for (Piece *piece : other_player.get_available_pieces()) {
+	for (Piece* piece : other_player.get_available_pieces()) {
 		for (Movement pseudo_movement : piece->get_pseudo_valid_movements(*this)) {
 			if (empty_cells.first == pseudo_movement.end || empty_cells.second == pseudo_movement.end) {
 				return MoveResult::invalid;
@@ -489,8 +487,8 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 		}
 	}
 
-	Piece *king = current_player.get_color() == Color::black ? b_king : w_king;
-	Piece *rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
+	Piece* king = current_player.get_color() == Color::black ? b_king : w_king;
+	Piece* rook = cells[initial_rook_coordinate.rank][initial_rook_coordinate.file];
 
 	temporary_move({initial_king_coordinate, final_king_coordinate});
 	temporary_move({initial_rook_coordinate, final_rook_coordinate});
@@ -502,7 +500,7 @@ MoveResult Board::handle_castling(Player &current_player, Player &other_player, 
 	return MoveResult::ok;
 }
 
-void Board::handle_en_passant(Player &current_player, Player &other_player, Movement movement) {
+void Board::handle_en_passant(Player& current_player, Player& other_player, Movement movement) {
 	Direction capture_direction;
 	if (movement.end == movement.start + DirectionOffset.at(Direction::left_up) ||
 		 movement.end == movement.start + DirectionOffset.at(Direction::left_down)) { //en passant to left
@@ -527,8 +525,8 @@ std::string Board::to_fen(Color current_color) {
 
 	//pieces positions
 	int empty_count = 0;
-	for (std::array<Piece *, 8> rank : cells) {
-		for (Piece *piece : rank) {
+	for (std::array<Piece*, 8> rank : cells) {
+		for (Piece* piece : rank) {
 			if(piece == nullptr) {
 				empty_count++;
 			} else {
@@ -577,7 +575,7 @@ std::string Board::to_fen(Color current_color) {
 	if(!w_kingside_c && !w_queenside_c && !b_kingside_c && !b_queenside_c) fen += "-";
 
 	//en passant position
-	Piece *last_moved = cells[last_movement.end.rank][last_movement.end.file];
+	Piece* last_moved = cells[last_movement.end.rank][last_movement.end.file];
 	if(last_moved != nullptr && last_moved->get_type() == PieceType::pawn) {
 		if(last_movement.end == last_movement.start + std::pair<int, int>(2, 0) || last_movement.end == last_movement.start + std::pair<int, int>(-2, 0)) {
 			char file = last_movement.end.file + 'a';
@@ -597,7 +595,7 @@ std::string Board::to_fen(Color current_color) {
 std::string Board::pretty_print() {
 	std::stringstream ss;
 
-	Piece *piece;
+	Piece* piece;
 	for (int rank = 0; rank < SIZE; rank++) {	
 		ss << 8 - rank << " "; //algebric notation is reversed from internal matrix representation
 		for (int file = 0; file < SIZE; file++) {
@@ -624,7 +622,7 @@ std::string Board::pretty_print() {
 
 namespace Chess {
 	std::ostream &operator<<(std::ostream &os, const Board &board) {
-		Piece *piece;
+		Piece* piece;
 		for (int rank = 0; rank < SIZE; rank++) {
 			os << 8 - rank << " "; //algebric notation is reversed from internal matrix representation
 			for (int file = 0; file < SIZE; file++) {

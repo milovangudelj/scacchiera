@@ -35,10 +35,10 @@ namespace Chess {
 
         protected:
 
-            Chess::Piece *selected_piece; //the selected piece will be displayed with a highlight color
+            Chess::Piece* selected_piece; //the selected piece will be displayed with a highlight color
 
         private:
-            Matrix<Piece *, SIZE> cells{};
+            Matrix<Piece*, SIZE> cells{};
 
             /**
              * @brief initialized cells with piece by parsing the fen input
@@ -48,10 +48,10 @@ namespace Chess {
              */
             void from_fen(std::string fen, Chess::Player* player1, Chess::Player* player2);
 
-            Piece *w_king; //Makes checking for checks easier and faster
-            Piece *b_king;
+            Piece* w_king; //Makes checking for checks easier and faster
+            Piece* b_king;
 
-            Piece *last_eaten; //Needed for undoing invalid moves
+            Piece* last_eaten; //Needed for undoing invalid moves
             Movement last_movement;
 
             /**
@@ -59,7 +59,7 @@ namespace Chess {
              * @param previous_movement The movement previous to last_movement, have to copy it before temporary_move()
              * @param previous_eaten The piece eaten previous to last_eaten, have to copy it before temporary_move()
              */
-            void undo(Movement previous_movement, Piece *previous_eaten);
+            void undo(Movement previous_movement, Piece* previous_eaten);
 
             
             /**
@@ -76,7 +76,7 @@ namespace Chess {
              * @return true 
              * @return false 
              */
-            bool is_check(Player &current, Player &other);
+            bool is_check(Player& current, Player& other);
 
             /**
              * @brief Helper function for move() to delegate castling case to
@@ -86,14 +86,14 @@ namespace Chess {
              * @return Chess::utilities::MoveResult invalid | ok
              */
 
-            Chess::utilities::MoveResult handle_castling(Player &current_player, Player &other_player, Movement movement);
+            Chess::utilities::MoveResult handle_castling(Player& current_player, Player& other_player, Movement movement);
             /**
              * @brief Helper function for move() to delegate en passant to
              * @param current_player The player who is doing en passant
              * @param other_player The opponent who had just moved a piece of two in front next to an enemy pawn
              * @param movement Movement with is_en_passant flag == true
              */
-            void handle_en_passant(Player &current_player, Player &other_player, Movement movement);
+            void handle_en_passant(Player& current_player, Player& other_player, Movement movement);
 
             std::map<std::string, int> position_history; //Map of number of occurence of positions during the game, for threefold repetition draw condition
 
@@ -112,7 +112,7 @@ namespace Chess {
              * @param player1 Player to which the pieces are assigned based on the color
              * @param player2 Player to which the pieces are assigned based on the color
              */
-            Board(std::string fen, Player *player1, Player *player2);
+            Board(std::string fen, Player* player1, Player* player2);
 
             /**
              * @brief Moves a piece according to parameter
@@ -121,14 +121,14 @@ namespace Chess {
              * @param movement Movement
              * @return Chess::utilities::MoveResult invalid | ok | check | promotion
              */
-            Chess::utilities::MoveResult move(Player &current_player, Player &other_player, Movement movement);
+            Chess::utilities::MoveResult move(Player& current_player, Player& other_player, Movement movement);
 
             /**
              * @brief To be used when last_movement has is_promotion flag == true
              * @param player Player whose pawn has reached opposite rank
              * @param piece_symbol Symbol in english standard of the piece you want the pawn to be promoted to
              */
-            void promote(Player &player, char piece_symbol);
+            void promote(Player& player, char piece_symbol);
 
             /**
              * @brief Checks if the situation is checkmate
@@ -137,7 +137,7 @@ namespace Chess {
              * @return true 
              * @return false 
              */
-            bool is_checkmate(Player &current, Player &other);
+            bool is_checkmate(Player& current, Player& other);
 
             /**
              * @brief Checks if the situation is draw
@@ -147,7 +147,7 @@ namespace Chess {
              * @return true 
              * @return false 
              */
-            bool is_draw(Player &current, Player &other); 
+            bool is_draw(Player& current, Player& other); 
 
             Movement get_last_movement() const { return last_movement; } //Used by Pawn for checking for en passant conditions
 
@@ -156,7 +156,7 @@ namespace Chess {
              * @param coordinate Must be valid
              * @return Piece* copy of the pointer in the position
              */
-            Piece *get_piece_at(Coordinate coordinate) const;
+            Piece* get_piece_at(Coordinate coordinate) const;
 
             /**
              * @brief Representation of current cells situation with ANSI formatting, for printing on a terminal 
@@ -170,7 +170,7 @@ namespace Chess {
              * @param board
              * @return std::ostream& 
              */
-            friend std::ostream &operator<<(std::ostream &os, const Board &board);
+            friend std::ostream& operator<<(std::ostream& os, const Board& board);
 
     }; //end class Board
 
