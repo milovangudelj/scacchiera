@@ -43,7 +43,8 @@ bool exists(std::unique_ptr<Chess::Piece> &_lost_piece, Chess::Piece *_piece)
 void Player::move_to_lost_pieces(Piece *_piece)
 {
 	std::list<std::unique_ptr<Chess::Piece>>::iterator piece_it;
-	piece_it = std::find_if(available_pieces.begin(), available_pieces.end(), exists);
+	piece_it = std::find_if(available_pieces.begin(), available_pieces.end(), [&_piece](auto &available_piece)
+									{ return available_piece.get() == _piece; });
 
 	lost_pieces.push_back(std::move(*piece_it));
 	lost_pieces_copy.push_back(lost_pieces.back().get());
@@ -55,7 +56,8 @@ void Player::move_to_lost_pieces(Piece *_piece)
 void Player::move_to_available_pieces(Piece *_piece)
 {
 	std::list<std::unique_ptr<Chess::Piece>>::iterator piece_it;
-	piece_it = std::find_if(lost_pieces.begin(), lost_pieces.end(), exists);
+	piece_it = std::find_if(lost_pieces.begin(), lost_pieces.end(), [&_piece](auto &lost_piece)
+									{ return lost_piece.get() == _piece; });
 
 	available_pieces.push_back(std::move(*piece_it));
 	available_pieces_copy.push_back(available_pieces.back().get());
