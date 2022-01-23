@@ -24,7 +24,7 @@ King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
-std::list<Movement> King::get_pseudo_valid_movements(Board& board) {
+std::list<Movement> King::get_pseudo_valid_movements(const Board& board) {
     std::list<Movement> pseudo_movements;
 
     Direction direction;

@@ -21,7 +21,7 @@ Bishop::Bishop(Coordinate _coordinate, Color _color, PieceType _type) : Piece{_c
 
 // Getters
 
-std::list<Movement> Bishop::get_pseudo_valid_movements(Board &_board)
+std::list<Movement> Bishop::get_pseudo_valid_movements(const Board &_board)
 {
 	std::list<Movement> pseudo_movements;
 

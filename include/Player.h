@@ -47,8 +47,8 @@ namespace Chess
 
 		// Simple inline getters
 
-		const std::list<Chess::Piece *> &get_available_pieces() { return available_pieces_copy; };
-		const std::list<Chess::Piece *> &get_lost_pieces() { return lost_pieces_copy; };
+		const std::list<Chess::Piece *> &get_available_pieces() const { return available_pieces_copy; };
+		const std::list<Chess::Piece *> &get_lost_pieces() const { return lost_pieces_copy; };
 
 		Chess::utilities::PlayerType get_type() const { return type; };
 		Chess::utilities::Color get_color() const { return color; };

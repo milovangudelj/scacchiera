@@ -21,7 +21,7 @@ Knight::Knight(Coordinate coordinate, Color color, PieceType type) : Piece(coord
     symbol = (color == Color::black) ? 'C' : 'c';
 }
 
-std::list<Movement> Knight::get_pseudo_valid_movements(Board& board) {
+std::list<Movement> Knight::get_pseudo_valid_movements(const Board& board) {
     std::list<Movement> pseudo_movements;
     
     std::array<Coordinate, 8> possible_movements;

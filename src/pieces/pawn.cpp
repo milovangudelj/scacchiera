@@ -18,7 +18,7 @@ Pawn::Pawn(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
 /// @brief to get the list of possible movements
 /// @param board reference to board
 /// @returns list<Movement>
-std::list<Movement> Pawn::get_pseudo_valid_movements(Board &board)
+std::list<Movement> Pawn::get_pseudo_valid_movements(const Board &board)
 {
     std::list<Movement> pseudo_movements;
     Coordinate test_coordinate;
@@ -109,7 +109,7 @@ std::list<Movement> Pawn::get_pseudo_valid_movements(Board &board)
 /// @param test_coordinate pawn's start position
 /// @param color pawn's color
 /// @returns Coordinate
-Chess::Coordinate Pawn::one_step(Board &board, Coordinate test_coordinate, Color color)
+Chess::Coordinate Pawn::one_step(const Board &board, Coordinate test_coordinate, Color color)
 {
     Piece *test_piece;
     Direction direction = (color == Color::white ? Direction::up : Direction::down);
@@ -134,7 +134,7 @@ Chess::Coordinate Pawn::one_step(Board &board, Coordinate test_coordinate, Color
 /// @param board reference to board
 /// @param color pawn's color
 /// @returns Coordinate
-Chess::Coordinate Pawn::double_step(Board &board, Color color)
+Chess::Coordinate Pawn::double_step(const Board &board, Color color)
 {
     Coordinate test_coordinate = this->coordinate;
     Piece *test_piece;
@@ -154,7 +154,7 @@ Chess::Coordinate Pawn::double_step(Board &board, Color color)
 /// @param board reference to board
 /// @param color pawn's color
 /// @returns pair<Coordinate,Coordinate>
-std::pair<Chess::Coordinate, Chess::Coordinate> Pawn::diag_cap(Board &board, Color color)
+std::pair<Chess::Coordinate, Chess::Coordinate> Pawn::diag_cap(const Board &board, Color color)
 {
     Coordinate test_coordinate;
     Piece *test_piece;
@@ -194,7 +194,7 @@ std::pair<Chess::Coordinate, Chess::Coordinate> Pawn::diag_cap(Board &board, Col
 /// @param board reference to board
 /// @param color pawn's color
 /// @returns Coordinate
-Chess::Coordinate Pawn::en_passant(Board &board, Color color)
+Chess::Coordinate Pawn::en_passant(const Board &board, Color color)
 {
     Coordinate end_p, start_p;
     Piece *test_piece;

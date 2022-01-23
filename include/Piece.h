@@ -37,7 +37,7 @@ namespace Chess {
              * @param board Need for invoking its get_cell_at() method
              * @return std::list<Movement> 
              */
-            virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
+            virtual std::list<Movement> get_pseudo_valid_movements(const Board& board) = 0;
             
             Coordinate get_coordinate() const { return coordinate;};
             Chess::utilities::Color get_color() const { return color;};
