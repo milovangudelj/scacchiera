@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file Movement.h
+ * @author Yihui Zhu
+ * @brief Header file of Movement struct
+ */
 
 #ifndef movement_h
 #define movement_h
