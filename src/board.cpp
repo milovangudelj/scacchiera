@@ -172,7 +172,7 @@ Piece* Board::get_piece_at(Coordinate coordinate) const {
 	return cells[coordinate.rank][coordinate.file];
 }
 
-bool Board::is_check(Player& current, Player& other) {
+bool Board::is_check(const Player& current, const Player& other) {
 	Coordinate king_coordinate = (current.get_color() == Color::black) ? b_king->get_coordinate() : w_king->get_coordinate();
 
 	for (Piece* piece : other.get_available_pieces()) {	

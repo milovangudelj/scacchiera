@@ -76,7 +76,7 @@ namespace Chess {
              * @return true 
              * @return false 
              */
-            bool is_check(Player& current, Player& other);
+            bool is_check(const Player& current, const Player& other);
 
             /**
              * @brief Helper function for move() to delegate castling case to

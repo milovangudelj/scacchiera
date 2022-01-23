@@ -45,7 +45,7 @@ namespace Chess
 		 * @param _board Reference to the board object from where the piece needs to find the moves.
 		 * @return std::list< Chess::Movement >
 		 */
-		std::list<Chess::Movement> get_pseudo_valid_movements(Chess::Board &_board);
+		std::list<Chess::Movement> get_pseudo_valid_movements(const Chess::Board &_board);
 
 		Chess::utilities::Color get_cell_color() const { return cell_color; }
 

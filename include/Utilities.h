@@ -16,14 +16,12 @@
  */
 namespace Chess::utilities {
 
-    enum class Color
-    {
+    enum class Color {
         black,
         white
     };
 
-    enum class Result
-    {
+    enum class Result {
         valid,
         invalid,
         check,
@@ -31,14 +29,12 @@ namespace Chess::utilities {
         draw
     };
 
-    enum class PlayerType
-    {
+    enum class PlayerType {
         human,
         computer
     };
 
-    enum class PieceType
-    {
+    enum class PieceType {
         king,
         queen,
         bishop,
@@ -47,8 +43,7 @@ namespace Chess::utilities {
         pawn
     };
 
-    enum class Direction
-    {
+    enum class Direction {
         left,
         up,
         right,
@@ -59,8 +54,7 @@ namespace Chess::utilities {
         left_down
     };
 
-    enum class MoveResult
-    {
+    enum class MoveResult {
         ok,
         invalid,
         promotion,
@@ -72,19 +66,19 @@ namespace Chess::utilities {
      */
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
-    /// Resets terminal colors to their default values
+    // Resets terminal colors to their default values
     static const char *RESET = "\033[0m";
-    /// Makes subsequent terminal text bright/bold
+    // Makes subsequent terminal text bright/bold
     static const char *BRIGHT = "\033[1m";
-    /// Inverts terminal colors
+    // Inverts terminal colors
     static const char *INVERT = "\033[7m";
-    /// Makes subsequent terminal text red
+    // Makes subsequent terminal text red
     static const char *RED_FG = "\033[31m";
-    /// Makes subsequent terminal text green
+    // Makes subsequent terminal text green
     static const char *GREEN_FG = "\033[32m";
-    /// Makes subsequent terminal text blue
+    // Makes subsequent terminal text blue
     static const char *BLUE_FG = "\033[34m";
-    /// Makes subsequent terminal background green
+    // Makes subsequent terminal background green
     static const char *GREEN_BG = "\033[42m";
 
     std::ostream& operator<< (std::ostream& os, const Color& color);

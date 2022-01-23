@@ -22,7 +22,7 @@ Rook::Rook(Coordinate coordinate, Color color, PieceType type) : Piece{coordinat
 /// @brief to get the list of possible movements
 /// @param board reference to board
 /// @returns list<Movement>
-std::list<Movement> Rook::get_pseudo_valid_movements(Board &board)
+std::list<Movement> Rook::get_pseudo_valid_movements(const Board &board)
 {
 	Coordinate test_coordinate;
 	std::list<Movement> pseudo_movements;
