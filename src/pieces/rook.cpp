@@ -1,4 +1,8 @@
-// Tommaso Jin
+/**
+ * @file rook.cpp
+ * @author Tommaso Jin
+ * @brief  Definition file of Rook.h of Rook class
+ */
 
 #include "pieces/Rook.h"
 #include "Board.h"

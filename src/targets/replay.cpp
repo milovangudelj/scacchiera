@@ -1,4 +1,8 @@
-// Tommaso Jin
+/**
+ * @file replay.cpp
+ * @author Tommaso Jin
+ * @brief  Reading from log and replaying the game
+ */
 
 #include <iostream>
 #include <cstring>
