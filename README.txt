@@ -35,10 +35,9 @@ Dopo la compilazione verranno generati due eseguibili nella cartella
 - `scacchiera`
 	Accetta due parametri:
 
-	- `[modalità/help]` - La modalità di gioco o la stampa del
-						  		 messaggio di aiuto. Il parametro può essere uno dei seguenti:
-						  		 pc, cc, pp, help. Dove p sta per player, e c per
-						  		 computer.
+	- `[modalità/help]` - La modalità di gioco o la stampa del messaggio di aiuto. 
+								 Il parametro può essere uno dei seguenti: pc, cc, pp, help. 
+								 Dove p sta per player, e c per computer.
 
 	- `(fen)` - (facoltativo) - Una stringa rappresentante la
 										 configurazione di partenza della scacchiera. Viene utilizzata la
@@ -53,18 +52,29 @@ Dopo la compilazione verranno generati due eseguibili nella cartella
 	Accetta tre parametri:
 
 	- `[destinazione]` - La destinazione dell'output del replay. Deve
-						   	essere un carattere tra i seguenti: v, f. Rispettivamente per
-						   	video e file.
+						   	essere un carattere tra i seguenti: v, f. 
+						   	Rispettivamente per video e file.
 
 	- `[log_file]` - Un file `.txt` di log di una partita di cui si
 					     vuole vedere il replay. Il file deve essere generato da
 					     `scacchiera`.
 
-	- `(output_file)` - (facoltativo) - Nome del file `.txt` di
-										  			output. Da specificare solo nel caso in cui si voglia stampare
-										  			il replay su file anziché a terminale.
+	- `(output_file)` - (facoltativo) - Nome del file `.txt` di output. 
+													Da specificare solo nel caso in cui si voglia stampare
+													il replay su file anziché a terminale.
 
 	Esempio: `sh   ./build/replay f history.txt output.txt`
+
+Mosse speciali
+----
+
+Durante il gioco per fare l'arrocco sarà necessario inserire come comando le coordinate 
+del re e quelle della torre con cui si desidera eseguire la mossa.
+
+Esempio: `E1 A1`
+
+In questo caso `E1` rappresenta le coordinate sulla scacchiera del re bianco, 
+e `A1` quelle della torre dal lato della regina.
 
 Note
 ----
