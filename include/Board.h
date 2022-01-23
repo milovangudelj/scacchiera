@@ -70,15 +70,6 @@ namespace Chess {
             void temporary_move(Movement movement);
 
             /**
-             * @brief Returns true if player's king is in check
-             * @param current The player you want to check checking condition of
-             * @param other The adversary, which pieces might check the opponent's king
-             * @return true 
-             * @return false 
-             */
-            bool is_check(const Player& current, const Player& other);
-
-            /**
              * @brief Helper function for move() to delegate castling case to
              * @param current_player The player which is castling
              * @param other_player The opponent which pieces might attack cells in between enemy king and rook
@@ -129,6 +120,15 @@ namespace Chess {
              * @param piece_symbol Symbol in english standard of the piece you want the pawn to be promoted to
              */
             void promote(Player& player, char piece_symbol);
+
+            /**
+             * @brief Returns true if player's king is in check
+             * @param current The player you want to check checking condition of
+             * @param other The adversary, which pieces might check the opponent's king
+             * @return true 
+             * @return false 
+             */
+            bool is_check(const Player& current, const Player& other);
 
             /**
              * @brief Checks if the situation is checkmate
