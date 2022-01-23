@@ -70,7 +70,7 @@ void Board::from_fen(std::string fen, Player* player1, Player* player2)
 	// Validate fen string against regex pattern
 	if (!std::regex_match(fen, std::regex(pattern, std::regex::ECMAScript)))
 	{
-		std::cout << "Invalid fen string. Make sure it matches this pattern: " << BRIGHT << pattern << RESET << '\n\n';
+		std::cout << "Invalid FEN string. Make sure it matches this regex pattern:\n\n" << BRIGHT << pattern << RESET << "\n\n";
 		exit(0);
 	}
 
