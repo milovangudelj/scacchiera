@@ -7,7 +7,7 @@ Progetto finale del corso di "Laboratorio di Programmazione"  - 2021/2022
 [Milovan Gudelj](https://github.com/milovangudelj)  
 
 ## Requisiti e compilazione
-Per compilare il coodice è necessario aver installato [CMake](https://cmake.org/) sul proprio computer.
+Per compilare il codice è necessario aver installato [CMake](https://cmake.org/) sul proprio computer.
 
 Successivamente basterà eseguire i seguenti comandi per compilare e generare i due eseguibili `scacchiera` e `replay` in una cartella `build`.
 

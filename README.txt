@@ -14,7 +14,7 @@ Milovan Gudelj
 Requisiti e compilazione
 ------------------------
 
-Per compilare il coodice è necessario aver installato
+Per compilare il codice è necessario aver installato
 CMake sul proprio computer.
 
 Successivamente basterà eseguire i seguenti comandi per compilare e
