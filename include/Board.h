@@ -38,7 +38,7 @@ namespace Chess {
             Chess::Piece* selected_piece; //the selected piece will be displayed with a highlight color
 
         private:
-            Matrix<Piece*, SIZE> cells{};
+            Matrix<Piece*, SIZE> cells;
 
             /**
              * @brief initialized cells with piece by parsing the fen input

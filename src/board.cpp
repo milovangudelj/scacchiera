@@ -45,7 +45,7 @@ std::map<char, Chess::utilities::PieceType> char_to_piece {
 	{'p', Chess::utilities::PieceType::pawn}
 };
 
-Board::Board(std::string fen, Player* player1, Player* player2) : selected_piece{nullptr}, last_eaten{nullptr} {
+Board::Board(std::string fen, Player* player1, Player* player2) : selected_piece{nullptr}, last_eaten{nullptr}, cells{} {
 	from_fen(fen, player1, player2);
 }
 
