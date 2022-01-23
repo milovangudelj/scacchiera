@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file piece.cpp
+ * @author Yihui Zhu
+ * @brief Definition file of Piece.h of Piece class
+ */
 
 #include "Piece.h"
 

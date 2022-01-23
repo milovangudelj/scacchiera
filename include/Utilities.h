@@ -1,6 +1,7 @@
-// Yihui Zhu
-
-/*Data structures shared by multiple classes
+/**
+ * @file Utilities.h
+ * @author Yihui Zhu
+ * @brief Header of enums and helper structures shared by multiple classes
 */
 
 #ifndef utilities_h
@@ -10,8 +11,10 @@
 #include <utility>
 #include <ostream>
 
-namespace Chess::utilities
-{
+/**
+ * @brief Enums and data structures shared by multple classes
+ */
+namespace Chess::utilities {
 
     enum class Color
     {
@@ -64,6 +67,9 @@ namespace Chess::utilities
         check
     };
 
+    /**
+     * @brief example: Coordinate b = a + DirectionOffset.at(Direction::left);
+     */
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
     /// Resets terminal colors to their default values
@@ -81,9 +87,9 @@ namespace Chess::utilities
     /// Makes subsequent terminal background green
     static const char *GREEN_BG = "\033[42m";
 
-    std::ostream &operator<<(std::ostream &os, const Color &color);
-    std::string operator+(std::string s, const Color &color);
-    std::ostream &operator<<(std::ostream &os, const PlayerType &player);
+    std::ostream& operator<< (std::ostream& os, const Color& color);
+    std::ostream& operator<< (std::ostream& os, const PlayerType& player);
+    std::string operator+ (std::string s, const Color &color);
 }
 
 #endif

@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file king.cpp
+ * @author Yihui Zhu
+ * @brief Definition file of King.h of King class
+ */
 
 #include "Board.h"
 #include "pieces/King.h"
@@ -9,20 +13,18 @@ using Chess::Movement;
 using Chess::Coordinate;
 using Chess::utilities::Color;
 using Chess::utilities::Direction;
-using Chess::utilities::DirectionOffset;
 using Chess::utilities::PieceType;
+using Chess::utilities::DirectionOffset;
 
 Coordinate get_testing_coordinate(Coordinate starting_coordinate, Chess::utilities::Direction direction) {
     return starting_coordinate + Chess::utilities::DirectionOffset.at(direction);
 }
 
-King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
-{
+King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type} {
     symbol = (color == Color::black) ? 'R' : 'r';
 }
 
-std::list<Movement> King::get_pseudo_valid_movements(Board &board)
-{
+std::list<Movement> King::get_pseudo_valid_movements(Board& board) {
     std::list<Movement> pseudo_movements;
 
     Direction direction;

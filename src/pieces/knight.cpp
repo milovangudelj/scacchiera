@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file knight.cpp
+ * @author Yihui Zhu
+ * @brief Definition file of Knight.h of Knight class
+ */
 
 #include "pieces/Knight.h"
 #include "Board.h"
@@ -19,8 +23,9 @@ Knight::Knight(Coordinate coordinate, Color color, PieceType type) : Piece(coord
 
 std::list<Movement> Knight::get_pseudo_valid_movements(Board& board) {
     std::list<Movement> pseudo_movements;
-
+    
     std::array<Coordinate, 8> possible_movements;
+
     possible_movements[0] = this->coordinate + 
                             DirectionOffset.at(Direction::up) + 
                             DirectionOffset.at(Direction::left) + 
