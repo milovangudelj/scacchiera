@@ -391,7 +391,6 @@ void Controller::play()
 		result = board->move(*current_player, *other_player, mvmt);
 
 		invalid_move = result == MoveResult::invalid;
-		check = result == MoveResult::check;
 		checkmate = board->is_checkmate(*other_player, *current_player);
 		draw = board->is_draw(*other_player, *current_player);
 
@@ -407,9 +406,12 @@ void Controller::play()
 			break;
 		case MoveResult::ok:
 			clear_errors();
+			check = board->is_check(*other_player, *current_player);
+			
 			// Swap players
 			current_player = current_player == white ? black : white;
 			other_player = other_player == white ? black : white;
+
 			// Add movement to history
 			history.push_back(std::make_pair(mvmt, ' '));
 
@@ -428,6 +430,7 @@ void Controller::play()
 			set_tip("You can promote the pawn in " + mvmt.end + ".\033[0K\n     These are the available pieces: " + can_promote_to(current_player) + "\033[0K\033[A\r");
 			char promote_to = promote(current_player);
 
+			check = board->is_check(*other_player, *current_player);
 			checkmate = board->is_checkmate(*other_player, *current_player);
 			draw = board->is_draw(*other_player, *current_player);
 
@@ -503,6 +506,7 @@ std::list<std::string> Controller::replay(char _out)
 			promote(current_player, (*log_it).second);
 		}
 
+		if (result == MoveResult::check) result = MoveResult::invalid;
 		if (result == MoveResult::invalid)
 		{
 			std::cout << "There's an invalid movement at line " << BRIGHT << (i + 1) << RESET << " in the history input file. Please fix the mistake and try again.\n\n";
@@ -510,14 +514,14 @@ std::list<std::string> Controller::replay(char _out)
 		}
 
 		// Flags
-		check = result == MoveResult::check;
+		check = board->is_check(*other_player, *current_player);
 		checkmate = board->is_checkmate(*other_player, *current_player); //checks if enemy is losing
 		draw = board->is_draw(*other_player, *current_player);
 
 		// Print the board to the string stream and add it to the list of strings to print
 		if (to_terminal)
 		{
-			ss << display(current_player, checkmate, draw, false, false);
+			ss << display(current_player, checkmate, draw, check, false);
 			ss << (i == log_list.size() - 1 ? ("Match result: " + (checkmate ? (BRIGHT + std::string("checkmate") + RESET + "! " + capitalise(current_player->get_color()) + " wins.\n") : (BRIGHT + std::string("draw") + RESET + ".\n"))) : "");
 		}
 		else
@@ -544,12 +548,14 @@ std::string Controller::display(Player *_current_player, bool _is_checkmate, boo
 	std::stringstream ss;
 	std::string out;
 
+	const char *check = _is_check ? "true" : "false";
 	const char *checkmate = _is_checkmate ? "true" : "false";
 	const char *draw = _is_draw ? "true" : "false";
 	const char *name = _current_player->get_name().c_str();
 	const char *color = _current_player->get_color() == Color::white ? "█" : "░";
 
 	ss << BRIGHT << "Now playing:" << RESET << " " << name << " " << color << "	";
+	ss << BRIGHT << "Check:" << RESET << " " << check << " 	";
 	ss << BRIGHT << "Checkmate:" << RESET << " " << checkmate << " 	";
 	ss << BRIGHT << "Draw:" << RESET << " " << draw << "\n\n";
 
