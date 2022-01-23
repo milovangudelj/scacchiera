@@ -1,6 +1,7 @@
-// Yihui Zhu
-
-/*Data structures shared by multiple classes
+/**
+ * @file Utilities.h
+ * @author Yihui Zhu
+ * @brief Header of enums and helper structures shared by multiple classes
 */
 
 #ifndef utilities_h
@@ -10,6 +11,9 @@
 #include <utility>
 #include <ostream>
 
+/**
+ * @brief Enums and data structures shared by multple classes
+ */
 namespace Chess::utilities {
 
     enum class Color {black, white};
@@ -24,11 +28,14 @@ namespace Chess::utilities {
 
     enum class MoveResult {ok, invalid, promotion, check};
 
+    /**
+     * @brief example: Coordinate b = a + DirectionOffset.at(Direction::left);
+     */
     extern std::map<Direction, std::pair<int, int>> DirectionOffset;
 
-    std::ostream &operator<<(std::ostream &os, const Color &color);
-    std::string operator+(std::string s, const Color &color);
-    std::ostream &operator<<(std::ostream &os, const PlayerType &player);
+    std::ostream& operator<< (std::ostream& os, const Color& color);
+    std::ostream& operator<< (std::ostream& os, const PlayerType& player);
+    std::string operator+ (std::string s, const Color &color);
 }
 
 #endif

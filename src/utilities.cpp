@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file utilities.cpp
+ * @author Yihui Zhu
+ * @brief Definition file of Utilities.h
+ */
 
 #include <ostream>
 
@@ -19,23 +23,21 @@ std::map<Direction, std::pair<int, int>> Chess::utilities::DirectionOffset {
     {Direction::left_down,  {1, -1}}
 };
 
-namespace Chess::utilities
+namespace Chess::utilities 
 {
-    std::ostream &operator<<(std::ostream &os, const Color &color)
-    {
+    std::ostream& operator<< (std::ostream& os, const Color& color) {
         os << ((color == Color::white) ? "white" : "black");
         return os;
     };
 
-    std::string operator+(std::string s, const Color &color)
-    {
+    std::ostream& operator<< (std::ostream& os, const PlayerType& type) {
+        os << ((type == PlayerType::human) ? "human" : "computer");
+        return os;
+    };
+
+    std::string operator+ (std::string s, const Color& color) {
         std::string out = s + ((color == Color::white) ? "white" : "black");
         return out;
     };
 
-    std::ostream &operator<<(std::ostream &os, const PlayerType &type)
-    {
-        os << ((type == PlayerType::human) ? "human" : "computer");
-        return os;
-    };
 }
