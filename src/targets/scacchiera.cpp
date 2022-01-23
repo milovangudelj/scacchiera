@@ -74,10 +74,10 @@ std::pair<std::string, std::string> parse_args(int argc, char *argv[])
 		params = std::pair<std::string, std::string>(def_mode, def_fen);
 		break;
 	case 2:
-		if(strcmp(argv[1], "pc") != 0 && strcmp(argv[1], "pp") != 0 && strcmp(argv[1], "cc") != 0) {
+		if(strcmp(argv[1], "help") == 0) {
 			print_help();
 		}
-		if(strcmp(argv[1], "help") != 0) {
+		if(strcmp(argv[1], "pc") != 0 && strcmp(argv[1], "pp") != 0 && strcmp(argv[1], "cc") != 0) {
 			print_help();
 		}
 		params = std::pair<std::string, std::string>(argv[1], def_fen);
