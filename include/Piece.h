@@ -1,4 +1,8 @@
-// Yihui Zhu
+/**
+ * @file Piece.h
+ * @author Yihui Zhu
+ * @brief Header file of Piece class
+ */
 
 #ifndef piece_h
 #define piece_h
@@ -8,14 +12,15 @@
 #include "Movement.h"
 
 #include <list>
-#include <memory> //get_pseudo_valid_movements of derived classes use shared_ptr<Piece>
 
 namespace Chess {
 
     class Board; //predeclaration to avoid circular dependency
 
     class Piece {
+
         protected:
+
             Coordinate coordinate;
             Chess::utilities::Color color;
             Chess::utilities::PieceType type;
@@ -24,12 +29,14 @@ namespace Chess {
             bool selected;
 
         public:
-            Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type) : coordinate{coordinate},
-                                                                                                            color{color},
-                                                                                                            type{type},
-                                                                                                            had_moved{false},
-                                                                                                            selected{false} {}
+            Piece(Coordinate coordinate, Chess::utilities::Color color, Chess::utilities::PieceType type) : 
+                coordinate{coordinate}, color{color}, type{type}, had_moved{false}, selected{false} {}
 
+            /**
+             * @brief Returns all possible moves of the piece without caring if it can cause a check
+             * @param board Need for invoking its get_cell_at() method
+             * @return std::list<Movement> 
+             */
             virtual std::list<Movement> get_pseudo_valid_movements(Board& board) = 0;
             
             Coordinate get_coordinate() const { return coordinate;};
@@ -40,9 +47,7 @@ namespace Chess {
             bool is_selected() const { return selected; };
             void set_selected(bool val = true) { selected = val; };
             void set_had_moved(bool val = true) { had_moved = true; };
-            void set_coordinate(Coordinate coordinate) {
-                this->coordinate = coordinate;
-            }
+            void set_coordinate(Coordinate coordinate) { this->coordinate = coordinate; }
     };
 
     bool operator == (Piece& piece1, Piece& piece2);
