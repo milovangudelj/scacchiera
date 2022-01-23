@@ -1,4 +1,8 @@
-// Tommaso Jin
+/**
+ * @file pawn.cpp
+ * @author Tommaso Jin
+ * @brief  Definition file of Pawn.h of Pawn class
+ */
 
 #include "pieces/Pawn.h"
 #include "Board.h"
