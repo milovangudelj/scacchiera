@@ -30,6 +30,8 @@ using Chess::utilities::GREEN_FG;
 using Chess::utilities::INVERT;
 using Chess::utilities::MoveResult;
 using Chess::utilities::PieceType;
+using Chess::utilities::RED_BG;
+using Chess::utilities::RED_FG;
 using Chess::utilities::RESET;
 
 /**
@@ -606,7 +608,7 @@ std::string Board::pretty_print() {
 			if (piece == nullptr) {
 				ss << "    ";
 			} else {
-				ss << (piece->is_selected() ? BRIGHT + std::string(((rank + file) % 2 == 0 ? GREEN_BG : GREEN_FG)) : ""); // Cell color
+				ss << (piece->is_selected() ? BRIGHT + std::string(((rank + file) % 2 == 0 ? RED_BG : RED_FG)) : ""); // Cell color
 				ss << " " << piece->get_symbol() << "  ";
 				ss << RESET;
 			}
