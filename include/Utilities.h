@@ -78,6 +78,8 @@ namespace Chess::utilities {
     static const char *GREEN_FG = "\033[32m";
     // Makes subsequent terminal text blue
     static const char *BLUE_FG = "\033[34m";
+    // Makes subsequent terminal background red
+    static const char *RED_BG = "\033[41m";
     // Makes subsequent terminal background green
     static const char *GREEN_BG = "\033[42m";
 
