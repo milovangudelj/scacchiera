@@ -16,7 +16,7 @@ using Chess::utilities::PieceType;
 
 Pawn::Pawn(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
-    symbol = (color == Color::black) ? 'P' : 'p';
+    symbol = (color == Color::black) ? "\u265F" : "\u2659";
 }
 
 /// @brief to get the list of possible movements

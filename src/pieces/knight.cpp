@@ -18,7 +18,7 @@ using Chess::utilities::Direction;
 using Chess::utilities::DirectionOffset;
 
 Knight::Knight(Coordinate coordinate, Color color, PieceType type) : Piece(coordinate, color, type) {
-    symbol = (color == Color::black) ? 'C' : 'c';
+    symbol = (color == Color::black) ? "\u265E" : "\u2658";
 }
 
 std::list<Movement> Knight::get_pseudo_valid_movements(const Board& board) {

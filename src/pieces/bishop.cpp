@@ -15,7 +15,7 @@ using namespace Chess::utilities;
 
 Bishop::Bishop(Coordinate _coordinate, Color _color, PieceType _type) : Piece{_coordinate, _color, _type}
 {
-	symbol = (_color == Color::black) ? 'A' : 'a';
+	symbol = (_color == Color::black) ? "\u265D" : "\u2657";
 	update_cell_color();
 }
 

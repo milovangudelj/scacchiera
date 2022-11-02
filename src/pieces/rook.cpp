@@ -16,7 +16,7 @@ using Chess::utilities::PieceType;
 
 Rook::Rook(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type}
 {
-	symbol = (color == Color::black) ? 'T' : 't';
+	symbol = (color == Color::black) ? "\u265C" : "\u2656";
 }
 
 /// @brief to get the list of possible movements

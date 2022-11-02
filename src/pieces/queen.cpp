@@ -15,7 +15,7 @@ using namespace Chess::utilities;
 
 Queen::Queen(Coordinate _coordinate, Color _color, PieceType _type) : Piece{_coordinate, _color, _type}
 {
-	symbol = (color == Color::black) ? 'D' : 'd';
+	symbol = (color == Color::black) ? "\u265B" : "\u2655";
 }
 
 // Getters

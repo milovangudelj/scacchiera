@@ -604,10 +604,10 @@ std::string Board::pretty_print() {
 			piece = cells[rank][file];
 			ss << ((rank + file) % 2 == 0 ? INVERT : RESET); // Cell color
 			if (piece == nullptr) {
-				ss << "   ";
+				ss << "    ";
 			} else {
 				ss << (piece->is_selected() ? BRIGHT + std::string(((rank + file) % 2 == 0 ? GREEN_BG : GREEN_FG)) : ""); // Cell color
-				ss << " " << piece->get_symbol() << " ";
+				ss << " " << piece->get_symbol() << "  ";
 				ss << RESET;
 			}
 		}
@@ -617,7 +617,7 @@ std::string Board::pretty_print() {
 	ss << "\n"
 		<< "  ";
 	for (int i = 0; i < SIZE; i++) {
-		ss << " " << static_cast<char>('A' + i) << " ";
+		ss << " " << static_cast<char>('A' + i) << "  ";
 	}
 	return ss.str();
 }

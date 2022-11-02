@@ -11,6 +11,7 @@
 #include "Coordinate.h"
 #include "Movement.h"
 
+#include <string>
 #include <list>
 
 namespace Chess {
@@ -24,7 +25,7 @@ namespace Chess {
             Coordinate coordinate;
             Chess::utilities::Color color;
             Chess::utilities::PieceType type;
-            char symbol;
+            std::string symbol;
             bool had_moved;
             bool selected;
 
@@ -42,7 +43,7 @@ namespace Chess {
             Coordinate get_coordinate() const { return coordinate;};
             Chess::utilities::Color get_color() const { return color;};
             Chess::utilities::PieceType get_type() const { return type;};
-            char get_symbol() const { return symbol;};
+            std::string get_symbol() const { return symbol; };
             bool get_had_moved() const { return had_moved;};
             bool is_selected() const { return selected; };
             void set_selected(bool val = true) { selected = val; };

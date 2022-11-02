@@ -21,7 +21,7 @@ Coordinate get_testing_coordinate(Coordinate starting_coordinate, Chess::utiliti
 }
 
 King::King(Coordinate coordinate, Color color, PieceType type) : Piece{coordinate, color, type} {
-    symbol = (color == Color::black) ? 'R' : 'r';
+    symbol = (color == Color::black) ? "\u265A" : "\u2654";
 }
 
 std::list<Movement> King::get_pseudo_valid_movements(const Board& board) {
